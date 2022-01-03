@@ -53,7 +53,7 @@ pipeline {
             }
             steps {
                 withGradle {
-                    sh './gradlew ${GRADLE_ARGS} curseforge publish -PcurseApiKey=${CURSE_API_KEY} -PmavenUser=${MAVEN_USER} -PmavenPassword${MAVEN_PASSWORD}'
+                    sh './gradlew ${GRADLE_ARGS} publish curseforge -PcurseApiKey=${CURSE_API_KEY} -PmavenUser=${MAVEN_USER} -PmavenPassword${MAVEN_PASSWORD}'
                 }
             }
         }
