@@ -14,7 +14,6 @@ plugins {
     id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
@@ -187,8 +186,8 @@ publishing {
                 basic(BasicAuthentication)
             }
             credentials {
-                username = project.getProperty('mavenUser') ?:'fake'
-                password = project.getProperty('mavenPassword') ?:'news'
+                username = project.hasProperty('mavenUser') ? project.getProperty('mavenUser') : 'fake'
+                password = project.hasProperty('mavenPassword') ? project.getProperty('mavenPassword') :'news'
             }
         }
     }
