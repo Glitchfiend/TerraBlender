@@ -14,6 +14,8 @@ plugins {
     id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 apply plugin: 'org.spongepowered.mixin'
@@ -141,4 +143,53 @@ artifacts {
     }
     archives jar
     archives deobfJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact deobfJar
+            pom {
+                name = 'TerraBlender'
+                description = "A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
+                url = 'https://github.com/Glitchfiend/TerraBlender'
+                scm {
+                    url = 'https://github.com/Glitchfiend/TerraBlender'
+                    connection = 'scm:git:git://github.com/Glitchfiend/TerraBlender.git'
+                    developerConnection = 'scm:git:git@github.com:Glitchfiend/TerraBlender.git'
+                }
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/Glitchfiend/TerraBlender/issues'
+                }
+
+                licenses {
+                    license {
+                        name = 'CC BY-NC-ND 4.0'
+                        url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'adubbz'
+                        name = 'Adubbz'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "https://maven.minecraftforge.net/releases/"
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                username = project.getProperty('mavenUser') ?:'fake'
+                password = project.getProperty('mavenPassword') ?:'news'
+            }
+        }
+    }
 }

@@ -48,10 +48,12 @@ pipeline {
             }
             environment {
                 CURSE_API_KEY = credentials('curse-api-key')
+                MAVEN_USER = credentials('forge-maven-user')
+                MAVEN_PASSWORD = credentials('forge-maven-password')
             }
             steps {
                 withGradle {
-                    sh './gradlew ${GRADLE_ARGS} curseforge -PcurseApiKey=${CURSE_API_KEY}'
+                    sh './gradlew ${GRADLE_ARGS} curseforge publish -PcurseApiKey=${CURSE_API_KEY} -PmavenUser=${MAVEN_USER} -PmavenPassword${MAVEN_PASSWORD}'
                 }
             }
         }
