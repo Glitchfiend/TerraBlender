@@ -1,0 +1,144 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+plugins {
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'idea'
+apply plugin: 'org.spongepowered.mixin'
+
+repositories { mavenLocal() }
+
+group = "com.github.glitchfiend"
+archivesBaseName = "TerraBlender"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+def getGitHash = {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+version = "${minecraft_version}-${mod_version}.${System.getenv().BUILD_NUMBER}"
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client = {
+            workingDirectory = project.file("run").canonicalPath
+            arg "-mixin.config=terrablender.mixins.json"
+            source sourceSets.main
+        }
+        server = {
+            workingDirectory = project.file("run").canonicalPath
+            arg "-mixin.config=terrablender.mixins.json"
+            source sourceSets.main
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "terrablender.refmap.json"
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xmaxerrs" << "10000"
+        }
+    }
+}
+
+// configure  the source folders
+sourceSets {
+    main {
+        java {
+            srcDir "src/main/java"
+            srcDir "public/src/main/java"
+        }
+        resources {
+            srcDir "src/main/resources"
+            srcDir "public/src/main/resources"
+        }
+    }
+}
+
+processResources {
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+jar {
+    classifier = 'universal'
+    manifest {
+        attributes([
+            "Specification-Title": "terrablender",
+            "Specification-Vendor": "TerraBlender",
+            "Specification-Version": "1.1",
+            "Implementation-Title": project.name,
+            "Implementation-Version": project.version,
+            "Implementation-Vendor" :"terrablender",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "MixinConfigs": "terrablender.mixins.json"
+        ])
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+
+def changelog_file = rootProject.file("build/TerraBlender-${version}-changelog.txt")
+
+curseforge {
+    if (project.hasProperty('curseApiKey')) {
+        apiKey = project.getProperty('curseApiKey')
+        project {
+            id = '563928'
+
+            if (changelog_file.exists()) {
+                changelog = changelog_file
+            }
+
+            releaseType = 'beta'
+            addGameVersion minecraft_version
+
+            mainArtifact(jar) {
+                displayName = "TerraBlender ${version}"
+            }
+
+            addArtifact deobfJar
+        }
+    }
+}
+
+artifacts {
+    if (changelog_file.exists()) {
+        archives changelog_file
+    }
+    archives jar
+    archives deobfJar
+}
