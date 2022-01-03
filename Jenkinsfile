@@ -50,7 +50,7 @@ pipeline {
                 CURSE_API_KEY = credentials('curse-api-key')
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'forge-maven-user', usernameVariable: 'MAVEN_USER', passwordVariable: 'MAVEN_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'maven-adubbz-user', usernameVariable: 'MAVEN_USER', passwordVariable: 'MAVEN_PASSWORD')]) {
                     sh './gradlew ${GRADLE_ARGS} publish'
                 }
                 withGradle {
