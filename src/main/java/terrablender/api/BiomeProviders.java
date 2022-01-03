@@ -5,9 +5,9 @@
 package terrablender.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
-import org.apache.commons.compress.utils.Lists;
 
 import java.util.LinkedHashMap;
 import java.util.List;
