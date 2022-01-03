@@ -52,7 +52,7 @@ public class TBClimate
     }
 
     interface DistanceMetric<T> {
-        long distance(RTree.Node<T> p_186810_, long[] p_186811_);
+        long distance(RTree.Node<T> p_186810_, long[] targets);
     }
 
     public static class ParameterList<T>
@@ -128,44 +128,44 @@ public class TBClimate
             if (p_186936_.isEmpty()) {
                 throw new IllegalArgumentException("Need at least one value to build the search tree.");
             } else {
-                int i = p_186936_.get(0).getFirst().parameterSpace().size();
-                if (i != PARAMETER_COUNT) {
-                    throw new IllegalStateException("Expecting parameter space to be 8, got " + i);
+                int parameterCount = p_186936_.get(0).getFirst().parameterSpace().size();
+                if (parameterCount != PARAMETER_COUNT) {
+                    throw new IllegalStateException("Expecting parameter space to be 8, got " + parameterCount);
                 } else {
                     List<RTree.Leaf<T>> list = p_186936_.stream().map((p_186934_) -> {
                         return new RTree.Leaf<T>(p_186934_.getFirst(), p_186934_.getSecond());
                     }).collect(Collectors.toCollection(ArrayList::new));
-                    return new RTree<>(build(i, list));
+                    return new RTree<>(build(parameterCount, list));
                 }
             }
         }
 
-        private static <T> RTree.Node<T> build(int p_186921_, List<? extends RTree.Node<T>> p_186922_)
+        private static <T> RTree.Node<T> build(int parameterCount, List<? extends RTree.Node<T>> nodes)
         {
-            if (p_186922_.isEmpty()) {
+            if (nodes.isEmpty()) {
                 throw new IllegalStateException("Need at least one child to build a node");
-            } else if (p_186922_.size() == 1) {
-                return p_186922_.get(0);
-            } else if (p_186922_.size() <= 10) {
-                p_186922_.sort(Comparator.comparingLong((p_186916_) -> {
+            } else if (nodes.size() == 1) {
+                return nodes.get(0);
+            } else if (nodes.size() <= 10) {
+                nodes.sort(Comparator.comparingLong((node) -> {
                     long i1 = 0L;
 
-                    for(int j1 = 0; j1 < p_186921_; ++j1) {
-                        Parameter climate$parameter = p_186916_.parameterSpace[j1];
+                    for (int j1 = 0; j1 < parameterCount; ++j1) {
+                        Parameter climate$parameter = node.parameterSpace[j1];
                         i1 += Math.abs((climate$parameter.min() + climate$parameter.max()) / 2L);
                     }
 
                     return i1;
                 }));
-                return new RTree.SubTree<>(p_186922_);
+                return new RTree.SubTree<>(nodes);
             } else {
                 long i = Long.MAX_VALUE;
                 int j = -1;
                 List<RTree.SubTree<T>> list = null;
 
-                for(int k = 0; k < p_186921_; ++k) {
-                    sort(p_186922_, p_186921_, k, false);
-                    List<RTree.SubTree<T>> list1 = bucketize(p_186922_);
+                for(int k = 0; k < parameterCount; ++k) {
+                    sort(nodes, parameterCount, k, false);
+                    List<RTree.SubTree<T>> list1 = bucketize(nodes);
                     long l = 0L;
 
                     for(RTree.SubTree<T> subtree : list1) {
@@ -179,9 +179,9 @@ public class TBClimate
                     }
                 }
 
-                sort(list, p_186921_, j, true);
+                sort(list, parameterCount, j, true);
                 return new RTree.SubTree<>(list.stream().map((p_186919_) -> {
-                    return build(p_186921_, Arrays.asList(p_186919_.children));
+                    return build(parameterCount, Arrays.asList(p_186919_.children));
                 }).collect(Collectors.toList()));
             }
         }
@@ -234,8 +234,8 @@ public class TBClimate
             return i;
         }
 
-        static <T> List<Parameter> buildParameterSpace(List<? extends RTree.Node<T>> p_186947_) {
-            if (p_186947_.isEmpty()) {
+        static <T> List<Parameter> buildParameterSpace(List<? extends RTree.Node<T>> children) {
+            if (children.isEmpty()) {
                 throw new IllegalArgumentException("SubTree needs at least one child");
             } else {
                 int i = PARAMETER_COUNT;
@@ -245,7 +245,7 @@ public class TBClimate
                     list.add((Parameter)null);
                 }
 
-                for(RTree.Node<T> node : p_186947_) {
+                for(RTree.Node<T> node : children) {
                     for(int k = 0; k < PARAMETER_COUNT; ++k) {
                         list.set(k, node.parameterSpace[k].span(list.get(k)));
                     }
@@ -270,7 +270,7 @@ public class TBClimate
                 this.value = p_186951_;
             }
 
-            protected RTree.Leaf<T> search(long[] p_186953_, @Nullable RTree.Leaf<T> p_186954_, DistanceMetric<T> p_186955_) {
+            protected RTree.Leaf<T> search(long[] targets, @Nullable RTree.Leaf<T> p_186954_, DistanceMetric<T> p_186955_) {
                 return this;
             }
         }
@@ -282,7 +282,7 @@ public class TBClimate
                 this.parameterSpace = p_186958_.toArray(new Parameter[0]);
             }
 
-            protected abstract RTree.Leaf<T> search(long[] p_186961_, @Nullable RTree.Leaf<T> p_186962_, DistanceMetric<T> p_186963_);
+            protected abstract RTree.Leaf<T> search(long[] targets, @Nullable RTree.Leaf<T> p_186962_, DistanceMetric<T> p_186963_);
 
             protected long distance(long[] p_186960_) {
                 long i = 0L;
@@ -311,17 +311,17 @@ public class TBClimate
                 this.children = p_186970_.toArray(new RTree.Node[0]);
             }
 
-            protected RTree.Leaf<T> search(long[] p_186972_, @Nullable RTree.Leaf<T> p_186973_, DistanceMetric<T> p_186974_) {
-                long i = p_186973_ == null ? Long.MAX_VALUE : p_186974_.distance(p_186973_, p_186972_);
-                RTree.Leaf<T> leaf = p_186973_;
+            protected RTree.Leaf<T> search(long[] targets, @Nullable RTree.Leaf<T> lastResult, DistanceMetric<T> distanceMetric) {
+                long distance = lastResult == null ? Long.MAX_VALUE : distanceMetric.distance(lastResult, targets);
+                RTree.Leaf<T> leaf = lastResult;
 
                 for(RTree.Node<T> node : this.children) {
-                    long j = p_186974_.distance(node, p_186972_);
-                    if (i > j) {
-                        RTree.Leaf<T> leaf1 = node.search(p_186972_, leaf, p_186974_);
-                        long k = node == leaf1 ? j : p_186974_.distance(leaf1, p_186972_);
-                        if (i > k) {
-                            i = k;
+                    long j = distanceMetric.distance(node, targets);
+                    if (distance > j) {
+                        RTree.Leaf<T> leaf1 = node.search(targets, leaf, distanceMetric);
+                        long k = node == leaf1 ? j : distanceMetric.distance(leaf1, targets);
+                        if (distance > k) {
+                            distance = k;
                             leaf = leaf1;
                         }
                     }

@@ -7,8 +7,10 @@ package terrablender.api;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.compress.utils.Lists;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BiomeProviders
@@ -17,6 +19,7 @@ public class BiomeProviders
 
     private static LinkedHashMap<ResourceLocation, BiomeProvider> biomeProviders = Maps.newLinkedHashMap();
     private static Map<ResourceLocation, Integer> biomeIndices = Maps.newHashMap();
+    private static List<Runnable> indexResetListeners = Lists.newArrayList();
 
     public static void register(ResourceLocation location, BiomeProvider provider)
     {
@@ -28,11 +31,17 @@ public class BiomeProviders
     {
         biomeProviders.remove(location);
         biomeIndices.clear();
+        indexResetListeners.forEach(listener -> listener.run());
     }
 
     public static ImmutableList<BiomeProvider> get()
     {
         return ImmutableList.copyOf(biomeProviders.values());
+    }
+
+    public static void addIndexResetListener(Runnable runnable)
+    {
+        indexResetListeners.add(runnable);
     }
 
     public static int getIndex(ResourceLocation location)

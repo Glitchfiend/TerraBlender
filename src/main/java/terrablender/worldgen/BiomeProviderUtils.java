@@ -6,6 +6,7 @@ package terrablender.worldgen;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.api.BiomeProvider;
 import terrablender.api.BiomeProviders;
 import terrablender.api.GenerationSettings;
+import terrablender.core.TerraBlender;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 
 import java.util.List;
@@ -25,6 +27,9 @@ import java.util.function.Function;
 
 public class BiomeProviderUtils
 {
+    private static Map<Integer, Float> uniquenessMidPointCache = Maps.newHashMap();
+    private static Map<Integer, Climate.Parameter> uniquenessParameterCache = Maps.newHashMap();
+
     public static SurfaceRules.RuleSource createOverworldRules(SurfaceRules.RuleSource base)
     {
         return createNamespacedRuleSource(base, provider -> provider.getOverworldSurfaceRules());
@@ -57,15 +62,26 @@ public class BiomeProviderUtils
 
     public static float getUniquenessMidPoint(int index)
     {
+        if (uniquenessMidPointCache.containsKey(index))
+            return uniquenessMidPointCache.get(index);
+
         float rangeSize = getUniquenessRangeSize();
-        return -1.0F + rangeSize * index + (rangeSize * 0.5F);
+        float midPoint = -1.0F + rangeSize * index + (rangeSize * 0.5F);
+        uniquenessMidPointCache.put(index, midPoint);
+        return midPoint;
     }
 
     public static Climate.Parameter getUniquenessParameter(int index)
     {
-        float min = -1.0F + getUniquenessRangeSize() * index;
-        float max = -1.0F + getUniquenessRangeSize() * (index + 1);
-        return Climate.Parameter.span(min, max);
+        if (uniquenessParameterCache.containsKey(index))
+            return uniquenessParameterCache.get(index);
+
+        float rangeSize = getUniquenessRangeSize();
+        float min = -1.0F + rangeSize * index;
+        float max = -1.0F + rangeSize * (index + 1);
+        Climate.Parameter parameter = Climate.Parameter.span(min, max);
+        uniquenessParameterCache.put(index, parameter);
+        return parameter;
     }
 
     public static TBClimate.ParameterPoint convertParameterPoint(Climate.ParameterPoint point, Climate.Parameter uniqueness)
@@ -96,5 +112,16 @@ public class BiomeProviderUtils
         }
 
         return builder.build();
+    }
+
+    private static void onIndexReset()
+    {
+        uniquenessMidPointCache.clear();
+        uniquenessParameterCache.clear();
+    }
+
+    static
+    {
+        BiomeProviders.addIndexResetListener(BiomeProviderUtils::onIndexReset);
     }
 }
