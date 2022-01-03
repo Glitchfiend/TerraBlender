@@ -186,8 +186,8 @@ publishing {
                 basic(BasicAuthentication)
             }
             credentials {
-                username = project.hasProperty('mavenUser') ? project.getProperty('mavenUser') : 'fake'
-                password = project.hasProperty('mavenPassword') ? project.getProperty('mavenPassword') :'news'
+                username = System.env.MAVEN_USER ?:'fake'
+                password = System.env.MAVEN_PASSWORD ?:'news'
             }
         }
     }
