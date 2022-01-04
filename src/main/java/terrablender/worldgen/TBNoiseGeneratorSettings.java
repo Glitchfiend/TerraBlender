@@ -32,28 +32,20 @@ public class TBNoiseGeneratorSettings
     public static final Codec<Supplier<NoiseGeneratorSettings>> CODEC = RegistryFileCodec.create(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY, DIRECT_CODEC);
 
     public static final ResourceKey<NoiseGeneratorSettings> OVERWORLD = ResourceKey.create(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY, new ResourceLocation(TerraBlender.MOD_ID, "overworld"));
+    public static final ResourceKey<NoiseGeneratorSettings> LARGE_BIOMES = ResourceKey.create(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY, new ResourceLocation(TerraBlender.MOD_ID, "large_biomes"));
+    public static final ResourceKey<NoiseGeneratorSettings> AMPLIFIED = ResourceKey.create(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY, new ResourceLocation(TerraBlender.MOD_ID, "amplified"));
     public static final ResourceKey<NoiseGeneratorSettings> NETHER = ResourceKey.create(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY, new ResourceLocation(TerraBlender.MOD_ID, "nether"));
 
-    public static NoiseSettings overworldNoiseSettings()
+    public static NoiseSettings overworldNoiseSettings(boolean amplified, boolean largeBiomes)
     {
         return NoiseSettings.create(-64, 384, new NoiseSamplingSettings(1.0D, 1.0D, 80.0D, 160.0D), new NoiseSlider(-0.078125D, 2, 8), new NoiseSlider(0.1171875D, 3, 0),
-                1, 2, false, GenerationSettings.isAmplified(), GenerationSettings.isLargeBiomes(),
-                TerrainProvider.overworld(GenerationSettings.isAmplified()));
+                1, 2, false, amplified, largeBiomes,
+                TerrainProvider.overworld(amplified));
     }
 
-    public static NoiseSettings netherNoiseSettings()
+    public static NoiseGeneratorSettings overworld(boolean amplified, boolean largeBiomes)
     {
-        return NoiseSettings.create(0, 128, new NoiseSamplingSettings(1.0D, 3.0D, 80.0D, 60.0D), new NoiseSlider(0.9375D, 3, 0), new NoiseSlider(2.5D, 4, -1), 1, 2, false, false, false, TerrainProvider.nether());
-    }
-
-    public static NoiseGeneratorSettings overworld()
-    {
-        return overworld(overworldNoiseSettings(), BiomeProviderUtils.createOverworldRules());
-    }
-
-    public static NoiseGeneratorSettings nether()
-    {
-        return overworld(netherNoiseSettings(), BiomeProviderUtils.createNetherRules());
+        return overworld(overworldNoiseSettings(amplified, largeBiomes), BiomeProviderUtils.createOverworldRules());
     }
 
     public static NoiseGeneratorSettings overworld(NoiseSettings noiseSettings, SurfaceRules.RuleSource ruleSource)
@@ -66,6 +58,17 @@ public class TBNoiseGeneratorSettings
                 ruleSource,
                 63, false, true, true, true, true, false);
     }
+
+    public static NoiseSettings netherNoiseSettings()
+    {
+        return NoiseSettings.create(0, 128, new NoiseSamplingSettings(1.0D, 3.0D, 80.0D, 60.0D), new NoiseSlider(0.9375D, 3, 0), new NoiseSlider(2.5D, 4, -1), 1, 2, false, false, false, TerrainProvider.nether());
+    }
+
+    public static NoiseGeneratorSettings nether()
+    {
+        return overworld(netherNoiseSettings(), BiomeProviderUtils.createNetherRules());
+    }
+
 
     public static NoiseGeneratorSettings nether(NoiseSettings noiseSettings, SurfaceRules.RuleSource ruleSource)
     {

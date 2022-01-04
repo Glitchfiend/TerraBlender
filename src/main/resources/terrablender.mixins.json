@@ -10,7 +10,9 @@
   "client": [
     "client.MixinMinecraft",
     "client.MixinWorldGenSettingsComponent",
-    "client.MixinWorldPreset"
+    "client.MixinDefaultWorldPreset",
+    "client.MixinLargeBiomesWorldPreset",
+    "client.MixinAmplifiedWorldPreset"
   ],
   "injectors": {
     "defaultRequire": 1

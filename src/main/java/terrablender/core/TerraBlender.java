@@ -41,6 +41,8 @@ public class TerraBlender
 
     private void loadComplete(final FMLLoadCompleteEvent event)
     {
-        Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.OVERWORLD, TBNoiseGeneratorSettings.overworld());
+        Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.OVERWORLD, TBNoiseGeneratorSettings.overworld(false, false));
+        Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.LARGE_BIOMES, TBNoiseGeneratorSettings.overworld(false, true));
+        Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.AMPLIFIED, TBNoiseGeneratorSettings.overworld(true, false));
     }
 }
