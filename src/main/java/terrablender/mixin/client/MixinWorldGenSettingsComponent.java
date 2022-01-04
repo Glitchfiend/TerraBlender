@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldGenSettingsComponent.class)
-public class MixinWorldGenSettingsComponent
+public abstract class MixinWorldGenSettingsComponent
 {
     @Inject(method = "updateDataPacks", at = @At("HEAD"), cancellable = true)
     void updateDataPacks(ServerResources serverResources, CallbackInfo ci)

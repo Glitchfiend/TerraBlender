@@ -4,11 +4,13 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "terrablender.refmap.json",
   "mixins": [
-    "MixinLevelStorageSource"
+    "MixinLevelStorageSource",
+    "MixinWorldGenSettings"
   ],
   "client": [
     "client.MixinMinecraft",
-    "client.MixinWorldGenSettingsComponent"
+    "client.MixinWorldGenSettingsComponent",
+    "client.MixinWorldPreset"
   ],
   "injectors": {
     "defaultRequire": 1

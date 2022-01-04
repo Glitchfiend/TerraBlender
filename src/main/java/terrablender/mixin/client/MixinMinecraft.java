@@ -30,7 +30,7 @@ import terrablender.data.DataPackManager;
 import java.util.function.Function;
 
 @Mixin(Minecraft.class)
-public class MixinMinecraft
+public abstract class MixinMinecraft
 {
     @Shadow
     private void doLoadLevel(String p_91220_, RegistryAccess.RegistryHolder p_91221_, Function<LevelStorageSource.LevelStorageAccess, DataPackConfig> p_91222_, Function4<LevelStorageSource.LevelStorageAccess, RegistryAccess.RegistryHolder, ResourceManager, DataPackConfig, WorldData> p_91223_, boolean p_91224_, Minecraft.ExperimentalDialogType p_91225_, boolean creating) {}

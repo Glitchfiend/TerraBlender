@@ -5,7 +5,11 @@
 package terrablender.api;
 
 import net.minecraft.data.worldgen.SurfaceRuleData;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
+
+import java.util.Optional;
 
 public class GenerationSettings
 {
@@ -13,6 +17,8 @@ public class GenerationSettings
     private static boolean largeBiomes = false;
     private static SurfaceRules.RuleSource defaultOverworldSurfaceRules = SurfaceRuleData.overworld();
     private static SurfaceRules.RuleSource defaultNetherSurfaceRules = SurfaceRuleData.nether();
+    private static Optional<WorldGenSettings> defaultWorldGenSettingsOverride = Optional.empty();
+    private static Optional<ChunkGenerator> defaultChunkGeneratorOverride = Optional.empty();
 
     public static void setAmplified(boolean value)
     {
@@ -34,6 +40,16 @@ public class GenerationSettings
         defaultNetherSurfaceRules = rules;
     }
 
+    public static void setDefaultWorldGenSettingsOverride(WorldGenSettings settings)
+    {
+        defaultWorldGenSettingsOverride = Optional.of(settings);
+    }
+
+    public static void setDefaultChunkGeneratorOverride(ChunkGenerator generator)
+    {
+        defaultChunkGeneratorOverride = Optional.of(generator);
+    }
+
     public static boolean isAmplified()
     {
         return amplified;
@@ -52,5 +68,15 @@ public class GenerationSettings
     public static SurfaceRules.RuleSource getDefaultNetherSurfaceRules()
     {
         return defaultNetherSurfaceRules;
+    }
+
+    public static Optional<WorldGenSettings> getDefaultWorldGenSettingsOverride()
+    {
+        return defaultWorldGenSettingsOverride;
+    }
+
+    public static Optional<ChunkGenerator> getDefaultChunkGeneratorOverride()
+    {
+        return defaultChunkGeneratorOverride;
     }
 }
