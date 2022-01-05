@@ -42,11 +42,6 @@ public class TBClimate
         return new ParameterPoint(Parameter.point(temperature), Parameter.point(humidity), Parameter.point(continentalness), Parameter.point(erosion), Parameter.point(depth), Parameter.point(weirdness), Parameter.point(uniqueness), quantizeCoord(offset));
     }
 
-    public static ParameterPoint parameters(float temperature, float humidity, float continentalness, float erosion, float depth, float weirdness, Parameter uniqueness, float offset)
-    {
-        return new ParameterPoint(Parameter.point(temperature), Parameter.point(humidity), Parameter.point(continentalness), Parameter.point(erosion), Parameter.point(depth), Parameter.point(weirdness), uniqueness, quantizeCoord(offset));
-    }
-
     public static ParameterPoint parameters(Parameter temperature, Parameter humidity, Parameter continentalness, Parameter erosion, Parameter depth, Parameter weirdness, Parameter uniqueness, float offset)
     {
         return new ParameterPoint(temperature, humidity, continentalness, erosion, depth, weirdness, uniqueness, quantizeCoord(offset));

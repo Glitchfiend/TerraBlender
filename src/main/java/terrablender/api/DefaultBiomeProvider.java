@@ -41,12 +41,11 @@ public class DefaultBiomeProvider extends BiomeProvider
     @Override
     public void addNetherBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
     {
-        Climate.Parameter uniqueness = this.getUniquenessParameter();
-        mapper.accept(Pair.of(TBClimate.parameters(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.0F), Biomes.NETHER_WASTES));
-        mapper.accept(Pair.of(TBClimate.parameters(0.0F, -0.5F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.0F), Biomes.SOUL_SAND_VALLEY));
-        mapper.accept(Pair.of(TBClimate.parameters(0.4F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.0F), Biomes.CRIMSON_FOREST));
-        mapper.accept(Pair.of(TBClimate.parameters(0.0F, 0.5F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.375F), Biomes.WARPED_FOREST));
-        mapper.accept(Pair.of(TBClimate.parameters(-0.5F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.175F), Biomes.BASALT_DELTAS));
+        this.addBiome(mapper, Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.0F, Biomes.NETHER_WASTES);
+        this.addBiome(mapper, Climate.Parameter.point(0.0F), Climate.Parameter.point(-0.5F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.0F, Biomes.SOUL_SAND_VALLEY);
+        this.addBiome(mapper, Climate.Parameter.point(0.4F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.0F, Biomes.CRIMSON_FOREST);
+        this.addBiome(mapper, Climate.Parameter.point(0.0F), Climate.Parameter.point(0.5F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.375F, Biomes.WARPED_FOREST);
+        this.addBiome(mapper, Climate.Parameter.point(-0.5F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.175F, Biomes.BASALT_DELTAS);
     }
 
     @Override
