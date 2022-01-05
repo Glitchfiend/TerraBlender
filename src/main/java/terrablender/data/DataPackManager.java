@@ -46,6 +46,9 @@ public class DataPackManager
 
     public static WorldGenSettings mergeWorldGenSettings(RegistryAccess registryAccess, WorldGenSettings currentSettings, WorldGenSettings newSettings)
     {
+        // Remove any existing data pack biome providers
+        BiomeProviders.remove(DATA_PACK_PROVIDER_LOCATION);
+
         // Do not merge if the chunk generator isn't ours or the new settings don't use a MultiNoiseBiomeSource
         if (!(currentSettings.overworld() instanceof TBNoiseBasedChunkGenerator) || !(newSettings.overworld().getBiomeSource() instanceof MultiNoiseBiomeSource) || currentSettings.equals(newSettings))
             return newSettings;
@@ -66,6 +69,9 @@ public class DataPackManager
 
     public static <T> DataResult replaceDatapackWorldGenSettings(Dynamic<T> dynamicWorldGenSettings)
     {
+        // Remove any existing data pack biome providers
+        BiomeProviders.remove(DATA_PACK_PROVIDER_LOCATION);
+
         DataResult<WorldGenSettings> directWorldGenSettingsResult = DIRECT_WGS_CODEC.parse(dynamicWorldGenSettings);
         DataResult<WorldGenSettings> dataPackedWorldGenSettingsResult = WorldGenSettings.CODEC.parse(dynamicWorldGenSettings);
         Optional<WorldGenSettings> directWorldGenSettingsOptional = directWorldGenSettingsResult.result();
@@ -87,11 +93,5 @@ public class DataPackManager
         {
             return dataPackedWorldGenSettingsResult;
         }
-    }
-
-    @SubscribeEvent
-    public void onWorldUnload(WorldEvent.Unload event)
-    {
-        BiomeProviders.remove(DATA_PACK_PROVIDER_LOCATION);
     }
 }

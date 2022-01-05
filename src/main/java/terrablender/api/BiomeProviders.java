@@ -50,7 +50,10 @@ public class BiomeProviders
         if (biomeIndices.containsKey(location))
             return biomeIndices.get(location);
 
-        int index = ImmutableList.of(biomeProviders.keySet()).indexOf(location);;
+        if (!biomeProviders.containsKey(location))
+            throw new RuntimeException("Attempted to get index of an unregistered biome provider " + location);
+
+        int index = ImmutableList.copyOf(biomeProviders.keySet()).indexOf(location);
         biomeIndices.put(location, index);
         return index;
     }
