@@ -15,6 +15,7 @@ import net.minecraft.world.level.levelgen.TerrainInfo;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+import terrablender.core.TerraBlender;
 import terrablender.worldgen.noise.Area;
 import terrablender.worldgen.noise.LayeredNoiseUtil;
 
@@ -40,7 +41,7 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
         };
 
         boolean largeBiomes = noiseSettings.largeBiomes();
-        this.uniquenessNoise = LayeredNoiseUtil.uniqueness(seed, largeBiomes ? 5 : 3);
+        this.uniquenessNoise = LayeredNoiseUtil.uniqueness(seed, largeBiomes ? TerraBlender.CONFIG.largeBiomesRegionSize : TerraBlender.CONFIG.regionSize);
 
         this.tbSpawnTarget = BiomeProviderUtils.getAllSpawnTargets();
 

@@ -11,8 +11,10 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import terrablender.config.TerraBlenderConfig;
 import terrablender.worldgen.TBMultiNoiseBiomeSource;
 import terrablender.worldgen.TBNoiseBasedChunkGenerator;
 import terrablender.worldgen.TBNoiseGeneratorSettings;
@@ -23,6 +25,7 @@ public class TerraBlender
 {
     public static final String MOD_ID = "terrablender";
 
+    public static final TerraBlenderConfig CONFIG = new TerraBlenderConfig(FMLPaths.CONFIGDIR.get().resolve(MOD_ID + ".toml"));
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     public TerraBlender()
@@ -41,8 +44,12 @@ public class TerraBlender
 
     private void loadComplete(final FMLLoadCompleteEvent event)
     {
-        Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.OVERWORLD, TBNoiseGeneratorSettings.overworld(false, false));
-        Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.LARGE_BIOMES, TBNoiseGeneratorSettings.overworld(false, true));
-        Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.AMPLIFIED, TBNoiseGeneratorSettings.overworld(true, false));
+        event.enqueueWork(() ->
+        {
+            Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.OVERWORLD, TBNoiseGeneratorSettings.overworld(false, false));
+            Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.LARGE_BIOMES, TBNoiseGeneratorSettings.overworld(false, true));
+            Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.AMPLIFIED, TBNoiseGeneratorSettings.overworld(true, false));
+            Registry.register(BuiltinRegistries.NOISE_GENERATOR_SETTINGS, TBNoiseGeneratorSettings.NETHER, TBNoiseGeneratorSettings.nether());
+        });
     }
 }

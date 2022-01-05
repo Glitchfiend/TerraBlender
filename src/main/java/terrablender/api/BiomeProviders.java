@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
+import terrablender.core.TerraBlender;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,6 +62,6 @@ public class BiomeProviders
 
     static
     {
-        register(DEFAULT_PROVIDER_LOCATION, new DefaultBiomeProvider(DEFAULT_PROVIDER_LOCATION, 10));
+        register(DEFAULT_PROVIDER_LOCATION, new DefaultBiomeProvider(DEFAULT_PROVIDER_LOCATION, TerraBlender.CONFIG.vanillaRegionWeight));
     }
 }

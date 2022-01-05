@@ -66,9 +66,8 @@ public class TBNoiseGeneratorSettings
 
     public static NoiseGeneratorSettings nether()
     {
-        return overworld(netherNoiseSettings(), BiomeProviderUtils.createNetherRules());
+        return nether(netherNoiseSettings(), BiomeProviderUtils.createNetherRules());
     }
-
 
     public static NoiseGeneratorSettings nether(NoiseSettings noiseSettings, SurfaceRules.RuleSource ruleSource)
     {

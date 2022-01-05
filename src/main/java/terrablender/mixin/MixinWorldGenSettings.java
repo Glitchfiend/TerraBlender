@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import terrablender.api.GenerationSettings;
 import terrablender.api.WorldPresetUtils;
+import terrablender.core.TerraBlender;
 
 import java.util.Optional;
 import java.util.Properties;
@@ -24,7 +25,7 @@ public class MixinWorldGenSettings
     @Inject(method = "create", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/core/RegistryAccess;registryOrThrow(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/core/Registry;"), cancellable = true)
     private static void onCreate(RegistryAccess registryAccess, Properties properties, CallbackInfoReturnable<WorldGenSettings> cir)
     {
-        if (!GenerationSettings.getReplaceDefaultWorldTypes()) return;
+        if (!TerraBlender.CONFIG.replaceDefaultWorldtypes) return;
 
         String levelSeed = (String)properties.get("level-seed");
         String levelType = (String)properties.get("level-type");

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -105,14 +106,11 @@ public class TBMultiNoiseBiomeSource extends BiomeSource
         static final Map<ResourceLocation, TBMultiNoiseBiomeSource.Preset> BY_NAME = Maps.newHashMap();
 
         public static final TBMultiNoiseBiomeSource.Preset OVERWORLD = new TBMultiNoiseBiomeSource.Preset(new ResourceLocation(TerraBlender.MOD_ID, "overworld"), (biomeRegistry) -> {
-            ImmutableList.Builder<Pair<TBClimate.ParameterPoint, Supplier<Biome>>> builder = ImmutableList.builder();
+            return createParameterSource(biomeRegistry, BiomeProviderUtils::addAllOverworldBiomes);
+        });
 
-            Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper = (parameterPair) -> {
-                builder.add(parameterPair.mapSecond((key) -> () -> biomeRegistry.getOrThrow(key)));
-            };
-
-            BiomeProviderUtils.addAllBiomes(biomeRegistry, mapper);
-            return new TBClimate.ParameterList<>(builder.build());
+        public static final TBMultiNoiseBiomeSource.Preset NETHER = new TBMultiNoiseBiomeSource.Preset(new ResourceLocation(TerraBlender.MOD_ID, "nether"), (biomeRegistry) -> {
+            return createParameterSource(biomeRegistry, BiomeProviderUtils::addAllNetherBiomes);
         });
 
         final ResourceLocation name;
@@ -145,6 +143,18 @@ public class TBMultiNoiseBiomeSource extends BiomeSource
             ImmutableList.Builder<Pair<TBClimate.ParameterPoint, Supplier<Biome>>> parameterListBuilder = ImmutableList.builder();
             parameterListBuilder.addAll(this.parameterSource.apply(preset.biomes()).values());
             return new TBClimate.ParameterList<>(parameterListBuilder.build());
+        }
+
+        private static TBClimate.ParameterList<Supplier<Biome>> createParameterSource(Registry<Biome> biomeRegistry, BiConsumer<Registry<Biome>, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>>> addBiomes)
+        {
+            ImmutableList.Builder<Pair<TBClimate.ParameterPoint, Supplier<Biome>>> builder = ImmutableList.builder();
+
+            Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper = (parameterPair) -> {
+                builder.add(parameterPair.mapSecond((key) -> () -> biomeRegistry.getOrThrow(key)));
+            };
+
+            addBiomes.accept(biomeRegistry, mapper);
+            return new TBClimate.ParameterList<>(builder.build());
         }
     }
 

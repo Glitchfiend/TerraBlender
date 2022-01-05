@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import terrablender.api.GenerationSettings;
 import terrablender.api.WorldPresetUtils;
+import terrablender.core.TerraBlender;
 
 @Mixin(targets = "net.minecraft.client.gui.screens.worldselection.WorldPreset$3")
 public abstract class MixinLargeBiomesWorldPreset extends WorldPreset
@@ -32,14 +33,14 @@ public abstract class MixinLargeBiomesWorldPreset extends WorldPreset
     @Inject(method = "generator", at = @At("HEAD"), cancellable = true)
     public void modifyGenerator(RegistryAccess registryAccess, long seed, CallbackInfoReturnable<ChunkGenerator> cir)
     {
-        if (!GenerationSettings.getReplaceDefaultWorldTypes()) return;
+        if (!TerraBlender.CONFIG.replaceDefaultWorldtypes) return;
         cir.setReturnValue(WorldPresetUtils.largeBiomesChunkGenerator(registryAccess, seed));
     }
 
     @Override
     public WorldGenSettings create(RegistryAccess.RegistryHolder registryAccess, long seed, boolean generateFeatures, boolean generateBonusChest)
     {
-        if (!GenerationSettings.getReplaceDefaultWorldTypes()) return super.create(registryAccess, seed, generateFeatures, generateBonusChest);
+        if (!TerraBlender.CONFIG.replaceDefaultWorldtypes) return super.create(registryAccess, seed, generateFeatures, generateBonusChest);
         return WorldPresetUtils.settings(registryAccess, seed, generateFeatures, generateBonusChest, DimensionType.defaultDimensions(registryAccess, seed), this.generator(registryAccess, seed));
     }
 }

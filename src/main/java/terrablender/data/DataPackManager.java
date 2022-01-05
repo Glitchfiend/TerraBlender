@@ -50,7 +50,7 @@ public class DataPackManager
         if (!(currentSettings.overworld() instanceof TBNoiseBasedChunkGenerator) || !(newSettings.overworld().getBiomeSource() instanceof MultiNoiseBiomeSource) || currentSettings.equals(newSettings))
             return newSettings;
 
-        BiomeProvider dataPackBiomeProvider = new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, 10, newSettings);
+        BiomeProvider dataPackBiomeProvider = new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, TerraBlender.CONFIG.datapackRegionWeight, newSettings);
         BiomeProviders.register(DATA_PACK_PROVIDER_LOCATION, dataPackBiomeProvider);
 
         NoiseBasedChunkGenerator newOverworldChunkGenerator = (NoiseBasedChunkGenerator)newSettings.overworld();
@@ -78,7 +78,7 @@ public class DataPackManager
             // Register the datapack provider if we're dealing with a datapack
             if (dataPackedWorldGenSettingsOptional.isPresent())
             {
-                BiomeProviders.register(DATA_PACK_PROVIDER_LOCATION, new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, 10, directWorldGenSettingsOptional.get()));
+                BiomeProviders.register(DATA_PACK_PROVIDER_LOCATION, new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, TerraBlender.CONFIG.datapackRegionWeight, directWorldGenSettingsOptional.get()));
             }
 
             return directWorldGenSettingsResult;

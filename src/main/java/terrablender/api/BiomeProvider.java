@@ -31,6 +31,7 @@ public abstract class BiomeProvider extends WeightedEntry.IntrusiveBase
     }
 
     public void addOverworldBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper) {}
+    public void addNetherBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper) {}
 
     public List<TBClimate.ParameterPoint> getSpawnTargets()
     {

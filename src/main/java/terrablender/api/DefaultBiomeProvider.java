@@ -4,12 +4,14 @@
  ******************************************************************************/
 package terrablender.api;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.SurfaceRuleData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
 import net.minecraft.world.level.levelgen.SurfaceRules;
@@ -26,6 +28,7 @@ public class DefaultBiomeProvider extends BiomeProvider
         super(location, weight);
     }
 
+    @Override
     public void addOverworldBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
     {
         Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> vanillaMapper = (pair) -> {
@@ -33,6 +36,17 @@ public class DefaultBiomeProvider extends BiomeProvider
         };
 
         (new OverworldBiomeBuilder()).addBiomes(vanillaMapper);
+    }
+
+    @Override
+    public void addNetherBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
+    {
+        Climate.Parameter uniqueness = this.getUniquenessParameter();
+        mapper.accept(Pair.of(TBClimate.parameters(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.0F), Biomes.NETHER_WASTES));
+        mapper.accept(Pair.of(TBClimate.parameters(0.0F, -0.5F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.0F), Biomes.SOUL_SAND_VALLEY));
+        mapper.accept(Pair.of(TBClimate.parameters(0.4F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.0F), Biomes.CRIMSON_FOREST));
+        mapper.accept(Pair.of(TBClimate.parameters(0.0F, 0.5F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.375F), Biomes.WARPED_FOREST));
+        mapper.accept(Pair.of(TBClimate.parameters(-0.5F, 0.0F, 0.0F, 0.0F, 0.0F, -1.0F, uniqueness, 0.175F), Biomes.BASALT_DELTAS));
     }
 
     @Override

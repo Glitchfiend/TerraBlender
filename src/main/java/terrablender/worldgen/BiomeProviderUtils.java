@@ -16,7 +16,6 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.api.BiomeProvider;
 import terrablender.api.BiomeProviders;
 import terrablender.api.GenerationSettings;
-import terrablender.core.TerraBlender;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 
 import java.util.List;
@@ -96,9 +95,14 @@ public class BiomeProviderUtils
         return builder.build();
     }
 
-    public static void addAllBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
+    public static void addAllOverworldBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
     {
         BiomeProviders.get().forEach(provider -> provider.addOverworldBiomes(registry, mapper));
+    }
+
+    public static void addAllNetherBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
+    {
+        BiomeProviders.get().forEach(provider -> provider.addNetherBiomes(registry, mapper));
     }
 
     private static Map<String, SurfaceRules.RuleSource> collectRuleSources(Function<BiomeProvider, Optional<SurfaceRules.RuleSource>> rulesSource)
