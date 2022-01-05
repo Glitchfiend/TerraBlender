@@ -34,7 +34,7 @@ public abstract class MixinDefaultWorldPreset extends WorldPreset
     public void modifyGenerator(RegistryAccess registryAccess, long seed, CallbackInfoReturnable<ChunkGenerator> cir)
     {
         if (!TerraBlender.CONFIG.replaceDefaultWorldtypes) return;
-        cir.setReturnValue(WorldPresetUtils.chunkGenerator(registryAccess, seed));
+        cir.setReturnValue(WorldPresetUtils.overworldChunkGenerator(registryAccess, seed));
     }
 
     @Override
