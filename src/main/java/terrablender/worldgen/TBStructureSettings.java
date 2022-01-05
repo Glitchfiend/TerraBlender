@@ -27,17 +27,6 @@ import java.util.Optional;
 
 public class TBStructureSettings extends StructureSettings
 {
-    // Unlike Vanilla, we use a lenientSimpleMap to prevent missing structures causing world breakage
-    public static final Codec<StructureSettings> CODEC = RecordCodecBuilder.create((p_64596_) -> {
-        return p_64596_.group(StrongholdConfiguration.CODEC.optionalFieldOf("stronghold").forGetter((p_158913_) -> {
-            return Optional.ofNullable(p_158913_.stronghold);
-        }), TBCodec.lenientSimpleMap(Registry.STRUCTURE_FEATURE.byNameCodec(), StructureFeatureConfiguration.CODEC, Registry.STRUCTURE_FEATURE).fieldOf("structures").forGetter((structureSettings) -> {
-            return structureSettings.structureConfig;
-        })).apply(p_64596_, StructureSettings::new);
-    });
-
-    private final ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> configuredStructures;
-
     public TBStructureSettings(Optional<StrongholdConfiguration> strongholdConfiguration, Map<StructureFeature<?>, StructureFeatureConfiguration> structureConfig)
     {
         super(strongholdConfiguration, structureConfig);
@@ -57,11 +46,5 @@ public class TBStructureSettings extends StructureSettings
     public TBStructureSettings(boolean enableStrongholds)
     {
         this(enableStrongholds ? Optional.of(DEFAULT_STRONGHOLD) : Optional.empty(), Maps.newHashMap(DEFAULTS));
-    }
-
-    @Override
-    public ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> structures(StructureFeature<?> structure)
-    {
-        return this.configuredStructures.getOrDefault(structure, ImmutableMultimap.of());
     }
 }

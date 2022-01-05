@@ -5,6 +5,7 @@
   "refmap": "terrablender.refmap.json",
   "mixins": [
     "MixinLevelStorageSource",
+    "MixinStructureSettings",
     "MixinWorldGenSettings"
   ],
   "client": [

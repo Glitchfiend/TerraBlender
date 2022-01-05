@@ -50,7 +50,7 @@ public class TBNoiseBasedChunkGenerator extends NoiseBasedChunkGenerator
             return instance.biomeSource;
         }), Codec.LONG.fieldOf("seed").stable().forGetter((instance) -> {
             return instance.seed;
-        }), TBNoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter((instance) -> {
+        }), NoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter((instance) -> {
             return instance.settings;
         })).apply(builder, builder.stable(TBNoiseBasedChunkGenerator::new));
     });
