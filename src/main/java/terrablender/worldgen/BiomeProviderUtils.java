@@ -92,7 +92,7 @@ public class BiomeProviderUtils
 
         for (BiomeProvider provider : BiomeProviders.get())
         {
-            Optional<SurfaceRules.RuleSource> rules = provider.getOverworldSurfaceRules();
+            Optional<SurfaceRules.RuleSource> rules = rulesSource.apply(provider);
             if (rules.isPresent()) builder.put(provider.getName().getNamespace(), rules.get());
         }
 
