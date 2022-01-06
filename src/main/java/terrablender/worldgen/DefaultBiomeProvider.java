@@ -2,9 +2,8 @@
  * Copyright 2022, the Glitchfiend Team.
  * Creative Commons Attribution-NonCommercial-NoDerivatives 4.0.
  ******************************************************************************/
-package terrablender.api;
+package terrablender.worldgen;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.SurfaceRuleData;
@@ -15,8 +14,7 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import terrablender.worldgen.BiomeProviderUtils;
-import terrablender.worldgen.TBClimate;
+import terrablender.api.BiomeProvider;
 
 import java.util.Optional;
 import java.util.function.Consumer;

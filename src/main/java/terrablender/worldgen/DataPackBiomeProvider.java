@@ -2,7 +2,7 @@
  * Copyright 2022, the Glitchfiend Team.
  * Creative Commons Attribution-NonCommercial-NoDerivatives 4.0.
  ******************************************************************************/
-package terrablender.api;
+package terrablender.worldgen;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
@@ -19,6 +19,7 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
+import terrablender.api.BiomeProvider;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.BiomeProviderUtils;
 import terrablender.worldgen.TBClimate;

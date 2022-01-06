@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
 import terrablender.core.TerraBlender;
+import terrablender.worldgen.DefaultBiomeProvider;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,41 +17,65 @@ import java.util.Map;
 
 public class BiomeProviders
 {
+    /** The resource location of the default biome provider. */
     public static final ResourceLocation DEFAULT_PROVIDER_LOCATION = new ResourceLocation("minecraft:biome_provider");
 
     private static LinkedHashMap<ResourceLocation, BiomeProvider> biomeProviders = Maps.newLinkedHashMap();
     private static Map<ResourceLocation, Integer> biomeIndices = Maps.newHashMap();
     private static List<Runnable> indexResetListeners = Lists.newArrayList();
 
-    public static void register(ResourceLocation location, BiomeProvider provider)
+    /**
+     * Register a {@link BiomeProvider}.
+     * @param name the name of the biome provider.
+     * @param provider the biome provider.
+     */
+    public static void register(ResourceLocation name, BiomeProvider provider)
     {
-        biomeProviders.put(location, provider);
+        biomeProviders.put(name, provider);
         int index = biomeProviders.size() - 1;
-        biomeIndices.put(location, index);
-        TerraBlender.LOGGER.info("Registered biome provider " + location + " to index " + index);
+        biomeIndices.put(name, index);
+        TerraBlender.LOGGER.info("Registered biome provider " + name + " to index " + index);
     }
 
-    public static void remove(ResourceLocation location)
+    /**
+     * Remove a biome provider.
+     * @param name the name of the biome provider.
+     */
+    public static void remove(ResourceLocation name)
     {
-        if (!biomeProviders.containsKey(location))
+        if (!biomeProviders.containsKey(name))
             return;
 
-        biomeProviders.remove(location);
+        biomeProviders.remove(name);
         biomeIndices.clear();
         indexResetListeners.forEach(listener -> listener.run());
-        TerraBlender.LOGGER.info("Removed biome provider " + location);
+        TerraBlender.LOGGER.info("Removed biome provider " + name);
     }
 
-    public static ImmutableList<BiomeProvider> get()
+    /**
+     * Get the list of biome providers.
+     * @return the list of biome providers.
+     */
+    public static List<BiomeProvider> get()
     {
         return ImmutableList.copyOf(biomeProviders.values());
     }
 
-    public static void addIndexResetListener(Runnable runnable)
+    /**
+     * Add a listener for when biome provider indices are reset.
+     * This usually happens when a biome provider is removed at runtime, such as in the case of data packs.
+     * @param listener the listener.
+     */
+    public static void addIndexResetListener(Runnable listener)
     {
-        indexResetListeners.add(runnable);
+        indexResetListeners.add(listener);
     }
 
+    /**
+     * Gets the index associated with a biome provider's {@link ResourceLocation}.
+     * @param location the location of the biome provider.
+     * @return the index of the biome provider.
+     */
     public static int getIndex(ResourceLocation location)
     {
         if (biomeIndices.containsKey(location))
@@ -64,6 +89,10 @@ public class BiomeProviders
         return index;
     }
 
+    /**
+     * Gets the number of biome providers.
+     * @return the biome provider count.
+     */
     public static int getCount()
     {
         return biomeProviders.size();
