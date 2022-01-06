@@ -15,6 +15,7 @@ import net.minecraft.core.QuartPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Climate.Parameter;
+import terrablender.api.BiomeProviders;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class TBClimate
     private static final boolean DEBUG_SLOW_BIOME_SEARCH = false;
     private static final float QUANTIZATION_FACTOR = 10000.0F;
     @VisibleForTesting
-    protected static final int PARAMETER_COUNT = 8;
+    protected static final int PARAMETER_COUNT = 7;
 
     public static TargetPoint target(float temperature, float humidity, float continentalness, float erosion, float depth, float weirdness, float uniqueness)
     {
@@ -58,11 +59,11 @@ public class TBClimate
     public static class ParameterList<T>
     {
         private final List<Pair<ParameterPoint, T>> values;
-        private final RTree<T> index;
+        private final UniquenessRTree<T> index;
 
         public ParameterList(List<Pair<ParameterPoint, T>> p_186849_) {
             this.values = p_186849_;
-            this.index = RTree.create(p_186849_);
+            this.index = UniquenessRTree.create(p_186849_);
         }
 
         public List<Pair<ParameterPoint, T>> values() {
@@ -105,15 +106,51 @@ public class TBClimate
         });
 
         long fitness(TargetPoint target) {
-            return Mth.square(this.temperature.distance(target.temperature)) + Mth.square(this.humidity.distance(target.humidity)) + Mth.square(this.continentalness.distance(target.continentalness)) + Mth.square(this.erosion.distance(target.erosion)) + Mth.square(this.depth.distance(target.depth)) + Mth.square(this.weirdness.distance(target.weirdness)) + Mth.square(this.uniqueness.distance(target.uniqueness)) + Mth.square(this.offset);
+            return Mth.square(this.temperature.distance(target.temperature)) + Mth.square(this.humidity.distance(target.humidity)) + Mth.square(this.continentalness.distance(target.continentalness)) + Mth.square(this.erosion.distance(target.erosion)) + Mth.square(this.depth.distance(target.depth)) + Mth.square(this.weirdness.distance(target.weirdness)) + Mth.square(this.offset);
         }
 
         protected List<Parameter> parameterSpace() {
-            return ImmutableList.of(this.temperature, this.humidity, this.continentalness, this.erosion, this.depth, this.weirdness, this.uniqueness, new Parameter(this.offset, this.offset));
+            return ImmutableList.of(this.temperature, this.humidity, this.continentalness, this.erosion, this.depth, this.weirdness, new Parameter(this.offset, this.offset));
         }
     }
 
-    protected static final class RTree<T>
+    protected static class UniquenessRTree<T>
+    {
+        private final RTree[] trees;
+
+        private UniquenessRTree()
+        {
+            this.trees = new RTree[BiomeProviders.getCount()];
+        }
+
+        public static <T> UniquenessRTree<T> create(List<Pair<ParameterPoint, T>> values)
+        {
+            UniquenessRTree<T> tree = new UniquenessRTree<>();
+
+            for (int i = 0; i < BiomeProviders.getCount(); i++)
+            {
+                final int uniqueness = i;
+                List<Pair<ParameterPoint, T>> filteredValues = values.stream().filter(pair -> {
+                    Climate.Parameter uniquenessParameter = pair.getFirst().uniqueness();
+                    return uniqueness >= uniquenessParameter.min() && uniqueness <= uniquenessParameter.max();
+                } ).collect(Collectors.toCollection(ArrayList::new));
+
+                if (filteredValues.isEmpty())
+                    throw new IllegalArgumentException("No values found for uniqueness " + uniqueness);
+
+                tree.trees[i] = RTree.create(filteredValues);
+            }
+
+            return tree;
+        }
+
+        public T search(TargetPoint target, DistanceMetric<T> metric)
+        {
+            return (T)this.trees[(int)target.uniqueness()].search(target, metric);
+        }
+    }
+
+    protected static class RTree<T>
     {
         private static final int CHILDREN_PER_NODE = 10;
         private final RTree.Node<T> root;
@@ -123,19 +160,19 @@ public class TBClimate
             this.root = p_186913_;
         }
 
-        public static <T> RTree<T> create(List<Pair<ParameterPoint, T>> p_186936_)
+        public static <T> RTree<T> create(List<Pair<ParameterPoint, T>> values)
         {
-            if (p_186936_.isEmpty()) {
+            if (values.isEmpty()) {
                 throw new IllegalArgumentException("Need at least one value to build the search tree.");
             } else {
-                int parameterCount = p_186936_.get(0).getFirst().parameterSpace().size();
+                int parameterCount = values.get(0).getFirst().parameterSpace().size();
                 if (parameterCount != PARAMETER_COUNT) {
-                    throw new IllegalStateException("Expecting parameter space to be 8, got " + parameterCount);
+                    throw new IllegalStateException("Expecting parameter space to be 7, got " + parameterCount);
                 } else {
-                    List<RTree.Leaf<T>> list = p_186936_.stream().map((p_186934_) -> {
-                        return new RTree.Leaf<T>(p_186934_.getFirst(), p_186934_.getSecond());
+                    List<RTree.Leaf<T>> leaves = values.stream().map((value) -> {
+                        return new RTree.Leaf<T>(value.getFirst(), value.getSecond());
                     }).collect(Collectors.toCollection(ArrayList::new));
-                    return new RTree<>(build(parameterCount, list));
+                    return new RTree<>(build(parameterCount, leaves));
                 }
             }
         }
@@ -402,7 +439,7 @@ public class TBClimate
     {
         @VisibleForTesting
         protected long[] toParameterArray() {
-            return new long[]{this.temperature, this.humidity, this.continentalness, this.erosion, this.depth, this.weirdness, this.uniqueness, 0L};
+            return new long[]{this.temperature, this.humidity, this.continentalness, this.erosion, this.depth, this.weirdness, 0L};
         }
     }
 }

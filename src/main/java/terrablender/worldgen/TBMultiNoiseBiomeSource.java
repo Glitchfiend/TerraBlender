@@ -77,9 +77,7 @@ public class TBMultiNoiseBiomeSource extends BiomeSource
     @Override
     public Biome getNoiseBiome(int p_186735_, int p_186736_, int p_186737_, Climate.Sampler sampler)
     {
-        if (!(sampler instanceof TBClimate.Sampler))
-            throw new RuntimeException("Sampler must be a TBClimate sampler");
-
+        // Under normal circumstances there should never be a situation where the sampler isn't a TBClimate.Sampler.
         return this.getNoiseBiome(((TBClimate.Sampler)sampler).sampleTB(p_186735_, p_186736_, p_186737_));
     }
 

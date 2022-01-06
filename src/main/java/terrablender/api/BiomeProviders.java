@@ -25,7 +25,10 @@ public class BiomeProviders
     public static void register(ResourceLocation location, BiomeProvider provider)
     {
         biomeProviders.put(location, provider);
-        biomeIndices.put(location, biomeProviders.size() - 1);
+
+        int index = biomeProviders.size() - 1;
+        biomeIndices.put(location, index);
+        TerraBlender.LOGGER.info("Registered biome provider " + location + " to index " + index);
     }
 
     public static void remove(ResourceLocation location)
@@ -33,6 +36,7 @@ public class BiomeProviders
         biomeProviders.remove(location);
         biomeIndices.clear();
         indexResetListeners.forEach(listener -> listener.run());
+        TerraBlender.LOGGER.info("Removed biome provider " + location);
     }
 
     public static ImmutableList<BiomeProvider> get()

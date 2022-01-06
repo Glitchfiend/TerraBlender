@@ -54,31 +54,12 @@ public class BiomeProviderUtils
         return new NamespacedSurfaceRuleSource(base, ImmutableMap.copyOf(collectRuleSources(source)));
     }
 
-    public static float getUniquenessRangeSize()
-    {
-        return 2.0F / (float)BiomeProviders.getCount();
-    }
-
-    public static float getUniquenessMidPoint(int index)
-    {
-        if (uniquenessMidPointCache.containsKey(index))
-            return uniquenessMidPointCache.get(index);
-
-        float rangeSize = getUniquenessRangeSize();
-        float midPoint = -1.0F + rangeSize * index + (rangeSize * 0.5F);
-        uniquenessMidPointCache.put(index, midPoint);
-        return midPoint;
-    }
-
     public static Climate.Parameter getUniquenessParameter(int index)
     {
         if (uniquenessParameterCache.containsKey(index))
             return uniquenessParameterCache.get(index);
 
-        float rangeSize = getUniquenessRangeSize();
-        float min = -1.0F + rangeSize * index;
-        float max = -1.0F + rangeSize * (index + 1);
-        Climate.Parameter parameter = Climate.Parameter.span(min, max);
+        Climate.Parameter parameter = Climate.Parameter.point(Climate.unquantizeCoord(index));
         uniquenessParameterCache.put(index, parameter);
         return parameter;
     }

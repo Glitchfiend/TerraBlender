@@ -108,7 +108,7 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
     @VisibleForDebug
     public double getUniqueness(double x, double y, double z)
     {
-        return BiomeProviderUtils.getUniquenessMidPoint(this.uniquenessNoise.get((int)x, (int)z));
+        return Climate.unquantizeCoord(this.uniquenessNoise.get((int)x, (int)z));
     }
 
     public synchronized void doWithNoiseDataCallsAllowed(Consumer<TBNoiseSampler> consumer)
