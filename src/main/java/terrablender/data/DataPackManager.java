@@ -36,7 +36,7 @@ import java.util.function.Function;
 
 public class DataPackManager
 {
-    private static final ResourceLocation DATA_PACK_PROVIDER_LOCATION = new ResourceLocation("datapack:biome_provider");
+    public static final ResourceLocation DATA_PACK_PROVIDER_LOCATION = new ResourceLocation("datapack:biome_provider");
 
     private static final Codec<WorldGenSettings> DIRECT_WGS_CODEC = RecordCodecBuilder.<WorldGenSettings>create((p_64626_) -> {
         return p_64626_.group(Codec.LONG.fieldOf("seed").stable().forGetter(WorldGenSettings::seed), Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldGenSettings::generateFeatures), Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldGenSettings::generateBonusChest), MappedRegistry.directCodec(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable(), LevelStem.CODEC).xmap(LevelStem::sortMap, Function.identity()).fieldOf("dimensions").forGetter(WorldGenSettings::dimensions), Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter((p_158959_) -> {
@@ -49,7 +49,6 @@ public class DataPackManager
         // Do not merge if the chunk generator isn't ours or the new settings don't use a MultiNoiseBiomeSource
         if (!(currentSettings.overworld() instanceof TBNoiseBasedChunkGenerator) || !(newSettings.overworld().getBiomeSource() instanceof MultiNoiseBiomeSource))
         {
-            BiomeProviders.remove(DATA_PACK_PROVIDER_LOCATION);
             return newSettings;
         }
 
@@ -69,9 +68,6 @@ public class DataPackManager
 
     public static <T> DataResult replaceDatapackWorldGenSettings(Dynamic<T> dynamicWorldGenSettings)
     {
-        // Remove any existing data pack biome providers
-        BiomeProviders.remove(DATA_PACK_PROVIDER_LOCATION);
-
         DataResult<WorldGenSettings> directWorldGenSettingsResult = DIRECT_WGS_CODEC.parse(dynamicWorldGenSettings);
         DataResult<WorldGenSettings> dataPackedWorldGenSettingsResult = WorldGenSettings.CODEC.parse(dynamicWorldGenSettings);
         Optional<WorldGenSettings> directWorldGenSettingsOptional = directWorldGenSettingsResult.result();
