@@ -28,7 +28,7 @@ public class TerraBlenderConfig extends ConfigFile
         this.regionSize = generationSettings.addNumber("The size of regions of biomes from each mod that uses TerraBlender.", "region_size", 3, 2, 6);
         this.largeBiomesRegionSize = generationSettings.addNumber("The size of regions of biomes from each mod that uses TerraBlender when using the large biomes world type.", "large_biomes_region_size", 5, 2, 6);
         this.vanillaRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions.", "vanilla_region_weight", 10, 0, Integer.MAX_VALUE);
-        this.datapackRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions.", "datapack_region_weight", 10, 0, Integer.MAX_VALUE);
+        this.datapackRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions.", "datapack_region_weight", 15, 0, Integer.MAX_VALUE);
         this.addSubConfig("Generation settings", "generation_settings", generationSettings);
 
         this.save();

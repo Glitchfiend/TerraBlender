@@ -19,6 +19,7 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
+import terrablender.core.TerraBlender;
 import terrablender.worldgen.BiomeProviderUtils;
 import terrablender.worldgen.TBClimate;
 
@@ -62,13 +63,15 @@ public class DataPackBiomeProvider extends BiomeProvider
             return;
 
         MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)this.overworldGenerator.getBiomeSource();
+        Climate.Parameter uniquenessParameter = this.getUniquenessParameter();
+        TerraBlender.LOGGER.info("Adding overworld biomes for datapack " + this.getName() + " with uniqueness " + uniquenessParameter);
 
-        biomeSource.parameters.values().stream().map(pair -> {
+        biomeSource.parameters.values().stream().forEach(pair -> {
+            TBClimate.ParameterPoint parameters = BiomeProviderUtils.convertParameterPoint(pair.getFirst(), uniquenessParameter);
             Optional<ResourceKey<Biome>> key = registry.getResourceKey(pair.getSecond().get());
-            return Pair.of(BiomeProviderUtils.convertParameterPoint(pair.getFirst(), this.getUniquenessParameter()), key);
-        }).forEach(pair -> {
-            if (pair.getSecond().isPresent())
-                mapper.accept(Pair.of(pair.getFirst(), pair.getSecond().get()));
+
+            if (key.isPresent())
+                this.addBiome(mapper, parameters, key.get());
         });
     }
 

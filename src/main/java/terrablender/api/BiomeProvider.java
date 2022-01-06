@@ -65,6 +65,11 @@ public abstract class BiomeProvider extends WeightedEntry.IntrusiveBase
 
     protected final void addBiome(Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper, Climate.Parameter temperature, Climate.Parameter humidity, Climate.Parameter continentalness, Climate.Parameter erosion, Climate.Parameter weirdness, Climate.Parameter depth, float offset, ResourceKey<Biome> biome)
     {
-        mapper.accept(Pair.of(TBClimate.parameters(temperature, humidity, continentalness, erosion, depth, weirdness, getUniquenessParameter(), offset), biome));
+        addBiome(mapper, TBClimate.parameters(temperature, humidity, continentalness, erosion, depth, weirdness, getUniquenessParameter(), offset), biome);
+    }
+
+    protected final void addBiome(Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper, TBClimate.ParameterPoint parameters, ResourceKey<Biome> biome)
+    {
+        mapper.accept(Pair.of(parameters, biome));
     }
 }

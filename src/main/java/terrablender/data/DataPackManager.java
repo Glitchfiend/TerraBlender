@@ -46,12 +46,12 @@ public class DataPackManager
 
     public static WorldGenSettings mergeWorldGenSettings(RegistryAccess registryAccess, WorldGenSettings currentSettings, WorldGenSettings newSettings)
     {
-        // Remove any existing data pack biome providers
-        BiomeProviders.remove(DATA_PACK_PROVIDER_LOCATION);
-
         // Do not merge if the chunk generator isn't ours or the new settings don't use a MultiNoiseBiomeSource
-        if (!(currentSettings.overworld() instanceof TBNoiseBasedChunkGenerator) || !(newSettings.overworld().getBiomeSource() instanceof MultiNoiseBiomeSource) || currentSettings.equals(newSettings))
+        if (!(currentSettings.overworld() instanceof TBNoiseBasedChunkGenerator) || !(newSettings.overworld().getBiomeSource() instanceof MultiNoiseBiomeSource))
+        {
+            BiomeProviders.remove(DATA_PACK_PROVIDER_LOCATION);
             return newSettings;
+        }
 
         BiomeProvider dataPackBiomeProvider = new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, TerraBlender.CONFIG.datapackRegionWeight, newSettings);
         BiomeProviders.register(DATA_PACK_PROVIDER_LOCATION, dataPackBiomeProvider);

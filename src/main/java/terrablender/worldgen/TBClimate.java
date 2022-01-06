@@ -16,6 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Climate.Parameter;
 import terrablender.api.BiomeProviders;
+import terrablender.core.TerraBlender;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -126,19 +127,28 @@ public class TBClimate
         public static <T> UniquenessRTree<T> create(List<Pair<ParameterPoint, T>> values)
         {
             UniquenessRTree<T> tree = new UniquenessRTree<>();
+            int vanillaIndex = BiomeProviders.getIndex(BiomeProviders.DEFAULT_PROVIDER_LOCATION);
+            RTree<T> vanillaTree = RTree.create(filterValues(vanillaIndex, values));
+            tree.trees[vanillaIndex] = vanillaTree;
 
             for (int i = 0; i < BiomeProviders.getCount(); i++)
             {
+                // Skip Vanilla as we have already dealt with it
+                if (i == vanillaIndex)
+                    continue;
+
                 final int uniqueness = i;
                 List<Pair<ParameterPoint, T>> filteredValues = values.stream().filter(pair -> {
                     Climate.Parameter uniquenessParameter = pair.getFirst().uniqueness();
                     return uniqueness >= uniquenessParameter.min() && uniqueness <= uniquenessParameter.max();
                 } ).collect(Collectors.toCollection(ArrayList::new));
 
-                if (filteredValues.isEmpty())
-                    throw new IllegalArgumentException("No values found for uniqueness " + uniqueness);
-
-                tree.trees[i] = RTree.create(filteredValues);
+                if (!filteredValues.isEmpty()) tree.trees[i] = RTree.create(filteredValues);
+                else
+                {
+                    TerraBlender.LOGGER.info("No values found for uniqueness " + uniqueness + ", using Vanilla's");
+                    tree.trees[i] = vanillaTree;
+                }
             }
 
             return tree;
@@ -147,6 +157,14 @@ public class TBClimate
         public T search(TargetPoint target, DistanceMetric<T> metric)
         {
             return (T)this.trees[(int)target.uniqueness()].search(target, metric);
+        }
+
+        private static <T> List<Pair<ParameterPoint, T>> filterValues(int uniqueness, List<Pair<ParameterPoint, T>> values)
+        {
+            return values.stream().filter(pair -> {
+                Climate.Parameter uniquenessParameter = pair.getFirst().uniqueness();
+                return uniqueness >= uniquenessParameter.min() && uniqueness <= uniquenessParameter.max();
+            } ).collect(Collectors.toCollection(ArrayList::new));
         }
     }
 
