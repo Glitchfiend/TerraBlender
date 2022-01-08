@@ -12,12 +12,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.LinearCongruentialGenerator;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import terrablender.mixin.access.BiomeManagerAccess;
 import terrablender.worldgen.TBClimate;
 import terrablender.worldgen.TBNoiseBasedChunkGenerator;
 
@@ -43,7 +39,7 @@ public class CommandBiomeParameters
         BiomeManager biomeManager = level.getBiomeManager();
         TBNoiseBasedChunkGenerator noiseBasedChunkGenerator = (TBNoiseBasedChunkGenerator)generator;
         TBClimate.Sampler sampler = (TBClimate.Sampler)noiseBasedChunkGenerator.climateSampler();
-        BlockPos adjustedPos = getAdjustedPos(pos, ((BiomeManagerAccess)biomeManager).getBiomeZoomSeed());
+        BlockPos adjustedPos = getAdjustedPos(pos, biomeManager.biomeZoomSeed);
         TBClimate.TargetPoint target = sampler.sampleTB(adjustedPos.getX(), adjustedPos.getY(), adjustedPos.getZ());
         cs.sendSuccess(new TranslatableComponent("commands.terrablender.biomeparams.success", pos.getX(), pos.getY(), pos.getZ(), target.toString().replace("TargetPoint[", "").replace("]", " ")), true);
         return 1;
@@ -73,7 +69,7 @@ public class CommandBiomeParameters
             double d4 = flag ? d0 : d0 - 1.0D;
             double d5 = flag1 ? d1 : d1 - 1.0D;
             double d6 = flag2 ? d2 : d2 - 1.0D;
-            double d7 = BiomeManagerAccess.getFiddledDistance(seed, i2, j2, k2, d4, d5, d6);
+            double d7 = BiomeManager.getFiddledDistance(seed, i2, j2, k2, d4, d5, d6);
             if (d3 > d7) {
                 k1 = l1;
                 d3 = d7;

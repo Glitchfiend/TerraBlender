@@ -44,7 +44,6 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
         this.uniquenessNoise = LayeredNoiseUtil.uniqueness(seed, largeBiomes ? TerraBlender.CONFIG.largeBiomesRegionSize : TerraBlender.CONFIG.regionSize);
 
         this.tbSpawnTarget = BiomeProviderUtils.getAllSpawnTargets();
-
         // Null Vanilla's spawn targets list to reduce memory usage.
         this.spawnTarget = null;
     }
