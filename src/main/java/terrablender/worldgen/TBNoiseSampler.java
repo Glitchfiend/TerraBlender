@@ -27,7 +27,6 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
     private final Area uniquenessNoise;
 
     private final List<TBClimate.ParameterPoint> tbSpawnTarget;
-    private boolean noiseDataCallsAllowed = false;
 
     public TBNoiseSampler(NoiseSettings noiseSettings, boolean isNoiseCavesEnabled, long seed, Registry<NormalNoise.NoiseParameters> noiseParamRegistry, WorldgenRandom.Algorithm randomSource)
     {
@@ -51,10 +50,7 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
     @Override
     public NoiseSampler.FlatNoiseData noiseData(int x, int z, Blender blender)
     {
-        if (this.noiseDataCallsAllowed)
-            return null;
-
-        throw new RuntimeException("Vanilla noiseData called on TBNoiseSampler!");
+        return null;
     }
 
     @Override
@@ -108,13 +104,6 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
     public double getUniqueness(double x, double y, double z)
     {
         return Climate.unquantizeCoord(this.uniquenessNoise.get((int)x, (int)z));
-    }
-
-    public synchronized void doWithNoiseDataCallsAllowed(Consumer<TBNoiseSampler> consumer)
-    {
-        this.noiseDataCallsAllowed = true;
-        consumer.accept(this);
-        this.noiseDataCallsAllowed = false;
     }
 
     public record TBFlatNoiseData(double shiftedX, double shiftedZ, double continentalness, double weirdness, double uniqueness, double erosion, TerrainInfo terrainInfo) {}

@@ -26,23 +26,14 @@ public class TBNoiseChunk extends NoiseChunk
         int j = Math.min(noisesettings.minY() + noisesettings.height(), chunkAccess.getMaxBuildHeight());
         int cellNoiseMinY = Mth.intFloorDiv(i, noisesettings.getCellHeight());
         int cellCountY = Mth.intFloorDiv(j - i, noisesettings.getCellHeight());
-
-        AtomicReference<TBNoiseChunk> noiseChunk = new AtomicReference();
-        sampler.doWithNoiseDataCallsAllowed((initSampler) -> {
-            noiseChunk.set(new TBNoiseChunk(16 / noisesettings.getCellWidth(), cellCountY, cellNoiseMinY, sampler, chunkpos.getMinBlockX(), chunkpos.getMinBlockZ(), noiseFiller.get(), noiseGenSettings, p_188778_, blender));
-        });
-        return noiseChunk.get();
+        return new TBNoiseChunk(16 / noisesettings.getCellWidth(), cellCountY, cellNoiseMinY, sampler, chunkpos.getMinBlockX(), chunkpos.getMinBlockZ(), noiseFiller.get(), noiseGenSettings, p_188778_, blender);
     }
 
     public static TBNoiseChunk forColumn(int x, int z, int cellNoiseMinY, int cellCountY, TBNoiseSampler sampler, NoiseGeneratorSettings noiseGenSettings, Aquifer.FluidPicker fluidPicker)
     {
-        AtomicReference<TBNoiseChunk> noiseChunk = new AtomicReference();
-        sampler.doWithNoiseDataCallsAllowed((initSampler) -> {
-            noiseChunk.set(new TBNoiseChunk(1, cellCountY, cellNoiseMinY, sampler, x, z, (noiseX, noiseY, noiseZ) -> {
-                return 0.0D;
-            }, noiseGenSettings, fluidPicker, Blender.empty()));
-        });
-        return noiseChunk.get();
+        return new TBNoiseChunk(1, cellCountY, cellNoiseMinY, sampler, x, z, (noiseX, noiseY, noiseZ) -> {
+            return 0.0D;
+        }, noiseGenSettings, fluidPicker, Blender.empty());
     }
 
     private TBNoiseChunk(int cellCountXZ, int cellCountY, int cellNoiseMinY, TBNoiseSampler sampler, int chunkX, int chunkZ, NoiseChunk.NoiseFiller noiseFiller, NoiseGeneratorSettings noiseGenSettings, Aquifer.FluidPicker fluidPicker, Blender blender)
