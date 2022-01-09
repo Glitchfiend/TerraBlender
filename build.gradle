@@ -1,194 +1,48 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-    }
-}
-
-plugins {
-    id "com.matthewprenger.cursegradle" version "1.4.0"
-}
-
-apply plugin: 'maven-publish'
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'idea'
-apply plugin: 'org.spongepowered.mixin'
-
-repositories { mavenLocal() }
-
-group = "com.github.glitchfiend"
-archivesBaseName = "TerraBlender"
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-def getGitHash = {
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
 version = "${minecraft_version}-${mod_version}.${System.getenv().BUILD_NUMBER}"
 
-minecraft {
-    mappings channel: 'official', version: minecraft_version
+subprojects {
+    apply plugin: 'java'
+    
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    java.withSourcesJar()
+    java.withJavadocJar()
 
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    version = rootProject.version
 
-    runs {
-        client = {
-            workingDirectory = project.file("run").canonicalPath
-            arg "-mixin.config=terrablender.mixins.json"
-            source sourceSets.main
-        }
-        server = {
-            workingDirectory = project.file("run").canonicalPath
-            arg "-mixin.config=terrablender.mixins.json"
-            source sourceSets.main
-        }
-    }
-}
-
-mixin {
-    add sourceSets.main, "terrablender.refmap.json"
-}
-
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xmaxerrs" << "10000"
+    jar {
+        manifest {
+            attributes([
+                'Specification-Title'     : mod_name,
+                'Specification-Vendor'    : mod_author,
+                'Specification-Version'   : project.jar.archiveVersion,
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_author,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'Timestampe'              : System.currentTimeMillis(),
+                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+                'Build-On-Minecraft'      : minecraft_version
+            ])
         }
     }
-}
-
-// configure  the source folders
-sourceSets {
-    main {
-        java {
-            srcDir "src/main/java"
-            srcDir "public/src/main/java"
-        }
-        resources {
-            srcDir "src/main/resources"
-            srcDir "public/src/main/resources"
-        }
-    }
-}
-
-processResources {
-	duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
-jar {
-    classifier = 'universal'
-    manifest {
-        attributes([
-            "Specification-Title": "terrablender",
-            "Specification-Vendor": "TerraBlender",
-            "Specification-Version": "1.1",
-            "Implementation-Title": project.name,
-            "Implementation-Version": project.version,
-            "Implementation-Vendor" :"terrablender",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs": "terrablender.mixins.json"
-        ])
-    }
-}
-
-dependencies {
-    minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-}
-
-def changelog_file = rootProject.file("build/TerraBlender-${version}-changelog.txt")
-
-curseforge {
-    if (project.hasProperty('curseApiKey')) {
-        apiKey = project.getProperty('curseApiKey')
-        project {
-            id = '563928'
-
-            if (changelog_file.exists()) {
-                changelog = changelog_file
-            }
-
-            releaseType = 'beta'
-            addGameVersion minecraft_version
-
-            mainArtifact(jar) {
-                displayName = "TerraBlender ${version}"
-            }
-
-            addArtifact deobfJar
-        }
-    }
-}
-
-artifacts {
-    if (changelog_file.exists()) {
-        archives changelog_file
-    }
-    archives jar
-    archives deobfJar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact deobfJar
-            pom {
-                name = 'TerraBlender'
-                description = "A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
-                url = 'https://github.com/Glitchfiend/TerraBlender'
-                scm {
-                    url = 'https://github.com/Glitchfiend/TerraBlender'
-                    connection = 'scm:git:git://github.com/Glitchfiend/TerraBlender.git'
-                    developerConnection = 'scm:git:git@github.com:Glitchfiend/TerraBlender.git'
-                }
-                issueManagement {
-                    system = 'github'
-                    url = 'https://github.com/Glitchfiend/TerraBlender/issues'
-                }
-
-                licenses {
-                    license {
-                        name = 'CC BY-NC-ND 4.0'
-                        url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = 'adubbz'
-                        name = 'Adubbz'
-                    }
-                }
-            }
-        }
-    }
+    
     repositories {
+        mavenCentral()
         maven {
-            url "https://maven.minecraftforge.net/releases/"
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                username = System.env.MAVEN_USER ?:'fake'
-                password = System.env.MAVEN_PASSWORD ?:'news'
-            }
+            name = 'Sponge / Mixin'
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
         }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = 'UTF-8'
+        it.options.release = 17
+    }
+
+    // Disables Gradle's custom module metadata from being published to maven. The
+    // metadata includes mapped dependencies which are not reasonably consumable by
+    // other mod developers.
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
     }
 }

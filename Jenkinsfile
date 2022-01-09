@@ -1,17 +1,13 @@
 @Library('forge-shared-library')_
 
 pipeline {
-    options {
-        disableConcurrentBuilds()
-    }
     agent {
         docker {
             image 'gradle:7-jdk16'
         }
     }
     environment {
-        GRADLE_ARGS = '--no-daemon --console=plain' // No daemon for now as FG3 kinda derps. //'-Dorg.gradle.daemon.idletimeout=5000'
-        JENKINS_HEAD = 'https://wiki.jenkins-ci.org/download/attachments/2916393/headshot.png'
+        GRADLE_ARGS = '-Dorg.gradle.daemon.idletimeout=5000'
     }
 
     stages {
@@ -20,7 +16,7 @@ pipeline {
                 checkout scm
             }
         }
-        stage('setup') {
+        stage('build') {
             steps {
                 withGradle {
                     sh './gradlew ${GRADLE_ARGS} --refresh-dependencies'
@@ -29,15 +25,10 @@ pipeline {
                     env.MYVERSION = sh(returnStdout: true, script: './gradlew :properties -q | grep "^version:" | awk \'{print $2}\'').trim()
                 }
             }
-        }
-        stage('changelog') {
-            when {
-                not {
-                    changeRequest()
+            post {
+                success {
+                    writeChangelog(currentBuild, "build/TerraBlender-${env.MYVERSION}-changelog.txt")
                 }
-            }
-            steps {
-                writeChangelog(currentBuild, "build/TerraBlender-${env.MYVERSION}-changelog.txt")
             }
         }
         stage('publish') {
@@ -50,11 +41,13 @@ pipeline {
                 CURSE_API_KEY = credentials('curse-api-key')
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'maven-adubbz-user', usernameVariable: 'MAVEN_USER', passwordVariable: 'MAVEN_PASSWORD')]) {
-                    sh './gradlew ${GRADLE_ARGS} publish'
-                }
                 withGradle {
+                    sh 'rm -rf ./Forge/build/classes' // Ensure refmaps are generated/included
                     sh './gradlew ${GRADLE_ARGS} curseforge -PcurseApiKey=${CURSE_API_KEY}'
+                }
+                withCredentials([usernamePassword(credentialsId: 'maven-adubbz-user', usernameVariable: 'MAVEN_USER', passwordVariable: 'MAVEN_PASSWORD')]) {
+                    sh 'rm -rf ./Forge/build/classes' // Ensure refmaps are generated/included
+                    sh './gradlew ${GRADLE_ARGS} publish'
                 }
             }
         }

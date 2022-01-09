@@ -1,0 +1,40 @@
+{
+    "schemaVersion": 1,
+    "id": "terrablender",
+    "version": "${version}",
+    "name": "TerraBlender",
+    "description": "A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system.",
+    "authors": [
+      "Adubbz"
+    ],
+    "contact": {
+      "homepage": "https://www.curseforge.com/minecraft/mc-mods/terrablender",
+      "sources": "https://github.com/Glitchfiend/TerraBlender/"
+    },
+    "license": "Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License",
+    "icon": "tb_logo.png",
+    "environment": "*",
+    "entrypoints": {
+      "main": [
+        "terrablender.core.TerraBlenderFabric"
+      ],
+      "client": [
+        "terrablender.core.TerraBlenderFabricClient"
+      ],
+      "server": [
+        "terrablender.core.TerraBlenderFabricServer"
+      ]
+    },
+    "mixins": [
+      "terrablender.mixins.json",
+      "terrablender_fabric.mixins.json"
+    ],
+    "depends": {
+      "fabricloader": "*",
+      "fabric": "*",
+      "minecraft": "1.18.x",
+      "java": ">=17"
+    },
+    "accessWidener": "terrablender.accesswidener"
+  }
+  

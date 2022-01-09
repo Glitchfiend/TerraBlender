@@ -1,0 +1,114 @@
+plugins {
+    id 'fabric-loom' version '0.10-SNAPSHOT'
+    id 'maven-publish'
+    id 'idea'
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+}
+
+archivesBaseName = "${mod_name}-fabric"
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    implementation project(":Common")
+    include implementation("com.electronwill.night-config:toml:${nightconfig_version}")
+    include implementation("com.electronwill.night-config:core:${nightconfig_version}")
+}
+
+loom {
+    accessWidenerPath = project(":Common").file("src/main/resources/terrablender.accesswidener")
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}
+
+processResources {
+    from project(":Common").sourceSets.main.resources
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+    
+    filesMatching("${mod_id}.mixins.json") {
+        expand "refmap_target": "${archivesBaseName}-"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    source(project(":Common").sourceSets.main.allSource)
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+def changelog_file = rootProject.file("build/TerraBlender-${version}-changelog.txt")
+
+curseforge {
+    if (project.hasProperty('curseApiKey')) {
+        apiKey = project.getProperty('curseApiKey')
+        project {
+            id = '563928'
+
+            if (changelog_file.exists()) {
+                changelog = changelog_file
+            }
+
+            releaseType = 'beta'
+            addGameVersion minecraft_version
+            addGameVersion 'Fabric'
+
+            mainArtifact(remapJar) {
+                displayName = "TerraBlender Fabric ${version}"
+
+                relations {
+					requiredDependency "fabric-api"
+				}
+            }
+        }
+
+        options {
+			forgeGradleIntegration = false
+		}
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "https://maven.minecraftforge.net/releases/"
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                username = System.env.MAVEN_USER ?:'fake'
+                password = System.env.MAVEN_PASSWORD ?:'news'
+            }
+        }
+    }
+}

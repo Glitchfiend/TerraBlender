@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "terrablender.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  ],
+  "client": [
+    "client.MixinCreateWorldScreen",
+    "client.MixinMinecraft"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}
