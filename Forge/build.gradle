@@ -161,7 +161,6 @@ publishing {
                 }
             }
         }
-        }
     }
     repositories {
         maven {
