@@ -17,12 +17,6 @@
     "entrypoints": {
       "main": [
         "terrablender.core.TerraBlenderFabric"
-      ],
-      "client": [
-        "terrablender.core.TerraBlenderFabricClient"
-      ],
-      "server": [
-        "terrablender.core.TerraBlenderFabricServer"
       ]
     },
     "mixins": [
