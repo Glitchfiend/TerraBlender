@@ -38,6 +38,15 @@ public class BiomeProviders
     }
 
     /**
+     * Register a {@link BiomeProvider}.
+     * @param provider the biome provider.
+     */
+    public static void register(BiomeProvider provider)
+    {
+        register(provider.getName(), provider);
+    }
+
+    /**
      * Remove a biome provider.
      * @param name the name of the biome provider.
      */
