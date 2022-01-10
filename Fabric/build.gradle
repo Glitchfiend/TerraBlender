@@ -13,7 +13,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation project(":Common")
+    compileOnly project(":Common")
     include implementation("com.electronwill.night-config:toml:${nightconfig_version}")
     include implementation("com.electronwill.night-config:core:${nightconfig_version}")
 }
@@ -127,25 +127,19 @@ publishing {
                         name = 'Adubbz'
                     }
                 }
-
-                whenConfigured {
-                    p -> p.dependencies = p.dependencies.findAll {
-                        dep -> dep.artifactId != "Common"
-                    }
-                }
             }
         }
     }
     repositories {
-        maven {
-            url "https://maven.minecraftforge.net/releases/"
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                username = System.env.MAVEN_USER ?:'fake'
-                password = System.env.MAVEN_PASSWORD ?:'news'
-            }
-        }
+       maven {
+           url "https://maven.minecraftforge.net/releases/"
+           authentication {
+               basic(BasicAuthentication)
+           }
+           credentials {
+               username = System.env.MAVEN_USER ?:'fake'
+               password = System.env.MAVEN_PASSWORD ?:'news'
+           }
+       }
     }
 }

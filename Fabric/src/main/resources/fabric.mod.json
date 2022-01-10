@@ -12,7 +12,7 @@
       "sources": "https://github.com/Glitchfiend/TerraBlender/"
     },
     "license": "Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License",
-    "icon": "tb_logo.png",
+    "icon": "tb_icon.png",
     "environment": "*",
     "entrypoints": {
       "main": [
@@ -35,6 +35,16 @@
       "minecraft": "1.18.x",
       "java": ">=17"
     },
-    "accessWidener": "terrablender.accesswidener"
+    "accessWidener": "terrablender.accesswidener",
+    "custom": {
+      "modmenu": {
+        "badges": [
+          "library"
+        ],
+        "links": {
+          "modmenu.discord": "https://discord.gg/GyyzU6T"
+        }
+      }
+    }
   }
   
