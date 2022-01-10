@@ -64,29 +64,30 @@ def changelog_file = rootProject.file("build/TerraBlender-${version}-changelog.t
 curseforge {
     if (project.hasProperty('curseApiKey')) {
         apiKey = project.getProperty('curseApiKey')
-        project {
-            id = '565956'
+    }
 
-            if (changelog_file.exists()) {
-                changelog = changelog_file
-            }
+    project {
+        id = '565956'
 
-            releaseType = 'beta'
-            addGameVersion minecraft_version
-            addGameVersion 'Fabric'
-
-            mainArtifact(remapJar) {
-                displayName = "TerraBlender Fabric ${version}"
-
-                relations {
-					requiredDependency "fabric-api"
-				}
-            }
+        if (changelog_file.exists()) {
+            changelog = changelog_file
         }
 
-        options {
-			forgeGradleIntegration = false
-		}
+        releaseType = 'beta'
+        addGameVersion minecraft_version
+        addGameVersion 'Fabric'
+
+        mainArtifact(remapJar) {
+            displayName = "TerraBlender Fabric ${version}"
+
+            relations {
+                requiredDependency "fabric-api"
+            }
+        }
+    }
+
+    options {
+        forgeGradleIntegration = false
     }
 }
 
@@ -97,6 +98,33 @@ publishing {
             artifactId project.archivesBaseName
             version project.version
             from components.java
+
+            pom {
+                name = 'TerraBlender-fabric'
+                description = "A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
+                url = 'https://github.com/Glitchfiend/TerraBlender'
+                scm {
+                    url = 'https://github.com/Glitchfiend/TerraBlender'
+                    connection = 'scm:git:git://github.com/Glitchfiend/TerraBlender.git'
+                    developerConnection = 'scm:git:git@github.com:Glitchfiend/TerraBlender.git'
+                }
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/Glitchfiend/TerraBlender/issues'
+                }
+                licenses {
+                    license {
+                        name = 'CC BY-NC-ND 4.0'
+                        url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adubbz'
+                        name = 'Adubbz'
+                    }
+                }
+            }
         }
     }
     repositories {

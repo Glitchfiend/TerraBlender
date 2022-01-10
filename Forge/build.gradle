@@ -126,10 +126,38 @@ curseforge {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            // We must use artifact jar to ensure the Forge dependency is excluded from the pom, breaking fg.deobf()
             artifact jar
             groupId project.group
             artifactId project.archivesBaseName
             version project.version
+
+            pom {
+                name = 'TerraBlender-forge'
+                description = "A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
+                url = 'https://github.com/Glitchfiend/TerraBlender'
+                scm {
+                    url = 'https://github.com/Glitchfiend/TerraBlender'
+                    connection = 'scm:git:git://github.com/Glitchfiend/TerraBlender.git'
+                    developerConnection = 'scm:git:git@github.com:Glitchfiend/TerraBlender.git'
+                }
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/Glitchfiend/TerraBlender/issues'
+                }
+                licenses {
+                    license {
+                        name = 'CC BY-NC-ND 4.0'
+                        url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adubbz'
+                        name = 'Adubbz'
+                    }
+                }
+            }
         }
     }
     repositories {
