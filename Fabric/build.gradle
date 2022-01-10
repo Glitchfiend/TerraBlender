@@ -41,7 +41,7 @@ processResources {
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand "version": "${mod_version}"
     }
     
     filesMatching("${mod_id}.mixins.json") {
@@ -94,6 +94,10 @@ curseforge {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifact(jar.archivePath) {
+                builtBy remapJar
+            }
+
             groupId project.group
             artifactId project.archivesBaseName
             version project.version
