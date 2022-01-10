@@ -147,7 +147,7 @@ publishing {
                 }
                 licenses {
                     license {
-                        name = 'CC BY-NC-ND 4.0'
+                        name = 'CC-BY-NC-ND-4.0
                         url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
                     }
                 }
