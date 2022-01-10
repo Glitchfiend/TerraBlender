@@ -25,12 +25,19 @@ buildscript {
 }
 ```
 
-2. Add **TerraBlender** to your dependencies block, ensuring you replace ``<Minecraft version>`` and ``<Mod version>`` as appropriate:
+2. Add **TerraBlender** to your dependencies block, ensuring you replace ``x.x.x`` with your **Minecraft version** and ``y.y.y.y`` with your mod version as appropriate:
 
+**Forge**
 ```groovy
 dependencies {
-    minecraft 'net.minecraftforge:forge:' <...>
-    implementation 'com.github.glitchfiend:TerraBlender:<Minecraft version>-<Mod version>:deobf'
+    implementation fg.deobf('com.github.glitchfiend:TerraBlender-forge:x.x.x-y.y.y.y')
+}
+```
+
+**Fabric**
+```groovy
+dependencies {
+    modImplementation 'com.github.glitchfiend:TerraBlender-fabric:x.x.x-y.y.y.y'
 }
 ```
 
