@@ -41,7 +41,7 @@ processResources {
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": "${mod_version}"
+        expand "version": "${mod_version}.${System.getenv().BUILD_NUMBER}"
     }
     
     filesMatching("${mod_id}.mixins.json") {
@@ -125,6 +125,12 @@ publishing {
                     developer {
                         id = 'adubbz'
                         name = 'Adubbz'
+                    }
+                }
+
+                whenConfigured {
+                    p -> p.dependencies = p.dependencies.findAll {
+                        dep -> dep.artifactId != "Common"
                     }
                 }
             }
