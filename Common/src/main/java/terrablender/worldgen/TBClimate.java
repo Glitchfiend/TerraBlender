@@ -6,6 +6,7 @@ package terrablender.worldgen;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -15,7 +16,6 @@ import net.minecraft.core.QuartPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Climate.Parameter;
-import terrablender.api.BiomeProviders;
 import terrablender.core.TerraBlender;
 
 import javax.annotation.Nullable;
@@ -117,24 +117,28 @@ public class TBClimate
 
     protected static class UniquenessRTree<T>
     {
-        private final RTree[] trees;
+        private static final int VANILLA_UNIQUENESS = 0;
 
-        private UniquenessRTree()
-        {
-            this.trees = new RTree[BiomeProviders.getCount()];
-        }
+        private RTree[] trees;
 
         public static <T> UniquenessRTree<T> create(List<Pair<ParameterPoint, T>> values)
         {
             UniquenessRTree<T> tree = new UniquenessRTree<>();
-            int vanillaIndex = BiomeProviders.getIndex(BiomeProviders.DEFAULT_PROVIDER_LOCATION);
-            RTree<T> vanillaTree = RTree.create(filterValues(vanillaIndex, values));
-            tree.trees[vanillaIndex] = vanillaTree;
 
-            for (int i = 0; i < BiomeProviders.getCount(); i++)
+            // Use uniqueness values as they have been given to us, not from BiomeProviders.
+            // This ensures we respect the data provided by save files, rather than doing our own thing.
+            List<Integer> uniquenesses = getUniquenessValues(values);
+            int numUniquenesses = uniquenesses.size();
+
+            // Initialize tree
+            tree.trees = new RTree[numUniquenesses];
+            RTree<T> vanillaTree = RTree.create(filterValues(VANILLA_UNIQUENESS, values));
+            tree.trees[VANILLA_UNIQUENESS] = vanillaTree;
+
+            for (int i = 0; i < numUniquenesses; i++)
             {
                 // Skip Vanilla as we have already dealt with it
-                if (i == vanillaIndex)
+                if (i == VANILLA_UNIQUENESS)
                     continue;
 
                 final int uniqueness = i;
@@ -166,6 +170,32 @@ public class TBClimate
                 return uniqueness >= uniquenessParameter.min() && uniqueness <= uniquenessParameter.max();
             } ).collect(Collectors.toCollection(ArrayList::new));
         }
+
+        private static <T> List<Integer> getUniquenessValues(List<Pair<ParameterPoint, T>> values)
+        {
+            List<Integer> uniquenesses = values.stream().filter(value -> value.getFirst().uniqueness().min() == value.getFirst().uniqueness().max()).map(value -> (int)value.getFirst().uniqueness().min()).collect(ImmutableSet.toImmutableSet()).stream().sorted().collect(ImmutableList.toImmutableList());
+
+            if (uniquenesses.isEmpty())
+                throw new IllegalArgumentException("Need at least one uniqueness value in parameter values.");
+
+            if (uniquenesses.get(0) != 0)
+                throw new IllegalStateException("Uniqueness values must start at 0");
+
+            if (uniquenesses.size() > 0)
+            {
+                // Ensure the uniquenesses are consecutive
+                for (int i = 1; i < uniquenesses.size(); i++)
+                {
+                    if (uniquenesses.get(i - 1) + 1 != uniquenesses.get(i))
+                    {
+                        throw new IllegalStateException("Uniqueness values must be consecutive.");
+                    }
+                }
+            }
+
+            return uniquenesses;
+        }
+
     }
 
     protected static class RTree<T>
