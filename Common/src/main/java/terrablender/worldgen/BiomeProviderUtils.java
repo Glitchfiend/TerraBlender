@@ -25,6 +25,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.OverworldBiomeBuilder;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.api.BiomeProvider;
 import terrablender.api.BiomeProviders;
@@ -39,6 +40,9 @@ import java.util.function.Function;
 
 public class BiomeProviderUtils
 {
+    private static final List<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> VANILLA_POINTS;
+
+    private static Map<ResourceKey<Biome>, List<Climate.ParameterPoint>> biomeParameterPointCache = Maps.newHashMap();
     private static Map<Integer, Float> uniquenessMidPointCache = Maps.newHashMap();
     private static Map<Integer, Climate.Parameter> uniquenessParameterCache = Maps.newHashMap();
 
@@ -77,9 +81,14 @@ public class BiomeProviderUtils
         return parameter;
     }
 
-    public static TBClimate.ParameterPoint convertParameterPoint(Climate.ParameterPoint point, Climate.Parameter uniqueness)
+    public static List<Climate.ParameterPoint> getVanillaParameterPoints(ResourceKey<Biome> biome)
     {
-        return TBClimate.parameters(point.temperature(), point.humidity(), point.continentalness(), point.erosion(), point.depth(), point.weirdness(), uniqueness, Climate.unquantizeCoord(point.offset()));
+        if (biomeParameterPointCache.containsKey(biome))
+            return biomeParameterPointCache.get(biome);
+
+        List<Climate.ParameterPoint> points = VANILLA_POINTS.stream().filter(pair -> pair.getSecond() == biome).map(pair -> pair.getFirst()).collect(ImmutableList.toImmutableList());
+        biomeParameterPointCache.put(biome, points);
+        return points;
     }
 
     public static List<TBClimate.ParameterPoint> getAllSpawnTargets()
@@ -121,5 +130,9 @@ public class BiomeProviderUtils
     static
     {
         BiomeProviders.addIndexResetListener(BiomeProviderUtils::onIndexReset);
+
+        ImmutableList.Builder<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> builder = new ImmutableList.Builder();
+        (new OverworldBiomeBuilder()).addBiomes(pair -> builder.add(pair));
+        VANILLA_POINTS = builder.build();
     }
 }

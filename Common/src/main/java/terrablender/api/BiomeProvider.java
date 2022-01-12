@@ -24,8 +24,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import terrablender.core.TerraBlender;
 import terrablender.worldgen.BiomeProviderUtils;
 import terrablender.worldgen.TBClimate;
 
@@ -142,5 +144,17 @@ public abstract class BiomeProvider extends WeightedEntry.IntrusiveBase
     protected final void addBiome(Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper, TBClimate.ParameterPoint parameters, ResourceKey<Biome> biome)
     {
         mapper.accept(Pair.of(parameters, biome));
+    }
+
+    /**
+     * Adds a biome using climate parameters similar to those of a given Vanilla biome.
+     * @param mapper the mapper used to construct a list of {@link terrablender.worldgen.TBClimate.ParameterPoint ParameterPoint} to biome mappings.
+     * @param similarVanillaBiome the Vanilla biome that is similar to the one to be added.
+     * @param biome the biome to be added.
+     */
+    protected final void addBiomeSimilar(Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper, ResourceKey<Biome> similarVanillaBiome, ResourceKey<Biome> biome)
+    {
+        List<TBClimate.ParameterPoint> points = BiomeProviderUtils.getVanillaParameterPoints(similarVanillaBiome).stream().map(point -> ParameterUtils.convertParameterPoint(point, getUniquenessParameter())).collect(ImmutableList.toImmutableList());
+        points.forEach(point -> addBiome(mapper, point, biome));
     }
 }

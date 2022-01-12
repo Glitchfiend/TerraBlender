@@ -17,13 +17,11 @@
  */
 package terrablender.worldgen;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -33,13 +31,11 @@ import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import terrablender.api.BiomeProvider;
+import terrablender.api.ParameterUtils;
 import terrablender.core.TerraBlender;
-import terrablender.worldgen.BiomeProviderUtils;
-import terrablender.worldgen.TBClimate;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class DataPackBiomeProvider extends BiomeProvider
 {
@@ -81,7 +77,7 @@ public class DataPackBiomeProvider extends BiomeProvider
         TerraBlender.LOGGER.info("Adding overworld biomes for datapack " + this.getName() + " with uniqueness " + uniquenessParameter);
 
         biomeSource.parameters.values().stream().forEach(pair -> {
-            TBClimate.ParameterPoint parameters = BiomeProviderUtils.convertParameterPoint(pair.getFirst(), uniquenessParameter);
+            TBClimate.ParameterPoint parameters = ParameterUtils.convertParameterPoint(pair.getFirst(), uniquenessParameter);
             Optional<ResourceKey<Biome>> key = registry.getResourceKey(pair.getSecond().get());
 
             if (key.isPresent())

@@ -28,6 +28,7 @@ import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.api.BiomeProvider;
+import terrablender.api.ParameterUtils;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -43,7 +44,7 @@ public class DefaultBiomeProvider extends BiomeProvider
     public void addOverworldBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
     {
         Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> vanillaMapper = (pair) -> {
-            mapper.accept(Pair.of(BiomeProviderUtils.convertParameterPoint(pair.getFirst(), this.getUniquenessParameter()), pair.getSecond()));
+            mapper.accept(Pair.of(ParameterUtils.convertParameterPoint(pair.getFirst(), this.getUniquenessParameter()), pair.getSecond()));
         };
 
         (new OverworldBiomeBuilder()).addBiomes(vanillaMapper);
