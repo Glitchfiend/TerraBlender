@@ -147,8 +147,8 @@ publishing {
                 }
                 licenses {
                     license {
-                        name = 'CC-BY-NC-ND-4.0'
-                        url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'
+                        name = 'LGPLv3'
+                        url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
                     }
                 }
                 developers {

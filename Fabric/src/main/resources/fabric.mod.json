@@ -11,7 +11,7 @@
       "homepage": "https://www.curseforge.com/minecraft/mc-mods/terrablender",
       "sources": "https://github.com/Glitchfiend/TerraBlender/"
     },
-    "license": "CC-BY-NC-ND-4.0",
+    "license": "LGPLv3",
     "icon": "tb_icon.png",
     "environment": "*",
     "entrypoints": {

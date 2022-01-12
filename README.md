@@ -43,6 +43,4 @@ dependencies {
 
 -----------------
 
- [<img src="https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png">](http://creativecommons.org/licenses/by-nc-nd/4.0/deed.en_US)
-
-TerraBlender is licensed under a [Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License](http://creativecommons.org/licenses/by-nc-nd/4.0/deed.en_US).
+This software is licensed under the terms of the LGPLv3. You can find a copy of the license in the [LICENSE file](LICENSE).
