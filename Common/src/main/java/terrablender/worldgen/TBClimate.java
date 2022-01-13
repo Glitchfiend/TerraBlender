@@ -29,6 +29,7 @@ import net.minecraft.core.QuartPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Climate.Parameter;
+import terrablender.api.BiomeProviders;
 import terrablender.core.TerraBlender;
 
 import javax.annotation.Nullable;
@@ -189,7 +190,12 @@ public class TBClimate
             List<Integer> uniquenesses = values.stream().filter(value -> value.getFirst().uniqueness().min() == value.getFirst().uniqueness().max()).map(value -> (int)value.getFirst().uniqueness().min()).collect(ImmutableSet.toImmutableSet()).stream().sorted().collect(ImmutableList.toImmutableList());
 
             if (uniquenesses.isEmpty())
-                throw new IllegalArgumentException("Need at least one uniqueness value in parameter values.");
+            {
+                TerraBlender.LOGGER.error("No uniqueness values found in parameter values. Things may not work well!");
+
+                // Fall back on our list from BiomeProviders
+                return BiomeProviders.get().stream().map(provider -> provider.getIndex()).collect(ImmutableSet.toImmutableSet()).stream().sorted().collect(ImmutableList.toImmutableList());
+            }
 
             if (uniquenesses.get(0) != 0)
                 throw new IllegalStateException("Uniqueness values must start at 0");
