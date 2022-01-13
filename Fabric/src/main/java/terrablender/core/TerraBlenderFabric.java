@@ -43,6 +43,7 @@ public class TerraBlenderFabric implements ModInitializer
             Optional<SurfaceRules.RuleSource> defaultOverworldSurfaceRules = api.getDefaultOverworldSurfaceRules();
             Optional<SurfaceRules.RuleSource> defaultNetherSurfaceRules = api.getDefaultNetherSurfaceRules();
 
+            entrypoint.getEntrypoint().onTerraBlenderInitialized();
             if (defaultOverworldSurfaceRules.isPresent()) GenerationSettings.setDefaultOverworldSurfaceRules(defaultOverworldSurfaceRules.get());
             if (defaultNetherSurfaceRules.isPresent()) GenerationSettings.setDefaultNetherSurfaceRules(defaultNetherSurfaceRules.get());
         });
