@@ -30,6 +30,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -37,6 +38,7 @@ import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import terrablender.core.TerraBlender;
+import terrablender.worldgen.noise.LayeredNoiseUtil;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -65,8 +67,18 @@ public class TBNoiseBasedChunkGenerator extends NoiseBasedChunkGenerator impleme
     {
         super(noises, runtimeBiomeSource, seed, settings);
         NoiseGeneratorSettings noiseGeneratorSettings = this.settings.get();
-        NoiseSettings noisesettings = noiseGeneratorSettings.noiseSettings();
-        this.sampler = new TBNoiseSampler(noisesettings, noiseGeneratorSettings.isNoiseCavesEnabled(), seed, noises, noiseGeneratorSettings.getRandomSource());
+        NoiseSettings noiseSettings = noiseGeneratorSettings.noiseSettings();
+        boolean largeBiomes = noiseSettings.largeBiomes();
+
+        LayeredNoiseUtil.UniquenessType uniquenessType = largeBiomes ? LayeredNoiseUtil.UniquenessType.OVERWORLD_LARGE : LayeredNoiseUtil.UniquenessType.OVERWORLD;
+
+        // Simple check to determine if we are working with the nether or not
+        if (noiseGeneratorSettings.getDefaultBlock().getBlock() == Blocks.NETHERRACK && noiseGeneratorSettings.getDefaultFluid().getBlock() == Blocks.LAVA)
+        {
+            uniquenessType = largeBiomes ? LayeredNoiseUtil.UniquenessType.NETHER_LARGE : LayeredNoiseUtil.UniquenessType.NETHER;
+        }
+
+        this.sampler = new TBNoiseSampler(noiseSettings, noiseGeneratorSettings.isNoiseCavesEnabled(), seed, noises, noiseGeneratorSettings.getRandomSource(), uniquenessType);
     }
 
     @Override

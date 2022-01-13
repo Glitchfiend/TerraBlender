@@ -33,7 +33,6 @@ import terrablender.worldgen.noise.Area;
 import terrablender.worldgen.noise.LayeredNoiseUtil;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
 {
@@ -41,7 +40,7 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
 
     private final List<TBClimate.ParameterPoint> tbSpawnTarget;
 
-    public TBNoiseSampler(NoiseSettings noiseSettings, boolean isNoiseCavesEnabled, long seed, Registry<NormalNoise.NoiseParameters> noiseParamRegistry, WorldgenRandom.Algorithm randomSource)
+    public TBNoiseSampler(NoiseSettings noiseSettings, boolean isNoiseCavesEnabled, long seed, Registry<NormalNoise.NoiseParameters> noiseParamRegistry, WorldgenRandom.Algorithm randomSource, LayeredNoiseUtil.UniquenessType uniquenessType)
     {
         super(noiseSettings, isNoiseCavesEnabled, seed, noiseParamRegistry, randomSource);
 
@@ -52,9 +51,7 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
             });
         };
 
-        boolean largeBiomes = noiseSettings.largeBiomes();
-        this.uniquenessNoise = LayeredNoiseUtil.uniqueness(seed, largeBiomes ? TerraBlender.CONFIG.largeBiomesRegionSize : TerraBlender.CONFIG.regionSize);
-
+        this.uniquenessNoise = LayeredNoiseUtil.uniqueness(seed, uniquenessType);
         this.tbSpawnTarget = BiomeProviderUtils.getAllSpawnTargets();
         // Null Vanilla's spawn targets list to reduce memory usage.
         this.spawnTarget = null;

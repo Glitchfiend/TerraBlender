@@ -25,21 +25,23 @@ import net.minecraft.util.random.WeightedRandom;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class InitialLayer implements AreaTransformer0
 {
-    private final WeightedRandomList<BiomeProvider> weightedEntries;
+    private final WeightedRandomList<WeightedEntry.Wrapper<BiomeProvider>> weightedEntries;
 
-    public InitialLayer()
+    public InitialLayer(Function<BiomeProvider, Integer> getWeight)
     {
-        this.weightedEntries = WeightedRandomList.create(BiomeProviders.get());
+        this.weightedEntries = WeightedRandomList.create(BiomeProviders.get().stream().filter(provider -> getWeight.apply(provider) > 0).map(provider -> WeightedEntry.wrap(provider, getWeight.apply(provider))).collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public int apply(AreaContext context, int x, int y)
     {
-        Optional<BiomeProvider> entry = weightedEntries.getRandom(context);
-        return entry.isPresent() ? entry.get().getIndex() : 0;
+        Optional<WeightedEntry.Wrapper<BiomeProvider>> entry = weightedEntries.getRandom(context);
+        return entry.isPresent() ? entry.get().getData().getIndex() : 0;
     }
 
     private static class WeightedRandomList<E extends WeightedEntry>

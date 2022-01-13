@@ -39,14 +39,22 @@ import java.util.function.Consumer;
  * A source of modded biome parameters and other biome-related data.
  * Each mod should implement one or more biome providers.
  */
-public abstract class BiomeProvider extends WeightedEntry.IntrusiveBase
+public abstract class BiomeProvider
 {
     private final ResourceLocation name;
+    private final int overworldWeight;
+    private final int netherWeight;
 
-    public BiomeProvider(ResourceLocation name, int weight)
+    public BiomeProvider(ResourceLocation name, int overworldWeight)
     {
-        super(weight);
+        this(name, overworldWeight, 0);
+    }
+
+    public BiomeProvider(ResourceLocation name, int overworldWeight, int netherWeight)
+    {
         this.name = name;
+        this.overworldWeight = overworldWeight;
+        this.netherWeight = netherWeight;
     }
 
     /**
@@ -98,6 +106,24 @@ public abstract class BiomeProvider extends WeightedEntry.IntrusiveBase
     public ResourceLocation getName()
     {
         return this.name;
+    }
+
+    /**
+     * Get the weight of this biome provider's regions in the overworld.
+     * @return the overworld region weight.
+     */
+    public int getOverworldWeight()
+    {
+        return this.overworldWeight;
+    }
+
+    /**
+     * Get the weight of this biome provider's regions in the nether.
+     * @return the nether region weight.
+     */
+    public int getNetherWeight()
+    {
+        return this.netherWeight;
     }
 
     /**

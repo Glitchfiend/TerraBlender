@@ -20,6 +20,7 @@ package terrablender.worldgen;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -27,6 +28,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import org.apache.logging.log4j.util.TriConsumer;
 import terrablender.api.BiomeProvider;
 import terrablender.api.BiomeProviders;
 import terrablender.api.GenerationSettings;
@@ -35,6 +37,8 @@ import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -100,12 +104,39 @@ public class BiomeProviderUtils
 
     public static void addAllOverworldBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
     {
-        BiomeProviders.get().forEach(provider -> provider.addOverworldBiomes(registry, mapper));
+        addBiomesWithVerification(registry, mapper, BiomeProvider::getOverworldWeight, BiomeProvider::addOverworldBiomes);
     }
 
     public static void addAllNetherBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
     {
-        BiomeProviders.get().forEach(provider -> provider.addNetherBiomes(registry, mapper));
+        addBiomesWithVerification(registry, mapper, BiomeProvider::getNetherWeight, BiomeProvider::addNetherBiomes);
+    }
+
+    private static void addBiomesWithVerification(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper, Function<BiomeProvider, Integer> weight, TriConsumer<BiomeProvider, Registry<Biome>, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>>> add)
+    {
+        Set<Integer> unusedIndices = Sets.newHashSet();
+        Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> verificationMapper = pair -> {
+            Climate.Parameter uniqueness = pair.getFirst().uniqueness();
+
+            // Remove indices that have been utilised
+            if (uniqueness.min() == uniqueness.max())
+                unusedIndices.remove((int)uniqueness.min());
+
+            mapper.accept(pair);
+        };
+
+        BiomeProviders.get().forEach(provider -> {
+            // Add to the list of indices if weighted more than 0.
+            if (weight.apply(provider) > 0)
+                unusedIndices.add(provider.getIndex());
+        });
+
+        BiomeProviders.get().forEach(provider -> {
+            add.accept(provider, registry, verificationMapper);
+        });
+
+        if (unusedIndices.size() > 0)
+            throw new RuntimeException("Biome indices have been registered but haven't been utilised: " + unusedIndices + ". Either utilise the uniqueness assigned to your biome provider or set your provider's weight to 0.");
     }
 
     private static Map<String, SurfaceRules.RuleSource> collectRuleSources(Function<BiomeProvider, Optional<SurfaceRules.RuleSource>> rulesSource)
