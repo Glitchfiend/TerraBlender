@@ -15,6 +15,6 @@ logoFile="tb_logo.png"
 [[dependencies.terrablender]]
     modId="forge"
     mandatory=true
-    versionRange="[39.0.8,)"
+    versionRange="[39.0.19,)"
     ordering="NONE"
     side="BOTH"

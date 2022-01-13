@@ -115,21 +115,25 @@ public class BiomeProviderUtils
     private static void addBiomesWithVerification(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper, Function<BiomeProvider, Integer> weight, TriConsumer<BiomeProvider, Registry<Biome>, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>>> add)
     {
         Set<Integer> unusedIndices = Sets.newHashSet();
-        Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> verificationMapper = pair -> {
-            Climate.Parameter uniqueness = pair.getFirst().uniqueness();
-
-            // Remove indices that have been utilised
-            if (uniqueness.min() == uniqueness.max())
-                unusedIndices.remove((int)uniqueness.min());
-
-            mapper.accept(pair);
-        };
 
         BiomeProviders.get().forEach(provider -> {
             // Add to the list of indices if weighted more than 0.
             if (weight.apply(provider) > 0)
                 unusedIndices.add(provider.getIndex());
         });
+
+        Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> verificationMapper = pair -> {
+            if (!unusedIndices.isEmpty())
+            {
+                Climate.Parameter uniqueness = pair.getFirst().uniqueness();
+
+                // Remove indices that have been utilised
+                if (uniqueness.min() == uniqueness.max())
+                    unusedIndices.remove((int)uniqueness.min());
+            }
+
+            mapper.accept(pair);
+        };
 
         BiomeProviders.get().forEach(provider -> {
             add.accept(provider, registry, verificationMapper);
