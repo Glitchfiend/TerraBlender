@@ -66,7 +66,13 @@ public class TBNoiseSampler extends NoiseSampler implements TBClimate.Sampler
     @Override
     public Climate.TargetPoint sample(int x, int y, int z)
     {
-        throw new RuntimeException("Vanilla sample called on TBNoiseSampler!");
+        // Here we convert to Climate.TargetPoint from TerraBlender's sample.
+        // This may potentially cover up bugs, but it is needed to provide support for mods that call this method for whatever reason such as Pokecube AIO.
+        // During testing, the below is recommended:
+        // throw new RuntimeException("Vanilla sample called on TBNoiseSampler!");
+
+        TBClimate.TargetPoint sample = this.sampleTB(x, y, z);
+        return new Climate.TargetPoint(sample.temperature(), sample.humidity(), sample.continentalness(), sample.erosion(), sample.depth(), sample.weirdness());
     }
 
     @Override
