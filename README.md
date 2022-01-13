@@ -8,38 +8,9 @@
 
 -----------------
 
-### Using TerraBlender
+### Documentation
 
-To configure your ``build.gradle`` to use **TerraBlender** you should:
-
-1. Ensure you have the Forge Maven in your `buildscript -> repositories` block:
-
-```groovy
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
-    }
-    dependencies {
-        ...
-    }
-}
-```
-
-2. Add **TerraBlender** to your dependencies block, ensuring you replace ``x.x.x`` with your **Minecraft version** and ``y.y.y.y`` with your mod version as appropriate:
-
-**Forge**
-```groovy
-dependencies {
-    implementation fg.deobf('com.github.glitchfiend:TerraBlender-forge:x.x.x-y.y.y.y')
-}
-```
-
-**Fabric**
-```groovy
-dependencies {
-    modImplementation 'com.github.glitchfiend:TerraBlender-fabric:x.x.x-y.y.y.y'
-}
-```
+Documentation on setting up and using **TerraBlender** can be found on our [Wiki](https://github.com/Glitchfiend/TerraBlender/wiki). It's also worth checking the [Common](https://github.com/Glitchfiend/TerraBlender/tree/TB-1.18.x-1.x.x/Common/src/main/java/terrablender/api) and [Fabric](https://github.com/Glitchfiend/TerraBlender/tree/TB-1.18.x-1.x.x/Fabric/src/main/java/terrablender/api) api packages to view the api docstrings.
 
 -----------------
 
