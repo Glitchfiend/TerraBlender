@@ -35,9 +35,9 @@ import java.util.function.Consumer;
 
 public class DefaultBiomeProvider extends BiomeProvider
 {
-    public DefaultBiomeProvider(ResourceLocation location, int weight)
+    public DefaultBiomeProvider(ResourceLocation location, int overworldWeight, int netherWeight)
     {
-        super(location, weight);
+        super(location, overworldWeight, netherWeight);
     }
 
     @Override

@@ -122,6 +122,6 @@ public class BiomeProviders
 
     static
     {
-        register(DEFAULT_PROVIDER_LOCATION, new DefaultBiomeProvider(DEFAULT_PROVIDER_LOCATION, TerraBlender.CONFIG.vanillaRegionWeight));
+        register(DEFAULT_PROVIDER_LOCATION, new DefaultBiomeProvider(DEFAULT_PROVIDER_LOCATION, TerraBlender.CONFIG.vanillaOverworldRegionWeight, TerraBlender.CONFIG.vanillaNetherRegionWeight));
     }
 }
