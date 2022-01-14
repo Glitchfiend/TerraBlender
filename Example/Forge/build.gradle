@@ -1,0 +1,37 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'idea'
+apply plugin: 'org.spongepowered.mixin'
+
+archivesBaseName = "Test"
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+
+    runs {
+        client = {
+            workingDirectory = project.file("run").canonicalPath
+            source sourceSets.main
+        }
+        server = {
+            workingDirectory = project.file("run").canonicalPath
+            source sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
+    implementation fg.deobf('com.github.glitchfiend:TerraBlender-forge:' + minecraft_version + '-' + terrablender_version)
+}
