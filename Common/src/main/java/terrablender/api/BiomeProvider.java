@@ -200,4 +200,16 @@ public abstract class BiomeProvider
         List<TBClimate.ParameterPoint> points = BiomeProviderUtils.getVanillaParameterPoints(similarVanillaBiome).stream().map(point -> ParameterUtils.convertParameterPoint(point, getUniquenessParameter())).collect(ImmutableList.toImmutableList());
         points.forEach(point -> addBiome(mapper, point, biome));
     }
+
+    /**
+     * Adds all Vanilla overworld biomes with any modifications made.
+     * @param mapper the mapper used to construct a list of {@link terrablender.worldgen.TBClimate.ParameterPoint ParameterPoint} to biome mappings.
+     * @param onModify a consumer which can be used to modify the Vanilla overworld parameters.
+     */
+    protected final void addModifiedVanillaOverworldBiomes(Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper, Consumer<ModifiedVanillaOverworldBuilder> onModify)
+    {
+        ModifiedVanillaOverworldBuilder builder = new ModifiedVanillaOverworldBuilder();
+        onModify.accept(builder);
+        builder.build(this.getUniquenessParameter()).forEach(mapper::accept);
+    }
 }
