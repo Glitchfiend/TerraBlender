@@ -164,6 +164,23 @@ public abstract class BiomeProvider
     /**
      * Adds a biome using the provided mapper.
      * @param mapper the mapper used to construct a list of {@link terrablender.worldgen.TBClimate.ParameterPoint ParameterPoint} to biome mappings.
+     * @param temperature the temperature value.
+     * @param humidity the humidity value.
+     * @param continentalness the continentalness value.
+     * @param erosion the erosion value.
+     * @param weirdness the weirdness value
+     * @param depth the depth value.
+     * @param offset the offset parameter value.
+     * @param biome the biome to be added.
+     */
+    protected final void addBiome(Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper, ParameterUtils.Temperature temperature, ParameterUtils.Humidity humidity, ParameterUtils.Continentalness continentalness, ParameterUtils.Erosion erosion, ParameterUtils.Weirdness weirdness, ParameterUtils.Depth depth, float offset, ResourceKey<Biome> biome)
+    {
+        addBiome(mapper, TBClimate.parameters(temperature.parameter(), humidity.parameter(), continentalness.parameter(), erosion.parameter(), depth.parameter(), weirdness.parameter(), getUniquenessParameter(), offset), biome);
+    }
+
+    /**
+     * Adds a biome using the provided mapper.
+     * @param mapper the mapper used to construct a list of {@link terrablender.worldgen.TBClimate.ParameterPoint ParameterPoint} to biome mappings.
      * @param parameters the parameters corresponding to the biome.
      * @param biome the biome to be added.
      */
