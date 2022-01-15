@@ -29,7 +29,8 @@ public class TerraBlenderConfig extends ConfigFile
     public final int netherLargeBiomesRegionSize;
     public final int vanillaOverworldRegionWeight;
     public final int vanillaNetherRegionWeight;
-    public final int datapackRegionWeight;
+    public final int datapackOverworldRegionWeight;
+    public final int datapackNetherRegionWeight;
 
     public TerraBlenderConfig(Path path)
     {
@@ -47,7 +48,8 @@ public class TerraBlenderConfig extends ConfigFile
         this.netherLargeBiomesRegionSize = generationSettings.addNumber("The size of nether biome regions from each mod that uses TerraBlender when using the large biomes world type.", "nether_large_biomes_region_size", 4, 2, 6);
         this.vanillaOverworldRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the overworld.", "vanilla_overworld_region_weight", 10, 0, Integer.MAX_VALUE);
         this.vanillaNetherRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the nether.", "vanilla_nether_region_weight", 10, 0, Integer.MAX_VALUE);
-        this.datapackRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions.", "datapack_region_weight", 15, 0, Integer.MAX_VALUE);
+        this.datapackOverworldRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions in the overworld.", "datapack_overworld_region_weight", 15, 0, Integer.MAX_VALUE);
+        this.datapackNetherRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions in the nether.", "datapack_nether_region_weight", 15, 0, Integer.MAX_VALUE);
         this.addSubConfig("Generation settings", "generation_settings", generationSettings);
 
         this.save();

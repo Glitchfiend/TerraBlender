@@ -41,12 +41,13 @@ public class DataPackBiomeProvider extends BiomeProvider
 {
     private WorldGenSettings settings;
     private ChunkGenerator overworldGenerator;
+    private ChunkGenerator netherGenerator;
     private Optional<SurfaceRules.RuleSource> overworldSurfaceRules = Optional.empty();
     private Optional<SurfaceRules.RuleSource> netherSurfaceRules = Optional.empty();
 
-    public DataPackBiomeProvider(ResourceLocation name, int weight, WorldGenSettings settings)
+    public DataPackBiomeProvider(ResourceLocation name, int overworldWeight, int netherWeight, WorldGenSettings settings)
     {
-        super(name, weight);
+        super(name, overworldWeight, netherWeight);
         this.settings = settings;
         this.overworldGenerator = settings.overworld();
 
@@ -57,7 +58,7 @@ public class DataPackBiomeProvider extends BiomeProvider
         }
 
         LevelStem netherStem = settings.dimensions().get(LevelStem.NETHER);
-        ChunkGenerator netherGenerator = netherStem != null ? netherStem.generator() : null;
+        this.netherGenerator = netherStem != null ? netherStem.generator() : null;
 
         if (netherGenerator != null && netherGenerator instanceof NoiseBasedChunkGenerator)
         {
@@ -75,6 +76,25 @@ public class DataPackBiomeProvider extends BiomeProvider
         MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)this.overworldGenerator.getBiomeSource();
         Climate.Parameter uniquenessParameter = this.getUniquenessParameter();
         TerraBlender.LOGGER.info("Adding overworld biomes for datapack " + this.getName() + " with uniqueness " + uniquenessParameter);
+
+        biomeSource.parameters.values().stream().forEach(pair -> {
+            TBClimate.ParameterPoint parameters = ParameterUtils.convertParameterPoint(pair.getFirst(), uniquenessParameter);
+            Optional<ResourceKey<Biome>> key = registry.getResourceKey(pair.getSecond().get());
+
+            if (key.isPresent())
+                this.addBiome(mapper, parameters, key.get());
+        });
+    }
+
+    @Override
+    public void addNetherBiomes(Registry<Biome> registry, Consumer<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> mapper)
+    {
+        if (this.netherGenerator == null || !(this.netherGenerator.getBiomeSource() instanceof MultiNoiseBiomeSource))
+            return;
+
+        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)this.netherGenerator.getBiomeSource();
+        Climate.Parameter uniquenessParameter = this.getUniquenessParameter();
+        TerraBlender.LOGGER.info("Adding nether biomes for datapack " + this.getName() + " with uniqueness " + uniquenessParameter);
 
         biomeSource.parameters.values().stream().forEach(pair -> {
             TBClimate.ParameterPoint parameters = ParameterUtils.convertParameterPoint(pair.getFirst(), uniquenessParameter);

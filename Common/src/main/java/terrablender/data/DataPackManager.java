@@ -25,24 +25,22 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.world.level.levelgen.*;
 import terrablender.api.BiomeProvider;
 import terrablender.api.BiomeProviders;
-import terrablender.worldgen.DataPackBiomeProvider;
+import terrablender.worldgen.*;
 import terrablender.api.WorldPresetUtils;
 import terrablender.core.TerraBlender;
-import terrablender.worldgen.BiomeProviderUtils;
-import terrablender.worldgen.TBNoiseBasedChunkGenerator;
-import terrablender.worldgen.TBNoiseGeneratorSettings;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class DataPackManager
@@ -57,24 +55,46 @@ public class DataPackManager
 
     public static WorldGenSettings mergeWorldGenSettings(RegistryAccess registryAccess, WorldGenSettings currentSettings, WorldGenSettings newSettings)
     {
-        // Do not merge if the chunk generator isn't ours or the new settings don't use a MultiNoiseBiomeSource
-        if (!(currentSettings.overworld() instanceof TBNoiseBasedChunkGenerator) || !(newSettings.overworld().getBiomeSource() instanceof MultiNoiseBiomeSource))
-        {
+        if (!shouldAttemptMerge(newSettings))
             return newSettings;
-        }
 
-        BiomeProvider dataPackBiomeProvider = new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, TerraBlender.CONFIG.datapackRegionWeight, newSettings);
+        boolean shouldMergeOverworld = shouldMergeStem(LevelStem.OVERWORLD, newSettings);
+        boolean shouldMergeNether = shouldMergeStem(LevelStem.NETHER, newSettings);
+        int overworldWeight = shouldMergeOverworld ? TerraBlender.CONFIG.datapackOverworldRegionWeight : 0;
+        int netherWeight = shouldMergeNether && TerraBlender.CONFIG.replaceDefaultNether ? TerraBlender.CONFIG.datapackNetherRegionWeight : 0;
+
+        BiomeProvider dataPackBiomeProvider = new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, overworldWeight, netherWeight, newSettings);
         BiomeProviders.register(DATA_PACK_PROVIDER_LOCATION, dataPackBiomeProvider);
 
-        NoiseBasedChunkGenerator newOverworldChunkGenerator = (NoiseBasedChunkGenerator)newSettings.overworld();
-        NoiseGeneratorSettings newNoiseGeneratorSettings = newOverworldChunkGenerator.settings.get();
+        Registry<DimensionType> dimensionTypeRegistry = registryAccess.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+        MappedRegistry<LevelStem> dimensions = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
 
-        SurfaceRules.RuleSource mergedOverworldRuleSource = BiomeProviderUtils.createOverworldRules(dataPackBiomeProvider.getOverworldSurfaceRules().get());
-        NoiseGeneratorSettings mergedNoiseGeneratorSettings = TBNoiseGeneratorSettings.overworld(newNoiseGeneratorSettings.noiseSettings(), mergedOverworldRuleSource);
-        ChunkGenerator mergedChunkGenerator = WorldPresetUtils.chunkGenerator(registryAccess, currentSettings.seed(), () -> mergedNoiseGeneratorSettings);
+        // Construct a new dimensions registry
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : newSettings.dimensions().entrySet())
+        {
+            ResourceKey<LevelStem> key = entry.getKey();
+            LevelStem stem = entry.getValue();
+
+            if (key == LevelStem.OVERWORLD && shouldMergeOverworld)
+            {
+                stem = new LevelStem(
+                    () -> dimensionTypeRegistry.getOrThrow(DimensionType.OVERWORLD_LOCATION),
+                    createdMergedChunkGenerator(LevelStem.OVERWORLD, registryAccess, currentSettings, newSettings, dataPackBiomeProvider, provider -> BiomeProviderUtils.createOverworldRules(provider.getOverworldSurfaceRules().get()), TBNoiseGeneratorSettings::overworld, TBMultiNoiseBiomeSource.Preset.OVERWORLD)
+                );
+            }
+            else if (key == LevelStem.NETHER && shouldMergeNether)
+            {
+                stem = new LevelStem(
+                    () -> dimensionTypeRegistry.getOrThrow(DimensionType.NETHER_LOCATION),
+                    createdMergedChunkGenerator(LevelStem.NETHER, registryAccess, currentSettings, newSettings, dataPackBiomeProvider, provider -> BiomeProviderUtils.createNetherRules(provider.getNetherSurfaceRules().get()), TBNoiseGeneratorSettings::nether, TBMultiNoiseBiomeSource.Preset.NETHER)
+                );
+            }
+
+            dimensions.register(key, stem, Lifecycle.stable());
+        }
 
         TerraBlender.LOGGER.info("Merged generation settings with datapack");
-        return WorldPresetUtils.settings(registryAccess, currentSettings.seed(), currentSettings.generateFeatures(), currentSettings.generateBonusChest(), currentSettings.dimensions(), mergedChunkGenerator);
+        return new WorldGenSettings(currentSettings.seed(), currentSettings.generateFeatures(), currentSettings.generateBonusChest(), dimensions);
     }
 
     public static <T> DataResult replaceDatapackWorldGenSettings(Dynamic<T> dynamicWorldGenSettings)
@@ -83,16 +103,18 @@ public class DataPackManager
         DataResult<WorldGenSettings> dataPackedWorldGenSettingsResult = WorldGenSettings.CODEC.parse(dynamicWorldGenSettings);
         Optional<WorldGenSettings> directWorldGenSettingsOptional = directWorldGenSettingsResult.result();
         Optional<WorldGenSettings> dataPackedWorldGenSettingsOptional = dataPackedWorldGenSettingsResult.result();
-        
-        if (directWorldGenSettingsOptional.isPresent() && directWorldGenSettingsOptional.get().overworld() instanceof TBNoiseBasedChunkGenerator && (dataPackedWorldGenSettingsOptional.isEmpty() || !(dataPackedWorldGenSettingsOptional.get().overworld() instanceof TBNoiseBasedChunkGenerator)))
-        {
-            TerraBlender.LOGGER.info("Using merged world generation settings for datapack");
 
-            // Register the datapack provider if we're dealing with a datapack
+        if (directWorldGenSettingsOptional.isPresent() && (dataPackedWorldGenSettingsOptional.isEmpty() || shouldAttemptMerge(dataPackedWorldGenSettingsOptional.get())))
+        {
             if (dataPackedWorldGenSettingsOptional.isPresent())
             {
-                BiomeProviders.register(DATA_PACK_PROVIDER_LOCATION, new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, TerraBlender.CONFIG.datapackRegionWeight, directWorldGenSettingsOptional.get()));
+                TerraBlender.LOGGER.info("Using merged world generation settings");
+                WorldGenSettings datapackSettings = dataPackedWorldGenSettingsOptional.get();
+                int overworldWeight = shouldMergeStem(LevelStem.OVERWORLD, datapackSettings) ? TerraBlender.CONFIG.datapackOverworldRegionWeight : 0;
+                int netherWeight = shouldMergeStem(LevelStem.NETHER, datapackSettings) && TerraBlender.CONFIG.replaceDefaultNether ? TerraBlender.CONFIG.datapackNetherRegionWeight : 0;
+                BiomeProviders.register(new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, overworldWeight, netherWeight, directWorldGenSettingsOptional.get()));
             }
+            else TerraBlender.LOGGER.info("Using direct world generation settings without merging");
 
             return directWorldGenSettingsResult;
         }
@@ -100,5 +122,46 @@ public class DataPackManager
         {
             return dataPackedWorldGenSettingsResult;
         }
+    }
+
+    private static ChunkGenerator createdMergedChunkGenerator(ResourceKey<LevelStem> key, RegistryAccess registryAccess, WorldGenSettings currentSettings, WorldGenSettings newSettings, BiomeProvider biomeProvider, Function<BiomeProvider, SurfaceRules.RuleSource> getSurfaceRules, BiFunction<NoiseSettings, SurfaceRules.RuleSource, NoiseGeneratorSettings> createNoiseGeneratorSettings, TBMultiNoiseBiomeSource.Preset preset)
+    {
+        ChunkGenerator newChunkGenerator = chunkGeneratorForStem(key, newSettings);
+
+        if (newChunkGenerator == null)
+            throw new IllegalStateException("Attempted to merge chunk generator for missing level stem");
+
+        // We can't merge new chunk generators that aren't NoiseBasedChunkGenerators
+        if (!(newChunkGenerator instanceof NoiseBasedChunkGenerator))
+            return newChunkGenerator;
+
+        NoiseBasedChunkGenerator newNoiseBasedChunkGenerator = (NoiseBasedChunkGenerator)newChunkGenerator;
+        NoiseGeneratorSettings newNoiseGeneratorSettings = newNoiseBasedChunkGenerator.settings.get();
+
+        // Create the merged surface rules
+        SurfaceRules.RuleSource surfaceRules = getSurfaceRules.apply(biomeProvider);
+
+        // Create the merged noise generator settings
+        NoiseGeneratorSettings mergedNoiseGeneratorSettings = createNoiseGeneratorSettings.apply(newNoiseGeneratorSettings.noiseSettings(), surfaceRules);
+
+        // Finally, create the new chunk generator.
+        return new TBNoiseBasedChunkGenerator(registryAccess.registryOrThrow(Registry.NOISE_REGISTRY), preset.biomeSource(registryAccess.registryOrThrow(Registry.BIOME_REGISTRY), false), currentSettings.seed(), () -> mergedNoiseGeneratorSettings);
+    }
+
+    private static boolean shouldAttemptMerge(WorldGenSettings settings)
+    {
+        return shouldMergeStem(LevelStem.OVERWORLD, settings) || shouldMergeStem(LevelStem.NETHER, settings);
+    }
+
+    private static boolean shouldMergeStem(ResourceKey<LevelStem> key, WorldGenSettings settings)
+    {
+        ChunkGenerator generator = chunkGeneratorForStem(key, settings);
+        return generator != null && (generator.getBiomeSource() instanceof MultiNoiseBiomeSource) && !(generator.getBiomeSource() instanceof TBMultiNoiseBiomeSource);
+    }
+
+    private static ChunkGenerator chunkGeneratorForStem(ResourceKey<LevelStem> key, WorldGenSettings settings)
+    {
+        LevelStem stem = settings.dimensions().get(key);
+        return stem == null ? null : stem.generator();
     }
 }
