@@ -1,0 +1,4 @@
+{
+  "commands.terrablender.biomeparams.success": "Parametrar på plats %s %s %s: %s",
+  "commands.terrablender.biomeparams.failed": "Det gick inte att fastställa parametrar"
+}
