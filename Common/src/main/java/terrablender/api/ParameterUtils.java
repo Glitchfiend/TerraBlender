@@ -17,12 +17,16 @@
  */
 package terrablender.api;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import terrablender.worldgen.BiomeProviderUtils;
 import terrablender.worldgen.TBClimate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ParameterUtils
@@ -47,6 +51,201 @@ public class ParameterUtils
     {
         return TBClimate.parameters(point.temperature(), point.humidity(), point.continentalness(), point.erosion(), point.depth(), point.weirdness(), uniqueness, Climate.unquantizeCoord(point.offset()));
     }
+
+    /**
+     * Builds a list of parameter points based on a list of parameters.
+     */
+    public static class ParameterPointListBuilder
+    {
+        private List<Climate.Parameter> temperatures = Lists.newArrayList();
+        private List<Climate.Parameter> humidities = Lists.newArrayList();
+        private List<Climate.Parameter> continentalnesses = Lists.newArrayList();
+        private List<Climate.Parameter> erosions = Lists.newArrayList();
+        private List<Climate.Parameter> depths = Lists.newArrayList();
+        private List<Climate.Parameter> weirdnesses = Lists.newArrayList();
+        private List<Climate.Parameter> uniquenesses = Lists.newArrayList();
+        private List<Long> offsets = Lists.newArrayList();
+
+        /**
+         * Adds temperature parameters to the list.
+         * @param values values to be added.
+         */
+        public void temperature(Climate.Parameter... values)
+        {
+            this.temperatures.addAll(Arrays.asList(values));
+        }
+
+        /**
+         * Adds temperature values to the list.
+         * @param values values to be added.
+         */
+        public void temperature(Temperature... values)
+        {
+            this.temperatures.addAll(Arrays.asList(values).stream().map(Temperature::parameter).toList());
+        }
+
+        /**
+         * Adds humidity parameters to the list.
+         * @param values values to be added.
+         */
+        public void humidity(Climate.Parameter... values)
+        {
+            this.humidities.addAll(Arrays.asList(values));
+        }
+
+        /**
+         * Adds humidity values to the list.
+         * @param values values to be added.
+         */
+        public void humidity(Humidity... values)
+        {
+            this.humidities.addAll(Arrays.asList(values).stream().map(Humidity::parameter).toList());
+        }
+
+        /**
+         * Adds continentalness parameters to the list.
+         * @param values values to be added.
+         */
+        public void continentalness(Climate.Parameter... values)
+        {
+            this.continentalnesses.addAll(Arrays.asList(values));
+        }
+
+        /**
+         * Adds continentalness values to the list.
+         * @param values values to be added.
+         */
+        public void continentalness(Continentalness... values)
+        {
+            this.continentalnesses.addAll(Arrays.asList(values).stream().map(Continentalness::parameter).toList());
+        }
+
+        /**
+         * Adds erosion parameters to the list.
+         * @param values values to be added.
+         */
+        public void erosion(Climate.Parameter... values)
+        {
+            this.erosions.addAll(Arrays.asList(values));
+        }
+
+        /**
+         * Adds erosion values to the list.
+         * @param values values to be added.
+         */
+        public void erosion(Erosion... values)
+        {
+            this.erosions.addAll(Arrays.asList(values).stream().map(Erosion::parameter).toList());
+        }
+
+        /**
+         * Adds depth parameters to the list.
+         * @param values values to be added.
+         */
+        public void depth(Climate.Parameter... values)
+        {
+            this.depths.addAll(Arrays.asList(values));
+        }
+
+        /**
+         * Adds depth values to the list.
+         * @param values values to be added.
+         */
+        public void depth(Depth... values)
+        {
+            this.depths.addAll(Arrays.asList(values).stream().map(Depth::parameter).toList());
+        }
+
+        /**
+         * Adds weirdness parameters to the list.
+         * @param values values to be added.
+         */
+        public void weirdness(Climate.Parameter... values)
+        {
+            this.weirdnesses.addAll(Arrays.asList(values));
+        }
+
+        /**
+         * Adds weirdness values to the list.
+         * @param values values to be added.
+         */
+        public void weirdness(Weirdness... values)
+        {
+            this.weirdnesses.addAll(Arrays.asList(values).stream().map(Weirdness::parameter).toList());
+        }
+
+        /**
+         * Adds uniqueness parameters to the list.
+         * @param values values to be added.
+         */
+        public void uniqueness(Climate.Parameter... values)
+        {
+            this.uniquenesses.addAll(Arrays.asList(values));
+        }
+
+        /**
+         * Adds uniqueness values to the list.
+         * @param values values to be added.
+         */
+        public void uniqueness(Integer... values)
+        {
+            this.uniquenesses.addAll(Arrays.asList(values).stream().map(BiomeProviderUtils::getUniquenessParameter).toList());
+        }
+
+        /**
+         * Adds offset values to the list.
+         * @param values values to be added.
+         */
+        public void offset(Float... values)
+        {
+            this.offsets.addAll(Arrays.asList(values).stream().map(Climate::quantizeCoord).toList());
+        }
+
+        /**
+         * Adds offset values to the list.
+         * @param values values to be added.
+         */
+        public void offset(Long... values)
+        {
+            this.offsets.addAll(Arrays.asList(values));
+        }
+
+        /**
+         * Builds a list of {@link TBClimate.ParameterPoint}
+         * @return the parameter point list.
+         */
+        public List<TBClimate.ParameterPoint> build()
+        {
+            this.populateIfEmpty();
+            ImmutableList.Builder<TBClimate.ParameterPoint> builder = new ImmutableList.Builder<>();
+            this.temperatures.forEach(temperature -> this.humidities.forEach(humidity -> this.continentalnesses.forEach(continentalness -> this.erosions.forEach(erosion ->
+                this.depths.forEach(depth -> this.weirdnesses.forEach(weirdness -> this.uniquenesses.forEach(uniqueness -> this.offsets.forEach(offset -> {
+                    builder.add(new TBClimate.ParameterPoint(temperature, humidity, continentalness, erosion, depth, weirdness, uniqueness, offset));
+                }))))))));
+            return builder.build();
+        }
+
+        /**
+         * Builds a list of {@link Climate.ParameterPoint}
+         * @return the parameter point list.
+         */
+        public List<Climate.ParameterPoint> buildVanilla()
+        {
+            return build().stream().map(point -> new Climate.ParameterPoint(point.temperature(), point.humidity(), point.continentalness(), point.erosion(), point.depth(), point.weirdness(), point.offset())).collect(ImmutableList.toImmutableList());
+        }
+
+        private void populateIfEmpty()
+        {
+            if (this.temperatures.isEmpty()) this.temperatures.add(Temperature.FULL_RANGE.parameter());
+            if (this.humidities.isEmpty()) this.humidities.add(Humidity.FULL_RANGE.parameter());
+            if (this.continentalnesses.isEmpty()) this.continentalnesses.add(Continentalness.FULL_RANGE.parameter());
+            if (this.erosions.isEmpty()) this.erosions.add(Erosion.FULL_RANGE.parameter());
+            if (this.depths.isEmpty()) this.depths.add(Depth.FULL_RANGE.parameter());
+            if (this.weirdnesses.isEmpty()) this.weirdnesses.add(Weirdness.FULL_RANGE.parameter());
+            if (this.uniquenesses.isEmpty()) this.uniquenesses.add(BiomeProviderUtils.getUniquenessParameter(0));
+            if (this.offsets.isEmpty()) this.offsets.add(Climate.quantizeCoord(0.0F));
+        }
+    };
 
     /**
      * Preset values for temperature parameters.
