@@ -28,6 +28,7 @@ import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.api.BiomeProvider;
+import terrablender.api.GenerationSettings;
 import terrablender.api.ParameterUtils;
 
 import java.util.Optional;
@@ -63,12 +64,12 @@ public class DefaultBiomeProvider extends BiomeProvider
     @Override
     public Optional<SurfaceRules.RuleSource> getOverworldSurfaceRules()
     {
-        return Optional.of(SurfaceRuleData.overworld());
+        return Optional.of(GenerationSettings.getDefaultOverworldSurfaceRules());
     }
 
     @Override
     public Optional<SurfaceRules.RuleSource> getNetherSurfaceRules()
     {
-        return Optional.of(SurfaceRuleData.nether());
+        return Optional.of(GenerationSettings.getDefaultNetherSurfaceRules());
     }
 }

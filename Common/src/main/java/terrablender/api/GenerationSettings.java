@@ -17,17 +17,24 @@
  */
 package terrablender.api;
 
-import net.minecraft.data.worldgen.SurfaceRuleData;
-import net.minecraft.world.level.chunk.ChunkGenerator;
+import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
+import org.apache.commons.compress.utils.Lists;
+import terrablender.worldgen.TBSurfaceRuleData;
 
-import java.util.Optional;
+import java.util.Comparator;
+import java.util.List;
 
 public class GenerationSettings
 {
-    private static SurfaceRules.RuleSource defaultOverworldSurfaceRules = SurfaceRuleData.overworld();
-    private static SurfaceRules.RuleSource defaultNetherSurfaceRules = SurfaceRuleData.nether();
+    private static SurfaceRules.RuleSource defaultOverworldSurfaceRules;
+    private static SurfaceRules.RuleSource defaultNetherSurfaceRules;
+
+    private static List<Pair<Integer, SurfaceRules.RuleSource>> beforeBedrockOverworldSurfaceRules = Lists.newArrayList();
+    private static List<Pair<Integer, SurfaceRules.RuleSource>> afterBedrockOverworldSurfaceRules = Lists.newArrayList();
+    private static List<Pair<Integer, SurfaceRules.RuleSource>> beforeBedrockNetherSurfaceRules = Lists.newArrayList();
+    private static List<Pair<Integer, SurfaceRules.RuleSource>> afterBedrockNetherSurfaceRules = Lists.newArrayList();
 
     /**
      * Set the default overworld surface rules. This is used when a {@link BiomeProvider BiomeProvider} does not specify its own rules.
@@ -48,11 +55,90 @@ public class GenerationSettings
     }
 
     /**
+     * Add default surface rules to be executed before the bedrock surface rules in the overworld.
+     * @param priority the priority of the rules.
+     * @param rules the surface rules to add.
+     */
+    public static void addBeforeBedrockOverworldSurfaceRules(int priority, SurfaceRules.RuleSource rules)
+    {
+        beforeBedrockOverworldSurfaceRules.add(Pair.of(priority, rules));
+    }
+
+    /**
+     * Add default surface rules to be executed before the bedrock surface rules in the overworld.
+     * @param rules the surface rules to add.
+     */
+    public static void addBeforeBedrockOverworldSurfaceRules(SurfaceRules.RuleSource rules)
+    {
+        addBeforeBedrockOverworldSurfaceRules(0, rules);
+    }
+
+    /**
+     * Add default surface rules to be executed after the bedrock surface rules in the overworld.
+     * @param priority the priority of the rules.
+     * @param rules the surface rules to add.
+     */
+    public static void addAfterBedrockOverworldSurfaceRules(int priority, SurfaceRules.RuleSource rules)
+    {
+        afterBedrockOverworldSurfaceRules.add(Pair.of(priority, rules));
+    }
+
+    /**
+     * Add default surface rules to be executed after the bedrock surface rules in the overworld.
+     * @param rules the surface rules to add.
+     */
+    public static void addAfterBedrockOverworldSurfaceRules(SurfaceRules.RuleSource rules)
+    {
+        addAfterBedrockOverworldSurfaceRules(0, rules);
+    }
+
+    /**
+     * Add default surface rules to be executed before the bedrock surface rules in the nether.
+     * @param priority the priority of the rules.
+     * @param rules the surface rules to add.
+     */
+    public static void addBeforeBedrockNetherSurfaceRules(int priority, SurfaceRules.RuleSource rules)
+    {
+        beforeBedrockNetherSurfaceRules.add(Pair.of(priority, rules));
+    }
+
+    /**
+     * Add default surface rules to be executed before the bedrock surface rules in the nether.
+     * @param rules the surface rules to add.
+     */
+    public static void addBeforeBedrockNetherSurfaceRules(SurfaceRules.RuleSource rules)
+    {
+        addBeforeBedrockNetherSurfaceRules(0, rules);
+    }
+
+    /**
+     * Add default surface rules to be executed after the bedrock surface rules in the nether.
+     * @param priority the priority of the rules.
+     * @param rules the surface rules to add.
+     */
+    public static void addAfterBedrockNetherSurfaceRules(int priority, SurfaceRules.RuleSource rules)
+    {
+        afterBedrockNetherSurfaceRules.add(Pair.of(priority, rules));
+    }
+
+    /**
+     * Add default surface rules to be executed after the bedrock surface rules in the nether.
+     * @param rules the surface rules to add.
+     */
+    public static void addAfterBedrockNetherSurfaceRules(SurfaceRules.RuleSource rules)
+    {
+        addAfterBedrockNetherSurfaceRules(0, rules);
+    }
+
+    /**
      * Get the default overworld surface rules.
      * @return the default overworld surface rules.
      */
     public static SurfaceRules.RuleSource getDefaultOverworldSurfaceRules()
     {
+        if (defaultOverworldSurfaceRules == null)
+            defaultOverworldSurfaceRules = TBSurfaceRuleData.overworld();
+
         return defaultOverworldSurfaceRules;
     }
 
@@ -62,6 +148,45 @@ public class GenerationSettings
      */
     public static SurfaceRules.RuleSource getDefaultNetherSurfaceRules()
     {
+        if (defaultNetherSurfaceRules == null)
+            defaultNetherSurfaceRules = TBSurfaceRuleData.nether();
+
         return defaultNetherSurfaceRules;
+    }
+
+    /**
+     * Get the list of default surface rules to be executed before the bedrock surface rules in the overworld.
+     * @return the list of surface rules.
+     */
+    public static List<SurfaceRules.RuleSource> getBeforeBedrockOverworldSurfaceRules()
+    {
+        return beforeBedrockOverworldSurfaceRules.stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(Pair::getSecond).collect(ImmutableList.toImmutableList());
+    }
+
+    /**
+     * Get the list of default surface rules to be executed after the bedrock surface rules in the overworld.
+     * @return the list of surface rules.
+     */
+    public static List<SurfaceRules.RuleSource> getAfterBedrockOverworldSurfaceRules()
+    {
+        return afterBedrockOverworldSurfaceRules.stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(Pair::getSecond).collect(ImmutableList.toImmutableList());
+    }
+
+    /**
+     * Get the list of default surface rules to be executed before the bedrock surface rules in the nether.
+     * @return the list of surface rules.
+     */
+    public static List<SurfaceRules.RuleSource> getBeforeBedrockNetherSurfaceRules()
+    {
+        return beforeBedrockNetherSurfaceRules.stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(Pair::getSecond).collect(ImmutableList.toImmutableList());
+    }
+
+    /**
+     * Get the list of default surface rules to be executed after the bedrock surface rules in the nether.
+     * @return the list of surface rules.
+     */
+    public static List<SurfaceRules.RuleSource> getAfterBedrockNetherSurfaceRules()
+    {
+        return afterBedrockNetherSurfaceRules.stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(Pair::getSecond).collect(ImmutableList.toImmutableList());
     }
 }
