@@ -25,7 +25,6 @@ import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
-import org.apache.commons.compress.utils.Lists;
 import terrablender.api.GenerationSettings;
 
 import java.util.List;
