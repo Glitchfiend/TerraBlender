@@ -70,144 +70,160 @@ public class ParameterUtils
          * Adds temperature parameters to the list.
          * @param values values to be added.
          */
-        public void temperature(Climate.Parameter... values)
+        public ParameterPointListBuilder temperature(Climate.Parameter... values)
         {
             this.temperatures.addAll(Arrays.asList(values));
+            return this;
         }
 
         /**
          * Adds temperature values to the list.
          * @param values values to be added.
          */
-        public void temperature(Temperature... values)
+        public ParameterPointListBuilder temperature(Temperature... values)
         {
             this.temperatures.addAll(Arrays.asList(values).stream().map(Temperature::parameter).toList());
+            return this;
         }
 
         /**
          * Adds humidity parameters to the list.
          * @param values values to be added.
          */
-        public void humidity(Climate.Parameter... values)
+        public ParameterPointListBuilder humidity(Climate.Parameter... values)
         {
             this.humidities.addAll(Arrays.asList(values));
+            return this;
         }
 
         /**
          * Adds humidity values to the list.
          * @param values values to be added.
          */
-        public void humidity(Humidity... values)
+        public ParameterPointListBuilder humidity(Humidity... values)
         {
             this.humidities.addAll(Arrays.asList(values).stream().map(Humidity::parameter).toList());
+            return this;
         }
 
         /**
          * Adds continentalness parameters to the list.
          * @param values values to be added.
          */
-        public void continentalness(Climate.Parameter... values)
+        public ParameterPointListBuilder continentalness(Climate.Parameter... values)
         {
             this.continentalnesses.addAll(Arrays.asList(values));
+            return this;
         }
 
         /**
          * Adds continentalness values to the list.
          * @param values values to be added.
          */
-        public void continentalness(Continentalness... values)
+        public ParameterPointListBuilder continentalness(Continentalness... values)
         {
             this.continentalnesses.addAll(Arrays.asList(values).stream().map(Continentalness::parameter).toList());
+            return this;
         }
 
         /**
          * Adds erosion parameters to the list.
          * @param values values to be added.
          */
-        public void erosion(Climate.Parameter... values)
+        public ParameterPointListBuilder erosion(Climate.Parameter... values)
         {
             this.erosions.addAll(Arrays.asList(values));
+            return this;
         }
 
         /**
          * Adds erosion values to the list.
          * @param values values to be added.
          */
-        public void erosion(Erosion... values)
+        public ParameterPointListBuilder erosion(Erosion... values)
         {
             this.erosions.addAll(Arrays.asList(values).stream().map(Erosion::parameter).toList());
+            return this;
         }
 
         /**
          * Adds depth parameters to the list.
          * @param values values to be added.
          */
-        public void depth(Climate.Parameter... values)
+        public ParameterPointListBuilder depth(Climate.Parameter... values)
         {
             this.depths.addAll(Arrays.asList(values));
+            return this;
         }
 
         /**
          * Adds depth values to the list.
          * @param values values to be added.
          */
-        public void depth(Depth... values)
+        public ParameterPointListBuilder depth(Depth... values)
         {
             this.depths.addAll(Arrays.asList(values).stream().map(Depth::parameter).toList());
+            return this;
         }
 
         /**
          * Adds weirdness parameters to the list.
          * @param values values to be added.
          */
-        public void weirdness(Climate.Parameter... values)
+        public ParameterPointListBuilder weirdness(Climate.Parameter... values)
         {
             this.weirdnesses.addAll(Arrays.asList(values));
+            return this;
         }
 
         /**
          * Adds weirdness values to the list.
          * @param values values to be added.
          */
-        public void weirdness(Weirdness... values)
+        public ParameterPointListBuilder weirdness(Weirdness... values)
         {
             this.weirdnesses.addAll(Arrays.asList(values).stream().map(Weirdness::parameter).toList());
+            return this;
         }
 
         /**
          * Adds uniqueness parameters to the list.
          * @param values values to be added.
          */
-        public void uniqueness(Climate.Parameter... values)
+        public ParameterPointListBuilder uniqueness(Climate.Parameter... values)
         {
             this.uniquenesses.addAll(Arrays.asList(values));
+            return this;
         }
 
         /**
          * Adds uniqueness values to the list.
          * @param values values to be added.
          */
-        public void uniqueness(Integer... values)
+        public ParameterPointListBuilder uniqueness(Integer... values)
         {
             this.uniquenesses.addAll(Arrays.asList(values).stream().map(BiomeProviderUtils::getUniquenessParameter).toList());
+            return this;
         }
 
         /**
          * Adds offset values to the list.
          * @param values values to be added.
          */
-        public void offset(Float... values)
+        public ParameterPointListBuilder offset(Float... values)
         {
             this.offsets.addAll(Arrays.asList(values).stream().map(Climate::quantizeCoord).toList());
+            return this;
         }
 
         /**
          * Adds offset values to the list.
          * @param values values to be added.
          */
-        public void offset(Long... values)
+        public ParameterPointListBuilder offset(Long... values)
         {
             this.offsets.addAll(Arrays.asList(values));
+            return this;
         }
 
         /**
