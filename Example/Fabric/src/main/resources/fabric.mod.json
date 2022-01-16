@@ -1,0 +1,29 @@
+{
+    "schemaVersion": 1,
+    "id": "test",
+    "version": "1.0.0",
+    "name": "Test",
+    "description": "A simple test mod for TerraBlender.",
+    "authors": [
+      "Adubbz"
+    ],
+    "license": "LGPLv3",
+    "environment": "*",
+    "entrypoints": {
+      "main": [
+        "terrablender.example.TestMod"
+      ],
+      "terrablender": [
+        "terrablender.example.TestMod"
+      ]
+    },
+    "mixins": [],
+    "depends": {
+      "fabricloader": "*",
+      "fabric": "*",
+      "minecraft": "1.18.x",
+      "java": ">=17",
+      "terrablender": "*"
+    }
+  }
+  

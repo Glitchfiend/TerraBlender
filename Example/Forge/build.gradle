@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 apply plugin: 'org.spongepowered.mixin'
 
-archivesBaseName = "Test"
+archivesBaseName = "Test-forge"
 
 minecraft {
     mappings channel: 'official', version: minecraft_version

@@ -3,7 +3,6 @@ license="LGPLv3"
 loaderVersion="[39,)"
 issueTrackerURL="https://github.com/Glitchfiend/TerraBlender/issues"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/terrablender"
-logoFile="tb_logo.png"
 
 [[mods]]
     modId="test"
@@ -22,6 +21,6 @@ logoFile="tb_logo.png"
 [[dependencies.test]]
     modId="terrablender"
     mandatory=true
-    versionRange="[1.0.0.52,)"
+    versionRange="[1.0.0.59,)"
     ordering="NONE"
     side="BOTH"
