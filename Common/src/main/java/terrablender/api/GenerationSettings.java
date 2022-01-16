@@ -18,9 +18,9 @@
 package terrablender.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import org.apache.commons.compress.utils.Lists;
 import terrablender.worldgen.TBSurfaceRuleData;
 
 import java.util.Comparator;
