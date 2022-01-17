@@ -100,9 +100,7 @@ public class BiomeProviderUtils
         if (uniquenesses.isEmpty())
         {
             TerraBlender.LOGGER.error("No uniqueness values found in parameter values. Things may not work well!");
-
-            // Fall back on our list from BiomeProviders
-            return BiomeProviders.get().stream().map(provider -> provider.getIndex()).collect(ImmutableSet.toImmutableSet()).stream().sorted().collect(ImmutableList.toImmutableList());
+            return ImmutableList.of(0);
         }
 
         if (uniquenesses.get(0) != 0)
@@ -115,7 +113,7 @@ public class BiomeProviderUtils
             {
                 if (uniquenesses.get(i - 1) + 1 != uniquenesses.get(i))
                 {
-                    TerraBlender.LOGGER.warn("Uniqueness values are not consecutive " + uniquenesses + ", using Vanilla uniqueness only.");
+                    TerraBlender.LOGGER.error("Uniqueness values are not consecutive " + uniquenesses + ", using Vanilla uniqueness only.");
                     return ImmutableList.of(0);
                 }
             }
