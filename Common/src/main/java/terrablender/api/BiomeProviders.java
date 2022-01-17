@@ -51,6 +51,19 @@ public class BiomeProviders
     }
 
     /**
+     * Register a {@link BiomeProvider} to a specified index.
+     * @param name the name of the biome provider.
+     * @param index the index of the biome provider.
+     * @param provider the biome provider.
+     */
+    public static void register(ResourceLocation name, int index, BiomeProvider provider)
+    {
+        biomeProviders.put(name, provider);
+        biomeIndices.put(name, index);
+        TerraBlender.LOGGER.info("Registered biome provider " + name + " to index " + index);
+    }
+
+    /**
      * Register a {@link BiomeProvider}.
      * @param provider the biome provider.
      */
