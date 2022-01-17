@@ -78,7 +78,7 @@ public class BiomeProviderUtils
         if (uniquenessParameterCache.containsKey(index))
             return uniquenessParameterCache.get(index);
 
-        Climate.Parameter parameter = Climate.Parameter.point(Climate.unquantizeCoord(index));
+        Climate.Parameter parameter = new Climate.Parameter(index, index);
         uniquenessParameterCache.put(index, parameter);
         return parameter;
     }
