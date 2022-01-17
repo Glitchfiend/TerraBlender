@@ -115,7 +115,8 @@ public class BiomeProviderUtils
             {
                 if (uniquenesses.get(i - 1) + 1 != uniquenesses.get(i))
                 {
-                    throw new IllegalStateException("Uniqueness values must be consecutive.");
+                    TerraBlender.LOGGER.warn("Uniqueness values are not consecutive " + uniquenesses + ", using Vanilla uniqueness only.");
+                    return ImmutableList.of(0);
                 }
             }
         }
