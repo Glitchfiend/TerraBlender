@@ -17,10 +17,7 @@
  */
 package terrablender.worldgen;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -32,6 +29,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 import terrablender.api.BiomeProvider;
 import terrablender.api.BiomeProviders;
 import terrablender.api.GenerationSettings;
+import terrablender.core.TerraBlender;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 
 import java.util.List;
@@ -93,6 +91,36 @@ public class BiomeProviderUtils
         List<Climate.ParameterPoint> points = VANILLA_POINTS.stream().filter(pair -> pair.getSecond() == biome).map(pair -> pair.getFirst()).collect(ImmutableList.toImmutableList());
         biomeParameterPointCache.put(biome, points);
         return points;
+    }
+
+    public static <T> List<Integer> getUniquenessValues(List<Pair<TBClimate.ParameterPoint, T>> parameters)
+    {
+        List<Integer> uniquenesses = parameters.stream().filter(value -> value.getFirst().uniqueness().min() == value.getFirst().uniqueness().max()).map(value -> (int)value.getFirst().uniqueness().min()).collect(ImmutableSet.toImmutableSet()).stream().sorted().collect(ImmutableList.toImmutableList());
+
+        if (uniquenesses.isEmpty())
+        {
+            TerraBlender.LOGGER.error("No uniqueness values found in parameter values. Things may not work well!");
+
+            // Fall back on our list from BiomeProviders
+            return BiomeProviders.get().stream().map(provider -> provider.getIndex()).collect(ImmutableSet.toImmutableSet()).stream().sorted().collect(ImmutableList.toImmutableList());
+        }
+
+        if (uniquenesses.get(0) != 0)
+            throw new IllegalStateException("Uniqueness values must start at 0");
+
+        if (uniquenesses.size() > 0)
+        {
+            // Ensure the uniquenesses are consecutive
+            for (int i = 1; i < uniquenesses.size(); i++)
+            {
+                if (uniquenesses.get(i - 1) + 1 != uniquenesses.get(i))
+                {
+                    throw new IllegalStateException("Uniqueness values must be consecutive.");
+                }
+            }
+        }
+
+        return uniquenesses;
     }
 
     public static List<TBClimate.ParameterPoint> getAllSpawnTargets()

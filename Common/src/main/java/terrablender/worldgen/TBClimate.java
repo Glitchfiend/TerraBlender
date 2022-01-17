@@ -141,7 +141,7 @@ public class TBClimate
 
             // Use uniqueness values as they have been given to us, not from BiomeProviders.
             // This ensures we respect the data provided by save files, rather than doing our own thing.
-            List<Integer> uniquenesses = getUniquenessValues(values);
+            List<Integer> uniquenesses = BiomeProviderUtils.getUniquenessValues(values);
             int numUniquenesses = uniquenesses.size();
 
             // Initialize tree
@@ -174,7 +174,8 @@ public class TBClimate
 
         public T search(TargetPoint target, DistanceMetric<T> metric)
         {
-            return (T)this.trees[(int)target.uniqueness()].search(target, metric);
+            int uniqueness = (int)target.uniqueness();
+            return (T)this.trees[uniqueness].search(target, metric);
         }
 
         private static <T> List<Pair<ParameterPoint, T>> filterValues(int uniqueness, List<Pair<ParameterPoint, T>> values)
@@ -184,37 +185,6 @@ public class TBClimate
                 return uniqueness >= uniquenessParameter.min() && uniqueness <= uniquenessParameter.max();
             } ).collect(Collectors.toCollection(ArrayList::new));
         }
-
-        private static <T> List<Integer> getUniquenessValues(List<Pair<ParameterPoint, T>> values)
-        {
-            List<Integer> uniquenesses = values.stream().filter(value -> value.getFirst().uniqueness().min() == value.getFirst().uniqueness().max()).map(value -> (int)value.getFirst().uniqueness().min()).collect(ImmutableSet.toImmutableSet()).stream().sorted().collect(ImmutableList.toImmutableList());
-
-            if (uniquenesses.isEmpty())
-            {
-                TerraBlender.LOGGER.error("No uniqueness values found in parameter values. Things may not work well!");
-
-                // Fall back on our list from BiomeProviders
-                return BiomeProviders.get().stream().map(provider -> provider.getIndex()).collect(ImmutableSet.toImmutableSet()).stream().sorted().collect(ImmutableList.toImmutableList());
-            }
-
-            if (uniquenesses.get(0) != 0)
-                throw new IllegalStateException("Uniqueness values must start at 0");
-
-            if (uniquenesses.size() > 0)
-            {
-                // Ensure the uniquenesses are consecutive
-                for (int i = 1; i < uniquenesses.size(); i++)
-                {
-                    if (uniquenesses.get(i - 1) + 1 != uniquenesses.get(i))
-                    {
-                        throw new IllegalStateException("Uniqueness values must be consecutive.");
-                    }
-                }
-            }
-
-            return uniquenesses;
-        }
-
     }
 
     protected static class RTree<T>

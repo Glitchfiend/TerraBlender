@@ -56,6 +56,9 @@ accessible method net/minecraft/world/level/levelgen/NoiseSampler getHumidity (D
 # OverworldBiomeBuilder
 accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder addBiomes (Ljava/util/function/Consumer;)V
 
+# RegistryReadOps
+accessible field net/minecraft/resources/RegistryReadOps registryAccess Lnet/minecraft/core/RegistryAccess;
+
 # StructureSettings
 accessible field net/minecraft/world/level/levelgen/StructureSettings structureConfig Ljava/util/Map;
 accessible field net/minecraft/world/level/levelgen/StructureSettings configuredStructures Lcom/google/common/collect/ImmutableMap;

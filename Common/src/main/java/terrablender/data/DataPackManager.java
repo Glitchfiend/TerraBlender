@@ -25,8 +25,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.RegistryReadOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -35,9 +37,9 @@ import net.minecraft.world.level.levelgen.*;
 import terrablender.api.BiomeProvider;
 import terrablender.api.BiomeProviders;
 import terrablender.worldgen.*;
-import terrablender.api.WorldPresetUtils;
 import terrablender.core.TerraBlender;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -99,6 +101,7 @@ public class DataPackManager
 
     public static <T> DataResult replaceDatapackWorldGenSettings(Dynamic<T> dynamicWorldGenSettings)
     {
+        RegistryAccess registryAccess = ((RegistryReadOps)dynamicWorldGenSettings.getOps()).registryAccess;
         DataResult<WorldGenSettings> directWorldGenSettingsResult = DIRECT_WGS_CODEC.parse(dynamicWorldGenSettings);
         DataResult<WorldGenSettings> dataPackedWorldGenSettingsResult = WorldGenSettings.CODEC.parse(dynamicWorldGenSettings);
         Optional<WorldGenSettings> directWorldGenSettingsOptional = directWorldGenSettingsResult.result();
@@ -112,16 +115,19 @@ public class DataPackManager
                 WorldGenSettings datapackSettings = dataPackedWorldGenSettingsOptional.get();
                 int overworldWeight = shouldMergeStem(LevelStem.OVERWORLD, datapackSettings) ? TerraBlender.CONFIG.datapackOverworldRegionWeight : 0;
                 int netherWeight = shouldMergeStem(LevelStem.NETHER, datapackSettings) && TerraBlender.CONFIG.replaceDefaultNether ? TerraBlender.CONFIG.datapackNetherRegionWeight : 0;
-                BiomeProviders.register(new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, overworldWeight, netherWeight, directWorldGenSettingsOptional.get()));
+                BiomeProviders.register(new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, overworldWeight, netherWeight, dataPackedWorldGenSettingsOptional.get()));
             }
             else TerraBlender.LOGGER.info("Using direct world generation settings without merging");
 
-            return directWorldGenSettingsResult;
+            return correctParameterDiscrepancies(registryAccess, directWorldGenSettingsOptional.get());
         }
-        else
+        else if (dataPackedWorldGenSettingsOptional.isPresent())
         {
-            return dataPackedWorldGenSettingsResult;
+            TerraBlender.LOGGER.info("Using original world generation settings");
+            return correctParameterDiscrepancies(registryAccess, dataPackedWorldGenSettingsOptional.get());
         }
+
+        return dataPackedWorldGenSettingsResult;
     }
 
     private static ChunkGenerator createdMergedChunkGenerator(ResourceKey<LevelStem> key, RegistryAccess registryAccess, WorldGenSettings currentSettings, WorldGenSettings newSettings, BiomeProvider biomeProvider, Function<BiomeProvider, SurfaceRules.RuleSource> getSurfaceRules, BiFunction<NoiseSettings, SurfaceRules.RuleSource, NoiseGeneratorSettings> createNoiseGeneratorSettings, TBMultiNoiseBiomeSource.Preset preset)
@@ -163,5 +169,71 @@ public class DataPackManager
     {
         LevelStem stem = settings.dimensions().get(key);
         return stem == null ? null : stem.generator();
+    }
+
+    private static DataResult<WorldGenSettings> correctParameterDiscrepancies(RegistryAccess registryAccess, WorldGenSettings settings)
+    {
+        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+        Registry<DimensionType> dimensionTypeRegistry = registryAccess.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+        MappedRegistry<LevelStem> dimensions = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental());
+
+        // Construct a new dimensions registry
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : settings.dimensions().entrySet())
+        {
+            ResourceKey<LevelStem> key = entry.getKey();
+            LevelStem stem = entry.getValue();
+
+            if (key == LevelStem.OVERWORLD && shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getOverworldWeight))
+            {
+                TBNoiseBasedChunkGenerator chunkGenerator = (TBNoiseBasedChunkGenerator)stem.generator();
+                stem = new LevelStem(
+                    () -> dimensionTypeRegistry.getOrThrow(DimensionType.OVERWORLD_LOCATION),
+                    new TBNoiseBasedChunkGenerator(chunkGenerator.noises, TBMultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomeRegistry, false), chunkGenerator.seed, chunkGenerator.settings)
+                );
+            }
+            else if (key == LevelStem.NETHER && shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getNetherWeight))
+            {
+                TBNoiseBasedChunkGenerator chunkGenerator = (TBNoiseBasedChunkGenerator)stem.generator();
+                stem = new LevelStem(
+                        () -> dimensionTypeRegistry.getOrThrow(DimensionType.NETHER_LOCATION),
+                        new TBNoiseBasedChunkGenerator(chunkGenerator.noises, TBMultiNoiseBiomeSource.Preset.NETHER.biomeSource(biomeRegistry, false), chunkGenerator.seed, chunkGenerator.settings)
+                );
+            }
+
+            dimensions.register(key, stem, Lifecycle.stable());
+        }
+
+        return DataResult.success(new WorldGenSettings(settings.seed(), settings.generateFeatures(), settings.generateBonusChest(), dimensions));
+    }
+
+    private static boolean shouldCorrectUniquenessDiscrepancy(ChunkGenerator chunkGenerator, Function<BiomeProvider, Integer> getWeight)
+    {
+        if (chunkGenerator == null || !(chunkGenerator instanceof TBNoiseBasedChunkGenerator) || !(chunkGenerator.getBiomeSource() instanceof TBMultiNoiseBiomeSource))
+            return false;
+
+        TBNoiseBasedChunkGenerator noiseBasedChunkGenerator = (TBNoiseBasedChunkGenerator)chunkGenerator;
+        TBMultiNoiseBiomeSource multiNoiseBiomeSource = (TBMultiNoiseBiomeSource)noiseBasedChunkGenerator.getBiomeSource();
+        List<Integer> uniquenessValues = BiomeProviderUtils.getUniquenessValues(multiNoiseBiomeSource.parameters().values());
+
+        if (TerraBlender.CONFIG.forceResetBiomeParameters)
+        {
+            TerraBlender.LOGGER.info("Forcibly resetting biome parameters");
+            return true;
+        }
+
+        int currentUniquenessCount = uniquenessValues.size();
+        int expectedUniquenessCount = 0;
+        for (BiomeProvider provider : BiomeProviders.get())
+        {
+            if (getWeight.apply(provider) > 0) expectedUniquenessCount++;
+        }
+
+        if (currentUniquenessCount != expectedUniquenessCount)
+        {
+            TerraBlender.LOGGER.warn("Discrepancy detected between current uniqueness count " + currentUniquenessCount + " and expected uniqueness count " + expectedUniquenessCount);
+            return true;
+        }
+
+        return false;
     }
 }

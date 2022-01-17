@@ -31,6 +31,7 @@ public class TerraBlenderConfig extends ConfigFile
     public final int vanillaNetherRegionWeight;
     public final int datapackOverworldRegionWeight;
     public final int datapackNetherRegionWeight;
+    public final boolean forceResetBiomeParameters;
 
     public TerraBlenderConfig(Path path)
     {
@@ -50,6 +51,7 @@ public class TerraBlenderConfig extends ConfigFile
         this.vanillaNetherRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the nether.", "vanilla_nether_region_weight", 10, 0, Integer.MAX_VALUE);
         this.datapackOverworldRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions in the overworld.", "datapack_overworld_region_weight", 15, 0, Integer.MAX_VALUE);
         this.datapackNetherRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions in the nether.", "datapack_nether_region_weight", 15, 0, Integer.MAX_VALUE);
+        this.forceResetBiomeParameters = generationSettings.add("Force the biome parameters to reset when loading worlds.", "force_reset_biome_parameters", false);
         this.addSubConfig("Generation settings", "generation_settings", generationSettings);
 
         this.save();

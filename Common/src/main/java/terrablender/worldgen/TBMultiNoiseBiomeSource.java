@@ -112,6 +112,11 @@ public class TBMultiNoiseBiomeSource extends BiomeSource
         }).get();
     }
 
+    public TBClimate.ParameterList<Supplier<Biome>> parameters()
+    {
+        return this.parameters;
+    }
+
     public static class Preset
     {
         static final Map<ResourceLocation, TBMultiNoiseBiomeSource.Preset> BY_NAME = Maps.newHashMap();
