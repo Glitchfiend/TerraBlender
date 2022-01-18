@@ -18,12 +18,14 @@
 package terrablender.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.DefaultBiomeProvider;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +60,16 @@ public class BiomeProviders
      */
     public static void register(ResourceLocation name, int index, BiomeProvider provider)
     {
-        biomeProviders.put(name, provider);
-        biomeIndices.put(name, index);
+        // Construct a list of the existing entries and add in our new entry
+        List<Map.Entry<ResourceLocation, BiomeProvider>> entries = Lists.newArrayList(biomeProviders.entrySet());
+        entries.add(index, Map.entry(name, provider));
+
+        // Clear the current biome providers and reconstruct the map
+        biomeProviders.clear();
+        entries.forEach(entry -> biomeProviders.put(entry.getKey(), entry.getValue()));
+
+        // Reset the indices
+        resetIndices();
         TerraBlender.LOGGER.info("Registered biome provider " + name + " to index " + index);
     }
 
@@ -82,8 +92,7 @@ public class BiomeProviders
             return;
 
         biomeProviders.remove(name);
-        biomeIndices.clear();
-        indexResetListeners.forEach(listener -> listener.run());
+        resetIndices();
         TerraBlender.LOGGER.info("Removed biome provider " + name);
     }
 
@@ -131,6 +140,12 @@ public class BiomeProviders
     public static int getCount()
     {
         return biomeProviders.size();
+    }
+
+    private static void resetIndices()
+    {
+        biomeIndices.clear();
+        indexResetListeners.forEach(listener -> listener.run());
     }
 
     static
