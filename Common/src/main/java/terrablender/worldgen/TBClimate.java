@@ -142,14 +142,14 @@ public class TBClimate
             // Use uniqueness values as they have been given to us, not from BiomeProviders.
             // This ensures we respect the data provided by save files, rather than doing our own thing.
             List<Integer> uniquenesses = BiomeProviderUtils.getUniquenessValues(values);
-            int numUniquenesses = uniquenesses.size();
+            int maxUniqueness = uniquenesses.get(uniquenesses.size() - 1);
 
             // Initialize tree
-            tree.trees = new RTree[numUniquenesses];
+            tree.trees = new RTree[maxUniqueness + 1];
             RTree<T> vanillaTree = RTree.create(filterValues(VANILLA_UNIQUENESS, values));
             tree.trees[VANILLA_UNIQUENESS] = vanillaTree;
 
-            for (int i = 0; i < numUniquenesses; i++)
+            for (int i = 0; i <= maxUniqueness; i++)
             {
                 // Skip Vanilla as we have already dealt with it
                 if (i == VANILLA_UNIQUENESS)
@@ -162,7 +162,7 @@ public class TBClimate
                 } ).collect(Collectors.toCollection(ArrayList::new));
 
                 if (!filteredValues.isEmpty()) tree.trees[i] = RTree.create(filteredValues);
-                else
+                else if (uniquenesses.contains(uniqueness))
                 {
                     TerraBlender.LOGGER.info("No values found for uniqueness " + uniqueness + ", using Vanilla's");
                     tree.trees[i] = vanillaTree;

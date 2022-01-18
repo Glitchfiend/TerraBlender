@@ -106,19 +106,6 @@ public class BiomeProviderUtils
         if (uniquenesses.get(0) != 0)
             throw new IllegalStateException("Uniqueness values must start at 0");
 
-        if (uniquenesses.size() > 0)
-        {
-            // Ensure the uniquenesses are consecutive
-            for (int i = 1; i < uniquenesses.size(); i++)
-            {
-                if (uniquenesses.get(i - 1) + 1 != uniquenesses.get(i))
-                {
-                    TerraBlender.LOGGER.error("Uniqueness values are not consecutive " + uniquenesses + ", using Vanilla uniqueness only.");
-                    return ImmutableList.of(0);
-                }
-            }
-        }
-
         return uniquenesses;
     }
 
