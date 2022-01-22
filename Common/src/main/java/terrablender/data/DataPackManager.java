@@ -109,6 +109,8 @@ public class DataPackManager
 
         if (directWorldGenSettingsOptional.isPresent() && (dataPackedWorldGenSettingsOptional.isEmpty() || shouldAttemptMerge(dataPackedWorldGenSettingsOptional.get())))
         {
+            boolean forceDiscrepencyCorrection = false;
+
             if (dataPackedWorldGenSettingsOptional.isPresent())
             {
                 TerraBlender.LOGGER.info("Using merged world generation settings");
@@ -116,15 +118,18 @@ public class DataPackManager
                 int overworldWeight = shouldMergeStem(LevelStem.OVERWORLD, datapackSettings) ? TerraBlender.CONFIG.datapackOverworldRegionWeight : 0;
                 int netherWeight = shouldMergeStem(LevelStem.NETHER, datapackSettings) && TerraBlender.CONFIG.replaceDefaultNether ? TerraBlender.CONFIG.datapackNetherRegionWeight : 0;
                 BiomeProviders.register(new DataPackBiomeProvider(DATA_PACK_PROVIDER_LOCATION, overworldWeight, netherWeight, dataPackedWorldGenSettingsOptional.get()));
+
+                // We need to reconstruct the NoiseBasedChunkGenerator in the case of data packs otherwise the uniqueness noises will be incorrect
+                forceDiscrepencyCorrection = true;
             }
             else TerraBlender.LOGGER.info("Using direct world generation settings without merging");
 
-            return correctParameterDiscrepancies(registryAccess, directWorldGenSettingsOptional.get());
+            return correctParameterDiscrepancies(registryAccess, directWorldGenSettingsOptional.get(), forceDiscrepencyCorrection);
         }
         else if (dataPackedWorldGenSettingsOptional.isPresent())
         {
             TerraBlender.LOGGER.info("Using original world generation settings");
-            return correctParameterDiscrepancies(registryAccess, dataPackedWorldGenSettingsOptional.get());
+            return correctParameterDiscrepancies(registryAccess, dataPackedWorldGenSettingsOptional.get(), false);
         }
 
         return dataPackedWorldGenSettingsResult;
@@ -171,7 +176,7 @@ public class DataPackManager
         return stem == null ? null : stem.generator();
     }
 
-    private static DataResult<WorldGenSettings> correctParameterDiscrepancies(RegistryAccess registryAccess, WorldGenSettings settings)
+    private static DataResult<WorldGenSettings> correctParameterDiscrepancies(RegistryAccess registryAccess, WorldGenSettings settings, boolean forceDiscrepancyCorrection)
     {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
         Registry<DimensionType> dimensionTypeRegistry = registryAccess.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
@@ -183,7 +188,7 @@ public class DataPackManager
             ResourceKey<LevelStem> key = entry.getKey();
             LevelStem stem = entry.getValue();
 
-            if (key == LevelStem.OVERWORLD && shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getOverworldWeight))
+            if (key == LevelStem.OVERWORLD && (shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getOverworldWeight) || forceDiscrepancyCorrection))
             {
                 TBNoiseBasedChunkGenerator chunkGenerator = (TBNoiseBasedChunkGenerator)stem.generator();
                 stem = new LevelStem(
@@ -191,7 +196,7 @@ public class DataPackManager
                     new TBNoiseBasedChunkGenerator(chunkGenerator.noises, TBMultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomeRegistry, false), chunkGenerator.seed, chunkGenerator.settings)
                 );
             }
-            else if (key == LevelStem.NETHER && shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getNetherWeight))
+            else if (key == LevelStem.NETHER && (shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getNetherWeight) || forceDiscrepancyCorrection))
             {
                 TBNoiseBasedChunkGenerator chunkGenerator = (TBNoiseBasedChunkGenerator)stem.generator();
                 stem = new LevelStem(
