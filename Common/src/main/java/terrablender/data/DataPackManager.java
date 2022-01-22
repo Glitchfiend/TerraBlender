@@ -188,7 +188,7 @@ public class DataPackManager
             ResourceKey<LevelStem> key = entry.getKey();
             LevelStem stem = entry.getValue();
 
-            if (key == LevelStem.OVERWORLD && (shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getOverworldWeight) || forceDiscrepancyCorrection))
+            if (key == LevelStem.OVERWORLD && (shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getOverworldWeight) || (isChunkGeneratorCorrectable(stem.generator()) && forceDiscrepancyCorrection)))
             {
                 TBNoiseBasedChunkGenerator chunkGenerator = (TBNoiseBasedChunkGenerator)stem.generator();
                 stem = new LevelStem(
@@ -196,7 +196,7 @@ public class DataPackManager
                     new TBNoiseBasedChunkGenerator(chunkGenerator.noises, TBMultiNoiseBiomeSource.Preset.OVERWORLD.biomeSource(biomeRegistry, false), chunkGenerator.seed, chunkGenerator.settings)
                 );
             }
-            else if (key == LevelStem.NETHER && (shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getNetherWeight) || forceDiscrepancyCorrection))
+            else if (key == LevelStem.NETHER && (shouldCorrectUniquenessDiscrepancy(stem.generator(), BiomeProvider::getNetherWeight) || (isChunkGeneratorCorrectable(stem.generator()) && forceDiscrepancyCorrection)))
             {
                 TBNoiseBasedChunkGenerator chunkGenerator = (TBNoiseBasedChunkGenerator)stem.generator();
                 stem = new LevelStem(
@@ -213,7 +213,7 @@ public class DataPackManager
 
     private static boolean shouldCorrectUniquenessDiscrepancy(ChunkGenerator chunkGenerator, Function<BiomeProvider, Integer> getWeight)
     {
-        if (chunkGenerator == null || !(chunkGenerator instanceof TBNoiseBasedChunkGenerator) || !(chunkGenerator.getBiomeSource() instanceof TBMultiNoiseBiomeSource))
+        if (!isChunkGeneratorCorrectable(chunkGenerator))
             return false;
 
         TBNoiseBasedChunkGenerator noiseBasedChunkGenerator = (TBNoiseBasedChunkGenerator)chunkGenerator;
@@ -240,5 +240,10 @@ public class DataPackManager
         }
 
         return false;
+    }
+
+    private static boolean isChunkGeneratorCorrectable(ChunkGenerator chunkGenerator)
+    {
+        return chunkGenerator != null && chunkGenerator instanceof TBNoiseBasedChunkGenerator && chunkGenerator.getBiomeSource() instanceof TBMultiNoiseBiomeSource;
     }
 }
