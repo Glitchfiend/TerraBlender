@@ -12,6 +12,7 @@
   ],
   "client": [
     "client.MixinClientLevel",
+    "client.MixinCreateWorldScreen",
     "client.MixinWorldGenSettingsComponent",
     "client.MixinDefaultWorldPreset",
     "client.MixinLargeBiomesWorldPreset",
