@@ -23,8 +23,12 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import terrablender.api.BiomeProviders;
 import terrablender.core.TerraBlender;
+import terrablender.data.DataPackManager;
 
 import java.util.Random;
 
@@ -38,5 +42,11 @@ public class MixinCreateWorldScreen
         if (!TerraBlender.CONFIG.replaceDefaultWorldtypes) WorldGenSettings.makeDefault(registryAccess);
         long seed = (new Random()).nextLong();
         return WorldPreset.NORMAL.create((RegistryAccess.RegistryHolder)registryAccess, seed, true, false);
+    }
+
+    @Inject(method = "removed", at = @At("HEAD"))
+    public void onRemoved(CallbackInfo ci)
+    {
+        BiomeProviders.remove(DataPackManager.DATA_PACK_PROVIDER_LOCATION);
     }
 }
