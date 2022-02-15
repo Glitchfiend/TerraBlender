@@ -30,6 +30,7 @@ import terrablender.api.BiomeProvider;
 import terrablender.api.BiomeProviders;
 import terrablender.api.GenerationSettings;
 import terrablender.core.TerraBlender;
+import terrablender.data.DataPackManager;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 
 import java.util.List;
@@ -131,8 +132,8 @@ public class BiomeProviderUtils
         Set<Integer> unusedIndices = Sets.newHashSet();
 
         BiomeProviders.get().forEach(provider -> {
-            // Add to the list of indices if weighted more than 0.
-            if (weight.apply(provider) > 0)
+            // Add to the list of indices if weighted more than 0 and it is not from a datapack.
+            if (weight.apply(provider) > 0 && provider.getName() != DataPackManager.DATA_PACK_PROVIDER_LOCATION)
                 unusedIndices.add(provider.getIndex());
         });
 
