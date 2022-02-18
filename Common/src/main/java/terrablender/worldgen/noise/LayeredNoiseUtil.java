@@ -61,7 +61,7 @@ public class LayeredNoiseUtil
         return factory.make();
     }
 
-    private static AreaFactory zoom(long seedModifier, AreaTransformer1 transformer, AreaFactory initialAreaFactory, int times, LongFunction<AreaContext> contextFactory)
+    public static AreaFactory zoom(long seedModifier, AreaTransformer1 transformer, AreaFactory initialAreaFactory, int times, LongFunction<AreaContext> contextFactory)
     {
         AreaFactory areaFactory = initialAreaFactory;
 
