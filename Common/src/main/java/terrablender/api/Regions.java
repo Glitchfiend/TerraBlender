@@ -44,7 +44,7 @@ public class Regions
         regions.get(region.getType()).put(name, region);
         int index = regions.get(region.getType()).size() - 1;
         indices.get(region.getType()).put(name, index);
-        TerraBlender.LOGGER.info("Registered region " + name + " to index " + index);
+        TerraBlender.LOGGER.info("Registered region " + name + " to index " + index + " for type " + region.getType());
     }
 
     /**
