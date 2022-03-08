@@ -7,8 +7,8 @@
     "MixinBiomeSource",
     "MixinMultiNoiseBiomeSource",
     "MixinNoiseBasedChunkGenerator",
-    "MixinNoiseGeneratorSettings",
     "MixinParameterList",
+    "MixinPrimaryLevelData",
     "MixinWorldStem"
   ],
   "client": [

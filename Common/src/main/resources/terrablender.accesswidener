@@ -47,6 +47,7 @@ accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator see
 accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator sampler Lnet/minecraft/world/level/levelgen/NoiseSampler;
 accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator globalFluidPicker Lnet/minecraft/world/level/levelgen/Aquifer$FluidPicker;
 accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator settings Ljava/util/function/Supplier;
+mutable field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator settings Lnet/minecraft/core/Holder;
 mutable field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator sampler Lnet/minecraft/world/level/levelgen/NoiseSampler;
 
 # NoiseGeneratorSettings

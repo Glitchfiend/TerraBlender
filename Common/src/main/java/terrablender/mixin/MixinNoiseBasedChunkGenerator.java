@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseRouter;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import org.spongepowered.asm.mixin.Final;
@@ -38,6 +39,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
+import terrablender.api.SurfaceRuleManager;
 import terrablender.util.RegistryUtils;
 import terrablender.worldgen.IExtendedBiomeSource;
 import terrablender.worldgen.IExtendedParameterList;
@@ -48,6 +50,9 @@ public class MixinNoiseBasedChunkGenerator
     @Shadow
     @Final
     private NoiseRouter router;
+
+    @Shadow
+    public Holder<NoiseGeneratorSettings> settings;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void onInit(Registry<StructureSet> structures, Registry<NormalNoise.NoiseParameters> noises, BiomeSource biomeSource, long seed, Holder<NoiseGeneratorSettings> settings, CallbackInfo ci)
@@ -64,6 +69,11 @@ public class MixinNoiseBasedChunkGenerator
                 regionType = RegionType.NETHER;
             else
                 regionType = RegionType.OVERWORLD;
+
+            // Replace the settings to use our surface rules
+            NoiseGeneratorSettings currentSettings = this.settings.value();
+            SurfaceRules.RuleSource surfaceRules = regionType == RegionType.NETHER ? SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.NETHER) : SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.OVERWORLD);
+            this.settings = new Holder.Direct<>(new NoiseGeneratorSettings(currentSettings.noiseSettings(), currentSettings.defaultBlock(), currentSettings.defaultFluid(), currentSettings.noiseRouter(), surfaceRules, currentSettings.seaLevel(), currentSettings.disableMobGeneration(), currentSettings.aquifersEnabled(), currentSettings.oreVeinsEnabled(), currentSettings.useLegacyRandomSource()));
 
             // Initialize the parameter list for TerraBlender
             parametersEx.initializeForTerraBlender(regionType, seed);
