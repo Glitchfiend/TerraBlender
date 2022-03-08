@@ -7,6 +7,12 @@ accessible method net/minecraft/world/level/levelgen/Beardifier <init> (Lnet/min
 accessible field net/minecraft/world/level/biome/BiomeManager biomeZoomSeed J
 accessible method net/minecraft/world/level/biome/BiomeManager getFiddledDistance (JIIIDDD)D
 
+# Climate
+accessible class net/minecraft/world/level/biome/Climate$RTree
+accessible class net/minecraft/world/level/biome/Climate$RTree$Node
+accessible method net/minecraft/world/level/biome/Climate$RTree$Node distance ([J)J
+accessible class net/minecraft/world/level/biome/Climate$DistanceMetric
+
 # ChunkAccess
 extendable class net/minecraft/world/level/chunk/ChunkAccess
 accessible field net/minecraft/world/level/chunk/ChunkAccess noiseChunk Lnet/minecraft/world/level/levelgen/NoiseChunk;

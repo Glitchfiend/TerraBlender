@@ -15,22 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package terrablender.mixin.client;
+package terrablender.worldgen;
 
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import terrablender.api.BiomeProviders;
-import terrablender.data.DataPackManager;
+import net.minecraft.world.level.biome.Climate;
+import terrablender.api.RegionSize;
+import terrablender.api.RegionType;
 
-@Mixin(CreateWorldScreen.class)
-public class MixinCreateWorldScreen
+public interface IExtendedParameterList<T>
 {
-    @Inject(method = "removed", at = @At("HEAD"))
-    public void onRemoved(CallbackInfo ci)
-    {
-        BiomeProviders.remove(DataPackManager.DATA_PACK_PROVIDER_LOCATION);
-    }
+    void initializeForTerraBlender(RegionType regionType, RegionSize regionSize, long seed);
+    T findValuePositional(Climate.TargetPoint target, int x, int y, int z);
 }

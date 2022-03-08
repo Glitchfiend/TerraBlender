@@ -4,11 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "terrablender.refmap.json",
   "mixins": [
-    "MixinMain"
   ],
   "client": [
-    "client.MixinCreateWorldScreen",
-    "client.MixinMinecraft"
   ],
   "injectors": {
     "defaultRequire": 1

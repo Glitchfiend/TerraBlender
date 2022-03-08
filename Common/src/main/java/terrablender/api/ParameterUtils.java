@@ -22,36 +22,12 @@ import com.google.common.collect.Lists;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
-import terrablender.worldgen.BiomeProviderUtils;
-import terrablender.worldgen.TBClimate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ParameterUtils
 {
-    /**
-     * Get a list of {@link Climate.ParameterPoint Climate.ParameterPoints} that are used for a given Vanilla biome.
-     * @param biome the biome to find the parameters of.
-     * @return a list of parameter points.
-     */
-    public static List<Climate.ParameterPoint> getVanillaParameterPoints(ResourceKey<Biome> biome)
-    {
-        return BiomeProviderUtils.getVanillaParameterPoints(biome);
-    }
-
-    /**
-     * Convert from Vanilla's {@link Climate.ParameterPoint} to TerraBlender's {@link TBClimate.ParameterPoint}.
-     * @param point the parameter point to convert.
-     * @param uniqueness the uniqueness for the converted parameter point.
-     * @return the converted parameter point.
-     */
-    public static TBClimate.ParameterPoint convertParameterPoint(Climate.ParameterPoint point, Climate.Parameter uniqueness)
-    {
-        return TBClimate.parameters(point.temperature(), point.humidity(), point.continentalness(), point.erosion(), point.depth(), point.weirdness(), uniqueness, Climate.unquantizeCoord(point.offset()));
-    }
-
     /**
      * Builds a list of parameter points based on a list of parameters.
      */
@@ -187,26 +163,6 @@ public class ParameterUtils
         }
 
         /**
-         * Adds uniqueness parameters to the list.
-         * @param values values to be added.
-         */
-        public ParameterPointListBuilder uniqueness(Climate.Parameter... values)
-        {
-            this.uniquenesses.addAll(Arrays.asList(values));
-            return this;
-        }
-
-        /**
-         * Adds uniqueness values to the list.
-         * @param values values to be added.
-         */
-        public ParameterPointListBuilder uniqueness(Integer... values)
-        {
-            this.uniquenesses.addAll(Arrays.asList(values).stream().map(BiomeProviderUtils::getUniquenessParameter).toList());
-            return this;
-        }
-
-        /**
          * Adds offset values to the list.
          * @param values values to be added.
          */
@@ -227,27 +183,18 @@ public class ParameterUtils
         }
 
         /**
-         * Builds a list of {@link TBClimate.ParameterPoint}
-         * @return the parameter point list.
-         */
-        public List<TBClimate.ParameterPoint> build()
-        {
-            this.populateIfEmpty();
-            ImmutableList.Builder<TBClimate.ParameterPoint> builder = new ImmutableList.Builder<>();
-            this.temperatures.forEach(temperature -> this.humidities.forEach(humidity -> this.continentalnesses.forEach(continentalness -> this.erosions.forEach(erosion ->
-                this.depths.forEach(depth -> this.weirdnesses.forEach(weirdness -> this.uniquenesses.forEach(uniqueness -> this.offsets.forEach(offset -> {
-                    builder.add(new TBClimate.ParameterPoint(temperature, humidity, continentalness, erosion, depth, weirdness, uniqueness, offset));
-                }))))))));
-            return builder.build();
-        }
-
-        /**
          * Builds a list of {@link Climate.ParameterPoint}
          * @return the parameter point list.
          */
-        public List<Climate.ParameterPoint> buildVanilla()
+        public List<Climate.ParameterPoint> build()
         {
-            return build().stream().map(point -> new Climate.ParameterPoint(point.temperature(), point.humidity(), point.continentalness(), point.erosion(), point.depth(), point.weirdness(), point.offset())).collect(ImmutableList.toImmutableList());
+            this.populateIfEmpty();
+            ImmutableList.Builder<Climate.ParameterPoint> builder = new ImmutableList.Builder<>();
+            this.temperatures.forEach(temperature -> this.humidities.forEach(humidity -> this.continentalnesses.forEach(continentalness -> this.erosions.forEach(erosion ->
+                this.depths.forEach(depth -> this.weirdnesses.forEach(weirdness -> this.uniquenesses.forEach(uniqueness -> this.offsets.forEach(offset -> {
+                    builder.add(new Climate.ParameterPoint(temperature, humidity, continentalness, erosion, depth, weirdness, offset));
+                }))))))));
+            return builder.build();
         }
 
         private void populateIfEmpty()
@@ -258,7 +205,6 @@ public class ParameterUtils
             if (this.erosions.isEmpty()) this.erosions.add(Erosion.FULL_RANGE.parameter());
             if (this.depths.isEmpty()) this.depths.add(Depth.FULL_RANGE.parameter());
             if (this.weirdnesses.isEmpty()) this.weirdnesses.add(Weirdness.FULL_RANGE.parameter());
-            if (this.uniquenesses.isEmpty()) this.uniquenesses.add(BiomeProviderUtils.getUniquenessParameter(0));
             if (this.offsets.isEmpty()) this.offsets.add(Climate.quantizeCoord(0.0F));
         }
     };

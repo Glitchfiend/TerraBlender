@@ -26,9 +26,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import terrablender.api.BiomeProviders;
+import terrablender.api.Regions;
 import terrablender.core.TerraBlender;
-import terrablender.data.DataPackManager;
 
 import java.util.Random;
 
@@ -47,6 +46,6 @@ public class MixinCreateWorldScreen
     @Inject(method = "removed", at = @At("HEAD"))
     public void onRemoved(CallbackInfo ci)
     {
-        BiomeProviders.remove(DataPackManager.DATA_PACK_PROVIDER_LOCATION);
+        Regions.remove(DataPackManager.DATA_PACK_PROVIDER_LOCATION);
     }
 }

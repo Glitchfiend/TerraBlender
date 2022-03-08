@@ -17,8 +17,9 @@
  */
 package terrablender.worldgen.noise;
 
-import terrablender.api.BiomeProvider;
-import terrablender.api.BiomeProviders;
+import terrablender.api.Region;
+import terrablender.api.RegionType;
+import terrablender.api.Regions;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
@@ -26,22 +27,24 @@ import net.minecraft.util.random.WeightedRandom;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class InitialLayer implements AreaTransformer0
 {
-    private final WeightedRandomList<WeightedEntry.Wrapper<BiomeProvider>> weightedEntries;
+    private final RegionType regionType;
+    private final WeightedRandomList<WeightedEntry.Wrapper<Region>> weightedEntries;
 
-    public InitialLayer(Function<BiomeProvider, Integer> getWeight)
+    public InitialLayer(RegionType type)
     {
-        this.weightedEntries = WeightedRandomList.create(BiomeProviders.get().stream().filter(provider -> getWeight.apply(provider) > 0).map(provider -> WeightedEntry.wrap(provider, getWeight.apply(provider))).collect(ImmutableList.toImmutableList()));
+        // TODO: Filter out regions with no biomes
+        this.regionType = type;
+        this.weightedEntries = WeightedRandomList.create(Regions.get(this.regionType).stream().filter(region -> region.getType() == type).map(region -> WeightedEntry.wrap(region, region.getWeight())).collect(ImmutableList.toImmutableList()));
     }
 
     @Override
     public int apply(AreaContext context, int x, int y)
     {
-        Optional<WeightedEntry.Wrapper<BiomeProvider>> entry = weightedEntries.getRandom(context);
-        return entry.isPresent() ? entry.get().getData().getIndex() : 0;
+        Optional<WeightedEntry.Wrapper<Region>> entry = weightedEntries.getRandom(context);
+        return entry.isPresent() ? Regions.getIndex(this.regionType, entry.get().getData().getName()) : 0;
     }
 
     private static class WeightedRandomList<E extends WeightedEntry>

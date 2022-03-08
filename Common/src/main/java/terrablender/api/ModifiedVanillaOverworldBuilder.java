@@ -22,10 +22,8 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
-import terrablender.worldgen.TBClimate;
 
 import java.util.List;
 import java.util.Map;
@@ -71,13 +69,12 @@ public class ModifiedVanillaOverworldBuilder
     }
 
     /**
-     * Builds a list of {@link TBClimate.ParameterPoint} and {@link ResourceKey<Biome>} pairs.
-     * @param uniqueness the uniqueness to be used by the {@link TBClimate.ParameterPoint TBClimate.ParameterPoints}.
+     * Builds a list of {@link Climate.ParameterPoint} and {@link ResourceKey<Biome>} pairs.
      * @return the built list.
      */
-    public List<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> build(Climate.Parameter uniqueness)
+    public List<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> build()
     {
-        ImmutableList.Builder<Pair<TBClimate.ParameterPoint, ResourceKey<Biome>>> builder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> builder = new ImmutableList.Builder<>();
         Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper = pair -> {
             Climate.ParameterPoint parameters = pair.getFirst();
             ResourceKey<Biome> biome = pair.getSecond();
@@ -92,7 +89,7 @@ public class ModifiedVanillaOverworldBuilder
             if (parameterMappings.containsKey(parameters))
                 parameters = parameterMappings.get(parameters);
 
-            builder.add(Pair.of(ParameterUtils.convertParameterPoint(parameters, uniqueness), biome));
+            builder.add(Pair.of(parameters, biome));
         };
 
         biomeBuilder.addBiomes(mapper);

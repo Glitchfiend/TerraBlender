@@ -17,15 +17,15 @@
  */
 package terrablender.core;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import terrablender.config.TerraBlenderConfig;
-import terrablender.core.TerraBlender;
 
 @Mod(value = TerraBlender.MOD_ID)
 public class TerraBlenderForge
@@ -36,10 +36,7 @@ public class TerraBlenderForge
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
-        MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
-
         TerraBlender.setConfig(CONFIG);
-        TerraBlender.register();
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -48,14 +45,15 @@ public class TerraBlenderForge
 
     private void loadComplete(final FMLLoadCompleteEvent event)
     {
-        event.enqueueWork(() ->
-        {
-            TerraBlender.registerNoiseGeneratorSettings();
-        });
     }
 
-    public void onRegisterCommands(RegisterCommandsEvent event)
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+    private static class Handler
     {
-        TerraBlender.registerCommands(event.getDispatcher());
+        @SubscribeEvent
+        public static void onRegisterBiomes(RegistryEvent.Register<Biome> event)
+        {
+            TerraBlender.register();
+        }
     }
 }

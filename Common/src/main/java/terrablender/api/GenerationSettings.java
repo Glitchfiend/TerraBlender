@@ -37,7 +37,7 @@ public class GenerationSettings
     private static List<Pair<Integer, SurfaceRules.RuleSource>> afterBedrockNetherSurfaceRules = Lists.newArrayList();
 
     /**
-     * Set the default overworld surface rules. This is used when a {@link BiomeProvider BiomeProvider} does not specify its own rules.
+     * Set the default overworld surface rules. This is used when a {@link Region BiomeProvider} does not specify its own rules.
      * @param rules surface rules.
      */
     public static void setDefaultOverworldSurfaceRules(SurfaceRules.RuleSource rules)
@@ -46,7 +46,7 @@ public class GenerationSettings
     }
 
     /**
-     * Set the default nether surface rules. This is used when a {@link BiomeProvider BiomeProvider} does not specify its own rules.
+     * Set the default nether surface rules. This is used when a {@link Region BiomeProvider} does not specify its own rules.
      * @param rules surface rules.
      */
     public static void setDefaultNetherSurfaceRules(SurfaceRules.RuleSource rules)

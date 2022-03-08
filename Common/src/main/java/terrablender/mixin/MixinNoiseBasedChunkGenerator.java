@@ -1,59 +1,61 @@
 /**
  * Copyright (C) Glitchfiend
- *
+ * <p>
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package terrablender.mixin;
 
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.*;
-import net.minecraft.world.level.levelgen.blending.Blender;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import terrablender.worldgen.IExtendedNoiseBasedChunkGenerator;
-
-import java.util.function.Supplier;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import terrablender.api.RegionSize;
+import terrablender.api.RegionType;
+import terrablender.worldgen.IExtendedParameterList;
 
 @Mixin(NoiseBasedChunkGenerator.class)
-public class MixinNoiseBasedChunkGenerator implements IExtendedNoiseBasedChunkGenerator
+public class MixinNoiseBasedChunkGenerator
 {
-    @Redirect(method = "iterateNoiseColumn", at=@At(value="INVOKE", target = "net/minecraft/world/level/levelgen/NoiseChunk.forColumn(IIIILnet/minecraft/world/level/levelgen/NoiseSampler;Lnet/minecraft/world/level/levelgen/NoiseGeneratorSettings;Lnet/minecraft/world/level/levelgen/Aquifer$FluidPicker;)Lnet/minecraft/world/level/levelgen/NoiseChunk;"))
-    public NoiseChunk redirectForColumn(int x, int z, int cellNoiseMinY, int cellCountY, NoiseSampler sampler, NoiseGeneratorSettings noiseGenSettings, Aquifer.FluidPicker fluidPicker)
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void onInit(Registry<StructureSet> structures, Registry<NormalNoise.NoiseParameters> noises, BiomeSource biomeSource, long seed, Holder<NoiseGeneratorSettings> settings, CallbackInfo ci)
     {
-        return this.forColumn(x, z, cellNoiseMinY, cellCountY, sampler, noiseGenSettings, fluidPicker);
-    }
+        if (biomeSource instanceof MultiNoiseBiomeSource)
+        {
+            MultiNoiseBiomeSource multiNoiseBiomeSource = (MultiNoiseBiomeSource)biomeSource;
+            Climate.ParameterList parameters = multiNoiseBiomeSource.parameters;
+            IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
 
-    @Redirect(method = {"doCreateBiomes", "buildSurface", "applyCarvers", "doFill"}, at=@At(value="INVOKE", target="net/minecraft/world/level/chunk/ChunkAccess.getOrCreateNoiseChunk(Lnet/minecraft/world/level/levelgen/NoiseSampler;Ljava/util/function/Supplier;Lnet/minecraft/world/level/levelgen/NoiseGeneratorSettings;Lnet/minecraft/world/level/levelgen/Aquifer$FluidPicker;Lnet/minecraft/world/level/levelgen/blending/Blender;)Lnet/minecraft/world/level/levelgen/NoiseChunk;"))
-    public NoiseChunk redirectGetOrCreateNoiseChunk(ChunkAccess chunkAccess, NoiseSampler sampler, Supplier<NoiseChunk.NoiseFiller> noiseFiller, NoiseGeneratorSettings settings, Aquifer.FluidPicker fluidPicker, Blender blender)
-    {
-        return this.getOrCreateNoiseChunk(chunkAccess, sampler, noiseFiller, settings, fluidPicker, blender);
-    }
+            RegionType regionType = RegionType.OVERWORLD;
 
-    @Override
-    public NoiseChunk forColumn(int x, int z, int cellNoiseMinY, int cellCountY, NoiseSampler sampler, NoiseGeneratorSettings noiseGenSettings, Aquifer.FluidPicker fluidPicker)
-    {
-        return NoiseChunk.forColumn(x, z, cellNoiseMinY, cellCountY, sampler, noiseGenSettings, fluidPicker);
-    }
+            if (settings.value().defaultBlock().getBlock() == Blocks.NETHERRACK && settings.value().defaultFluid().getBlock() == Blocks.LAVA)
+                regionType = RegionType.NETHER;
 
-    @Override
-    public NoiseChunk getOrCreateNoiseChunk(ChunkAccess chunkAccess, NoiseSampler sampler, Supplier<NoiseChunk.NoiseFiller> noiseFiller, NoiseGeneratorSettings settings, Aquifer.FluidPicker fluidPicker, Blender blender)
-    {
-        if (chunkAccess.noiseChunk == null)
-            chunkAccess.noiseChunk = NoiseChunk.forChunk(chunkAccess, sampler, noiseFiller, settings, fluidPicker, blender);
-
-        return chunkAccess.noiseChunk;
+            // TODO: MultiNoiseBiomeSource possibleValues
+            // TODO: Figure out how to manage region sizes/make them configurable
+            // TODO: Fix the config file in general
+            parametersEx.initializeForTerraBlender(regionType, RegionSize.MEDIUM, seed);
+        }
     }
 }

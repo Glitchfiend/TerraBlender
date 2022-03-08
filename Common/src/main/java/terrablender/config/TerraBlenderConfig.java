@@ -21,25 +21,18 @@ import java.nio.file.Path;
 
 public class TerraBlenderConfig extends ConfigFile
 {
-    public final boolean replaceDefaultWorldtypes;
-    public final boolean replaceDefaultNether;
     public final int overworldRegionSize;
     public final int overworldLargeBiomesRegionSize;
     public final int netherRegionSize;
     public final int netherLargeBiomesRegionSize;
     public final int vanillaOverworldRegionWeight;
     public final int vanillaNetherRegionWeight;
-    public final int datapackOverworldRegionWeight;
-    public final int datapackNetherRegionWeight;
-    public final boolean forceResetBiomeParameters;
 
     public TerraBlenderConfig(Path path)
     {
         super(path);
 
         Config generalConfig = this.getSubConfig("general");
-        this.replaceDefaultWorldtypes = generalConfig.add("Whether to replace the default built-in world types with our own.", "replace_default_worldtypes", true);
-        this.replaceDefaultNether = generalConfig.add("Whether to replace the default Nether with our own.", "replace_default_nether", true);
         this.addSubConfig("General settings", "general", generalConfig);
 
         Config generationSettings = this.getSubConfig("generation_settings");
@@ -49,9 +42,6 @@ public class TerraBlenderConfig extends ConfigFile
         this.netherLargeBiomesRegionSize = generationSettings.addNumber("The size of nether biome regions from each mod that uses TerraBlender when using the large biomes world type.", "nether_large_biomes_region_size", 4, 2, 6);
         this.vanillaOverworldRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the overworld.", "vanilla_overworld_region_weight", 10, 0, Integer.MAX_VALUE);
         this.vanillaNetherRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the nether.", "vanilla_nether_region_weight", 10, 0, Integer.MAX_VALUE);
-        this.datapackOverworldRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions in the overworld.", "datapack_overworld_region_weight", 15, 0, Integer.MAX_VALUE);
-        this.datapackNetherRegionWeight = generationSettings.addNumber("The weighting of data pack biome regions in the nether.", "datapack_nether_region_weight", 15, 0, Integer.MAX_VALUE);
-        this.forceResetBiomeParameters = generationSettings.add("Force the biome parameters to reset when loading worlds.", "force_reset_biome_parameters", false);
         this.addSubConfig("Generation settings", "generation_settings", generationSettings);
 
         this.save();

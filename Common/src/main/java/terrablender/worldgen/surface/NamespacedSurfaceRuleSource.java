@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -58,9 +60,9 @@ public record NamespacedSurfaceRuleSource(SurfaceRules.RuleSource base, Map<Stri
         @Nullable
         public BlockState tryApply(int x, int y, int z)
         {
-            Biome biome = context.biomeGetter.apply(new BlockPos(x, y, z));
-            ResourceLocation biomeKey = context.biomes.getKey(biome);
-            String namespace = biomeKey.getNamespace();
+            Holder<Biome> biome = context.biomeGetter.apply(new BlockPos(x, y, z));
+            ResourceKey<Biome> biomeKey = biome.unwrapKey().orElse(null);
+            String namespace = biomeKey != null ? biomeKey.location().getNamespace() : null;
             BlockState state = null;
 
             if (this.rules.containsKey(namespace))

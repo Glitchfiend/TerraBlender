@@ -1,50 +1,44 @@
 /**
  * Copyright (C) Glitchfiend
- *
+ * <p>
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package terrablender.mixin;
 
-import terrablender.data.DataPackManager;
-import com.google.common.collect.ImmutableList;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Dynamic;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
-import net.minecraft.world.level.storage.LevelStorageSource;
-import org.apache.logging.log4j.Logger;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import terrablender.worldgen.IExtendedParameterList;
 
-@Mixin(LevelStorageSource.class)
-public class MixinLevelStorageSource
+@Mixin(MultiNoiseBiomeSource.class)
+public class MixinMultiNoiseBiomeSource
 {
     @Shadow
     @Final
-    static Logger LOGGER;
+    public Climate.ParameterList<Holder<Biome>> parameters;
 
-    @Shadow
-    @Final
-    private static ImmutableList<String> OLD_SETTINGS_KEYS;
-
-    @Redirect(method="readWorldGenSettings", at=@At(value="INVOKE", target="Lcom/mojang/serialization/Codec;parse(Lcom/mojang/serialization/Dynamic;)Lcom/mojang/serialization/DataResult;"))
-    private static <T> DataResult readWorldGenSettings_parse(Codec<WorldGenSettings> codec, final Dynamic<T> input)
+    @Inject(method="getNoiseBiome(IIILnet/minecraft/world/level/biome/Climate$Sampler;)Lnet/minecraft/core/Holder;", at=@At("HEAD"), cancellable = true)
+    public void getNoiseBiome(int x, int y, int z, Climate.Sampler sampler, CallbackInfoReturnable<Holder<Biome>> cir)
     {
-        return DataPackManager.replaceDatapackWorldGenSettings(input);
+        cir.setReturnValue(((IExtendedParameterList<Holder<Biome>>)parameters).findValuePositional(sampler.sample(x, y, z), x, y, z));
     }
 }

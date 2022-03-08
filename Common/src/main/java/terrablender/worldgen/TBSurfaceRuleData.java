@@ -334,7 +334,7 @@ public class TBSurfaceRuleData
                     SurfaceRules.ifTrue(
                         isSandstoneLiningBiome,
                         SurfaceRules.ifTrue(
-                            SurfaceRules.stoneDepthCheck(0, true, true, CaveSurface.FLOOR),
+                            SurfaceRules.DEEP_UNDER_FLOOR,
                             SANDSTONE
                         )
                     )

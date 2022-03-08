@@ -4,18 +4,11 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "${refmap_target}refmap.json",
   "mixins": [
-    "MixinLevelStorageSource",
+    "MixinMultiNoiseBiomeSource",
     "MixinNoiseBasedChunkGenerator",
-    "MixinStructureSettings",
-    "MixinWorldGenSettings",
-    "MixinPrimaryLevelData"
+    "MixinParameterList"
   ],
   "client": [
-    "client.MixinClientLevel",
-    "client.MixinWorldGenSettingsComponent",
-    "client.MixinDefaultWorldPreset",
-    "client.MixinLargeBiomesWorldPreset",
-    "client.MixinAmplifiedWorldPreset"
   ],
   "injectors": {
     "defaultRequire": 1
