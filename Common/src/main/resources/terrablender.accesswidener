@@ -80,7 +80,7 @@ accessible field net/minecraft/world/level/levelgen/StructureSettings stronghold
 accessible class net/minecraft/world/level/levelgen/SurfaceRules$Context
 accessible class net/minecraft/world/level/levelgen/SurfaceRules$SurfaceRule
 accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context biomeGetter Ljava/util/function/Function;
-accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context biomes Lnet/minecraft/core/Registry;
+accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context biome Ljava/util/function/Supplier;
 
 # WorldGenSettings
 accessible field net/minecraft/world/level/levelgen/WorldGenSettings legacyCustomOptions Ljava/util/Optional;

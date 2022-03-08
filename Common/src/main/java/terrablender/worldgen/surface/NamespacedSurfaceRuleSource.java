@@ -60,13 +60,11 @@ public record NamespacedSurfaceRuleSource(SurfaceRules.RuleSource base, Map<Stri
         @Nullable
         public BlockState tryApply(int x, int y, int z)
         {
-            Holder<Biome> biome = context.biomeGetter.apply(new BlockPos(x, y, z));
-            ResourceKey<Biome> biomeKey = biome.unwrapKey().orElse(null);
-            String namespace = biomeKey != null ? biomeKey.location().getNamespace() : null;
+            Holder<Biome> biome = context.biome.get();
             BlockState state = null;
 
-            if (this.rules.containsKey(namespace))
-                state = this.rules.get(namespace).tryApply(x, y, z);
+            if (biome.is(key -> this.rules.containsKey(key.location().getNamespace())))
+                state = this.rules.get(biome.unwrapKey().get().location().getNamespace()).tryApply(x, y, z);
 
             if (state == null)
                 state = this.baseRule.tryApply(x, y, z);
