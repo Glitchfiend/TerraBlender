@@ -39,7 +39,7 @@ public class DefaultOverworldRegion extends Region
     }
 
     @Override
-    public void addBiomes(Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper)
+    public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper)
     {
         (new OverworldBiomeBuilder()).addBiomes(mapper);
     }

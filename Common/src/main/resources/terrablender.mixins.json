@@ -6,7 +6,8 @@
   "mixins": [
     "MixinMultiNoiseBiomeSource",
     "MixinNoiseBasedChunkGenerator",
-    "MixinParameterList"
+    "MixinParameterList",
+    "MixinWorldStem"
   ],
   "client": [
   ],

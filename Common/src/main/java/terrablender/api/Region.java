@@ -76,9 +76,10 @@ public abstract class Region
     /**
      * A place to register biome parameter mappings. This may be used in conjunction with {@link #addBiome(Consumer, Climate.Parameter, Climate.Parameter, Climate.Parameter, Climate.Parameter, Climate.Parameter, Climate.Parameter, float, ResourceKey) addBiome}.
      * In the case of the overworld, Mojang's approach to biome parameter mappings may be found in {@link net.minecraft.world.level.biome.OverworldBiomeBuilder OverworldBiomeBuilder}.
+     * @param registry the biome registry.
      * @param mapper the mapper used to construct a list of {@link Climate.ParameterPoint ParameterPoint} to biome mappings.
      */
-    public void addBiomes(Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {}
+    public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {}
 
     /**
      * Adds a biome using the provided mapper.
