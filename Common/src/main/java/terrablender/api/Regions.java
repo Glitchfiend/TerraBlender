@@ -62,7 +62,7 @@ public class Regions
         // Clear the current regions and reconstruct the map
         regions.get(region.getType()).clear();
         entries.forEach(entry -> regions.get(region.getType()).put(entry.getKey(), entry.getValue()));
-        TerraBlender.LOGGER.info("Registered region " + name + " to index " + index);
+        TerraBlender.LOGGER.info("Registered region " + name + " to index " + index + " for type " + region.getType());
     }
 
     /**

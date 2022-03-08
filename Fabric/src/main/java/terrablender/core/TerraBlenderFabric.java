@@ -36,7 +36,6 @@ public class TerraBlenderFabric implements ModInitializer
     {
         TerraBlender.setConfig(CONFIG);
         TerraBlender.register();
-        CommandRegistrationCallback.EVENT.register(((dispatcher, dedicated) -> TerraBlender.registerCommands(dispatcher)));
 
         FabricLoader.getInstance().getEntrypointContainers("terrablender", TerraBlenderApi.class).forEach(entrypoint -> {
             TerraBlenderApi api = entrypoint.getEntrypoint();
@@ -47,7 +46,5 @@ public class TerraBlenderFabric implements ModInitializer
             if (defaultOverworldSurfaceRules.isPresent()) GenerationSettings.setDefaultOverworldSurfaceRules(defaultOverworldSurfaceRules.get());
             if (defaultNetherSurfaceRules.isPresent()) GenerationSettings.setDefaultNetherSurfaceRules(defaultNetherSurfaceRules.get());
         });
-
-        TerraBlender.registerNoiseGeneratorSettings();
     }
 }
