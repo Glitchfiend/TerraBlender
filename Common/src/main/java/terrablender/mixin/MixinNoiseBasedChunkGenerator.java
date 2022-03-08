@@ -17,8 +17,11 @@
  */
 package terrablender.mixin;
 
+import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
@@ -33,6 +36,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import terrablender.api.RegionSize;
 import terrablender.api.RegionType;
+import terrablender.api.Regions;
+import terrablender.util.RegistryUtils;
+import terrablender.worldgen.IExtendedBiomeSource;
 import terrablender.worldgen.IExtendedParameterList;
 
 @Mixin(NoiseBasedChunkGenerator.class)
@@ -44,18 +50,30 @@ public class MixinNoiseBasedChunkGenerator
         if (biomeSource instanceof MultiNoiseBiomeSource)
         {
             MultiNoiseBiomeSource multiNoiseBiomeSource = (MultiNoiseBiomeSource)biomeSource;
+            IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
             Climate.ParameterList parameters = multiNoiseBiomeSource.parameters;
             IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
 
-            RegionType regionType = RegionType.OVERWORLD;
-
+            final RegionType regionType;
             if (settings.value().defaultBlock().getBlock() == Blocks.NETHERRACK && settings.value().defaultFluid().getBlock() == Blocks.LAVA)
                 regionType = RegionType.NETHER;
+            else
+                regionType = RegionType.OVERWORLD;
 
-            // TODO: MultiNoiseBiomeSource possibleValues
             // TODO: Figure out how to manage region sizes/make them configurable
             // TODO: Fix the config file in general
+            // TODO: Surface rules
+
+            // Initialize the parameter list for TerraBlender
             parametersEx.initializeForTerraBlender(regionType, RegionSize.MEDIUM, seed);
+
+            // Append modded biomes to the biome source biome list
+            RegistryUtils.addRegistryAccessCaptureOneShotListener(registryAccess -> {
+                Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+                ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
+                Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getOrCreateHolder(pair.getSecond()))));
+                biomeSourceEx.appendDeferredBiomesList(builder.build());
+            });
         }
     }
 }
