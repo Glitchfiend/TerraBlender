@@ -72,12 +72,15 @@ public class SurfaceRuleManager
     /**
      * Gets the namespaced rules for a given category.
      * @param category the category to get the surface rules for.
+     * @param fallback the surface rules to fallback on.
      * @return the namespaced rules.
      */
-    public static SurfaceRules.RuleSource getNamespacedRules(RuleCategory category)
+    public static SurfaceRules.RuleSource getNamespacedRules(RuleCategory category, SurfaceRules.RuleSource fallback)
     {
-        SurfaceRules.RuleSource base = getDefaultSurfaceRules(category);
-        return new NamespacedSurfaceRuleSource(base, ImmutableMap.copyOf(surfaceRules.get(category)));
+        ImmutableMap.Builder<String, SurfaceRules.RuleSource> builder = ImmutableMap.builder();
+        builder.put("minecraft", getDefaultSurfaceRules(category));
+        builder.putAll(surfaceRules.get(category));
+        return new NamespacedSurfaceRuleSource(fallback, builder.build());
     }
 
     /**
