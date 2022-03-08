@@ -24,6 +24,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -61,7 +62,10 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
     @Inject(method = "lambda$new$0", at = @At("HEAD"), cancellable = true)
     private void skipInitialFeaturesPerStep(List<Holder<Biome>> $$0x, CallbackInfoReturnable<List<BiomeSource.StepFeatureData>> cir)
     {
-        cir.setReturnValue(new ArrayList<>());
+        if ((Object)this instanceof MultiNoiseBiomeSource)
+        {
+            cir.setReturnValue(new ArrayList<>());
+        }
     }
 
     @Override
