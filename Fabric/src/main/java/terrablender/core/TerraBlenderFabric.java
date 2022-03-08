@@ -18,10 +18,9 @@
 package terrablender.core;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import terrablender.api.GenerationSettings;
+import terrablender.api.SurfaceRuleManager;
 import terrablender.api.TerraBlenderApi;
 import terrablender.config.TerraBlenderConfig;
 
@@ -39,12 +38,7 @@ public class TerraBlenderFabric implements ModInitializer
 
         FabricLoader.getInstance().getEntrypointContainers("terrablender", TerraBlenderApi.class).forEach(entrypoint -> {
             TerraBlenderApi api = entrypoint.getEntrypoint();
-            Optional<SurfaceRules.RuleSource> defaultOverworldSurfaceRules = api.getDefaultOverworldSurfaceRules();
-            Optional<SurfaceRules.RuleSource> defaultNetherSurfaceRules = api.getDefaultNetherSurfaceRules();
-
-            entrypoint.getEntrypoint().onTerraBlenderInitialized();
-            if (defaultOverworldSurfaceRules.isPresent()) GenerationSettings.setDefaultOverworldSurfaceRules(defaultOverworldSurfaceRules.get());
-            if (defaultNetherSurfaceRules.isPresent()) GenerationSettings.setDefaultNetherSurfaceRules(defaultNetherSurfaceRules.get());
+            api.onTerraBlenderInitialized();
         });
     }
 }

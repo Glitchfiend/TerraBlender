@@ -27,10 +27,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import terrablender.api.Region;
-import terrablender.api.RegionSize;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
-import terrablender.core.TerraBlender;
 import terrablender.util.RegistryUtils;
 import terrablender.worldgen.IExtendedParameterList;
 import terrablender.worldgen.noise.Area;
@@ -51,13 +49,13 @@ public class MixinParameterList<T> implements IExtendedParameterList<T>
     private Climate.RTree[] uniqueTrees;
 
     @Override
-    public void initializeForTerraBlender(RegionType regionType, RegionSize regionSize, long seed)
+    public void initializeForTerraBlender(RegionType regionType, long seed)
     {
         // We don't want to initialize multiple times
         if (this.initialized)
             return;
 
-        this.uniqueness = LayeredNoiseUtil.uniqueness(regionType, regionSize, seed);
+        this.uniqueness = LayeredNoiseUtil.uniqueness(regionType, seed);
         this.uniqueTrees = new Climate.RTree[Regions.getCount(regionType)];
 
         RegistryUtils.addRegistryAccessCaptureOneShotListener(registryAccess -> {

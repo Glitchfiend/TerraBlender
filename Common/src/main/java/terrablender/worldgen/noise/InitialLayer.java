@@ -17,16 +17,19 @@
  */
 package terrablender.worldgen.noise;
 
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.Biome;
 import terrablender.api.Region;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
+import terrablender.util.RegistryUtils;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InitialLayer implements AreaTransformer0
 {
@@ -35,9 +38,15 @@ public class InitialLayer implements AreaTransformer0
 
     public InitialLayer(RegionType type)
     {
-        // TODO: Filter out regions with no biomes
         this.regionType = type;
-        this.weightedEntries = WeightedRandomList.create(Regions.get(this.regionType).stream().filter(region -> region.getType() == type).map(region -> WeightedEntry.wrap(region, region.getWeight())).collect(ImmutableList.toImmutableList()));
+        this.weightedEntries = WeightedRandomList.create(Regions.get(this.regionType).stream().filter(region -> {
+            Registry<Biome> biomeRegistry = RegistryUtils.getCurrentRegistryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+            AtomicBoolean biomesAdded = new AtomicBoolean(false);
+            region.addBiomes(biomeRegistry, pair -> biomesAdded.set(true));
+
+            // Filter out irrelevant regions or regions without any biomes
+            return region.getType() == type && biomesAdded.get();
+        }).map(region -> WeightedEntry.wrap(region, region.getWeight())).collect(ImmutableList.toImmutableList()));
     }
 
     @Override

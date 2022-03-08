@@ -17,7 +17,6 @@
  */
 package terrablender.worldgen.noise;
 
-import terrablender.api.RegionSize;
 import terrablender.api.RegionType;
 import terrablender.core.TerraBlender;
 
@@ -25,12 +24,12 @@ import java.util.function.LongFunction;
 
 public class LayeredNoiseUtil
 {
-    public static Area uniqueness(RegionType regionType, RegionSize regionSize, long worldSeed)
+    public static Area uniqueness(RegionType regionType, long worldSeed)
     {
-        int numZooms = regionSize == RegionSize.LARGE ? TerraBlender.CONFIG.overworldLargeBiomesRegionSize : TerraBlender.CONFIG.overworldRegionSize;
+        int numZooms = TerraBlender.CONFIG.overworldRegionSize;
 
         if (regionType == RegionType.NETHER)
-            numZooms = regionSize == RegionSize.LARGE ? TerraBlender.CONFIG.netherLargeBiomesRegionSize : TerraBlender.CONFIG.netherRegionSize;
+            numZooms = TerraBlender.CONFIG.netherRegionSize;
 
         LongFunction<AreaContext> contextFactory = (seedModifier) -> new AreaContext(25, worldSeed, seedModifier);
         AreaFactory factory = new InitialLayer(regionType).run(contextFactory.apply(1L));

@@ -7,6 +7,7 @@
     "MixinBiomeSource",
     "MixinMultiNoiseBiomeSource",
     "MixinNoiseBasedChunkGenerator",
+    "MixinNoiseGeneratorSettings",
     "MixinParameterList",
     "MixinWorldStem"
   ],

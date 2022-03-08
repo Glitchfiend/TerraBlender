@@ -27,22 +27,4 @@ import java.util.Optional;
 public interface TerraBlenderApi
 {
     default void onTerraBlenderInitialized() {}
-
-    /**
-     * Get the default overworld surface rules.
-     * @return the default overworld surface rules.
-     */
-    default Optional<SurfaceRules.RuleSource> getDefaultOverworldSurfaceRules()
-    {
-        return Optional.empty();
-    }
-
-    /**
-     * Get the default nether surface rules.
-     * @return the default nether surface rules.
-     */
-    default Optional<SurfaceRules.RuleSource> getDefaultNetherSurfaceRules()
-    {
-        return Optional.empty();
-    }
 }

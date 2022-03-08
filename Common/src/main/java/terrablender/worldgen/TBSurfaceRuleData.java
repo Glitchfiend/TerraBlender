@@ -24,8 +24,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
-import net.minecraft.world.level.levelgen.placement.CaveSurface;
-import terrablender.api.GenerationSettings;
+import terrablender.api.SurfaceRuleManager;
 
 import java.util.List;
 
@@ -355,7 +354,7 @@ public class TBSurfaceRuleData
             )
         );
 
-        List<SurfaceRules.RuleSource> afterBedrockRules = GenerationSettings.getAfterBedrockOverworldSurfaceRules();
+        List<SurfaceRules.RuleSource> afterBedrockRules = SurfaceRuleManager.getDefaultSurfaceRuleAdditionsForStage(SurfaceRuleManager.RuleCategory.OVERWORLD, SurfaceRuleManager.RuleStage.AFTER_BEDROCK);
 
         if (!afterBedrockRules.isEmpty())
         {
@@ -366,7 +365,7 @@ public class TBSurfaceRuleData
         }
 
         ImmutableList.Builder<SurfaceRules.RuleSource> builder = ImmutableList.builder();
-        builder.addAll(GenerationSettings.getBeforeBedrockOverworldSurfaceRules());
+        builder.addAll(SurfaceRuleManager.getDefaultSurfaceRuleAdditionsForStage(SurfaceRuleManager.RuleCategory.OVERWORLD, SurfaceRuleManager.RuleStage.BEFORE_BEDROCK));
         if (bedrockRoof)
             builder.add(SurfaceRules.ifTrue(SurfaceRules.not(SurfaceRules.verticalGradient("bedrock_roof", VerticalAnchor.belowTop(5), VerticalAnchor.top())), BEDROCK));
 
@@ -512,9 +511,9 @@ public class TBSurfaceRuleData
         );
 
         ImmutableList.Builder<SurfaceRules.RuleSource> builder = ImmutableList.builder();
-        builder.addAll(GenerationSettings.getBeforeBedrockNetherSurfaceRules());
+        builder.addAll(SurfaceRuleManager.getDefaultSurfaceRuleAdditionsForStage(SurfaceRuleManager.RuleCategory.NETHER, SurfaceRuleManager.RuleStage.BEFORE_BEDROCK));
         builder.add(bedrockRules);
-        builder.addAll(GenerationSettings.getAfterBedrockNetherSurfaceRules());
+        builder.addAll(SurfaceRuleManager.getDefaultSurfaceRuleAdditionsForStage(SurfaceRuleManager.RuleCategory.NETHER, SurfaceRuleManager.RuleStage.AFTER_BEDROCK));
         builder.add(surfaceRules);
         return SurfaceRules.sequence(builder.build().toArray(SurfaceRules.RuleSource[]::new));
     }

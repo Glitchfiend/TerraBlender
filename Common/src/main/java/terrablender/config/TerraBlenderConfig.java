@@ -22,9 +22,7 @@ import java.nio.file.Path;
 public class TerraBlenderConfig extends ConfigFile
 {
     public final int overworldRegionSize;
-    public final int overworldLargeBiomesRegionSize;
     public final int netherRegionSize;
-    public final int netherLargeBiomesRegionSize;
     public final int vanillaOverworldRegionWeight;
     public final int vanillaNetherRegionWeight;
 
@@ -37,9 +35,7 @@ public class TerraBlenderConfig extends ConfigFile
 
         Config generationSettings = this.getSubConfig("generation_settings");
         this.overworldRegionSize = generationSettings.addNumber("The size of overworld biome regions from each mod that uses TerraBlender.", "overworld_region_size", 3, 2, 6);
-        this.overworldLargeBiomesRegionSize = generationSettings.addNumber("The size of overworld biome regions from each mod that uses TerraBlender when using the large biomes world type.", "overworld_large_biomes_region_size", 5, 2, 6);
         this.netherRegionSize = generationSettings.addNumber("The size of nether biome regions from each mod that uses TerraBlender.", "nether_region_size", 2, 2, 6);
-        this.netherLargeBiomesRegionSize = generationSettings.addNumber("The size of nether biome regions from each mod that uses TerraBlender when using the large biomes world type.", "nether_large_biomes_region_size", 4, 2, 6);
         this.vanillaOverworldRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the overworld.", "vanilla_overworld_region_weight", 10, 0, Integer.MAX_VALUE);
         this.vanillaNetherRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the nether.", "vanilla_nether_region_weight", 10, 0, Integer.MAX_VALUE);
         this.addSubConfig("Generation settings", "generation_settings", generationSettings);
