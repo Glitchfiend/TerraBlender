@@ -59,7 +59,7 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
         this.originalBiomeList = biomeList;
     }
 
-    @Inject(method = "lambda$new$0", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "Lnet/minecraft/world/level/biome/BiomeSource;lambda$new$0(Ljava/util/List;)Ljava/util/List;", at = @At("HEAD"), cancellable = true)
     private void skipInitialFeaturesPerStep(List<Holder<Biome>> $$0x, CallbackInfoReturnable<List<BiomeSource.StepFeatureData>> cir)
     {
         if ((Object)this instanceof MultiNoiseBiomeSource)
