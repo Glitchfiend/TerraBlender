@@ -73,7 +73,7 @@ curseforge {
             changelog = changelog_file
         }
 
-        releaseType = 'beta'
+        releaseType = 'alpha'
         addGameVersion minecraft_version
         addGameVersion 'Fabric'
 
