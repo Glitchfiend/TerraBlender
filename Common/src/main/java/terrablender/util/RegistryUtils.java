@@ -17,10 +17,9 @@
  */
 package terrablender.util;
 
+import com.google.common.collect.Lists;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.BuiltinRegistries;
-import org.apache.commons.compress.utils.Lists;
-import terrablender.core.TerraBlender;
 
 import java.util.List;
 import java.util.function.Consumer;
