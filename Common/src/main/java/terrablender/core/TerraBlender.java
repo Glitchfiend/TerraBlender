@@ -17,15 +17,18 @@
  */
 package terrablender.core;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Registry;
+import net.minecraft.data.worldgen.biome.OverworldBiomes;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import terrablender.api.Region;
 import terrablender.config.TerraBlenderConfig;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
+
+import java.util.function.BiConsumer;
 
 public class TerraBlender
 {
@@ -37,8 +40,9 @@ public class TerraBlender
     {
     }
 
-    public static void register()
+    public static void register(BiConsumer<ResourceKey<Biome>, Biome> registerBiome)
     {
+        registerBiome.accept(Region.DEFERRED_PLACEHOLDER, OverworldBiomes.theVoid());
         Registry.register(Registry.RULE, new ResourceLocation(terrablender.core.TerraBlender.MOD_ID, "merged"), NamespacedSurfaceRuleSource.CODEC);
     }
 

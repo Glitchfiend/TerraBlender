@@ -19,7 +19,10 @@ package terrablender.core;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import terrablender.api.Region;
 import terrablender.api.SurfaceRuleManager;
 import terrablender.api.TerraBlenderApi;
 import terrablender.config.TerraBlenderConfig;
@@ -34,7 +37,7 @@ public class TerraBlenderFabric implements ModInitializer
     public void onInitialize()
     {
         TerraBlender.setConfig(CONFIG);
-        TerraBlender.register();
+        TerraBlender.register((key, biome) -> BuiltinRegistries.register(BuiltinRegistries.BIOME, key, biome));
 
         FabricLoader.getInstance().getEntrypointContainers("terrablender", TerraBlenderApi.class).forEach(entrypoint -> {
             TerraBlenderApi api = entrypoint.getEntrypoint();

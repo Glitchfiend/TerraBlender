@@ -53,7 +53,10 @@ public class TerraBlenderForge
         @SubscribeEvent
         public static void onRegisterBiomes(RegistryEvent.Register<Biome> event)
         {
-            TerraBlender.register();
+            TerraBlender.register((key, biome) -> {
+                biome.setRegistryName(key.location());
+                event.getRegistry().register(biome);
+            });
         }
     }
 }

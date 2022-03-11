@@ -99,6 +99,11 @@ public class MixinParameterList<T> implements IExtendedParameterList<T>
             throw new RuntimeException("Attempted to call findValuePositional whilst trees remain unpopulated!");
 
         int uniqueness = this.uniqueness.get(x, z);
-        return (T)this.uniqueTrees[uniqueness].search(target, Climate.RTree.Node::distance);
+        Holder<Biome> biome = (Holder<Biome>)this.uniqueTrees[uniqueness].search(target, Climate.RTree.Node::distance);
+
+        if (biome.is(Region.DEFERRED_PLACEHOLDER))
+            return (T)this.uniqueTrees[0].search(target, Climate.RTree.Node::distance);
+        else
+            return (T)biome;
     }
 }

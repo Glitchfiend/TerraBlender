@@ -24,6 +24,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
+import terrablender.core.TerraBlender;
 import terrablender.worldgen.RegionUtils;
 
 import java.util.List;
@@ -35,6 +36,9 @@ import java.util.function.Consumer;
  */
 public abstract class Region
 {
+    /* A resource key used to indicate that biome selection should be deferred to Vanilla's region. */
+    public static final ResourceKey<Biome> DEFERRED_PLACEHOLDER = ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(TerraBlender.MOD_ID, "deferred_placeholder"));
+
     private final ResourceLocation name;
     private RegionType type;
     private int weight;
