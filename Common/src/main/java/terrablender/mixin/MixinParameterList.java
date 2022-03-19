@@ -37,11 +37,14 @@ import terrablender.worldgen.noise.LayeredNoiseUtil;
 import java.util.List;
 
 @Mixin(Climate.ParameterList.class)
-public class MixinParameterList<T> implements IExtendedParameterList<T>
+public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
 {
     @Shadow
     @Final
     private List<Pair<Climate.ParameterPoint, T>> values;
+
+    @Shadow
+    public abstract T findValue(Climate.TargetPoint target);
 
     private boolean initialized = false;
     private boolean treesPopulated = false;
@@ -92,8 +95,9 @@ public class MixinParameterList<T> implements IExtendedParameterList<T>
     @Override
     public T findValuePositional(Climate.TargetPoint target, int x, int y, int z)
     {
+        // Fallback on findValue if we are uninitialized (may be the case for non-TerraBlender dimensions)
         if (!this.initialized)
-            throw new RuntimeException("Attempted to call findValuePositional whilst ParameterList is uninitialized!");
+            return this.findValue(target);
 
         if (!this.treesPopulated)
             throw new RuntimeException("Attempted to call findValuePositional whilst trees remain unpopulated!");

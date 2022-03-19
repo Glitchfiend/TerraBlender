@@ -114,7 +114,7 @@ curseforge {
             changelog = changelog_file
         }
 
-        releaseType = 'alpha'
+        releaseType = 'beta'
         addGameVersion minecraft_version
 
         mainArtifact(jar) {

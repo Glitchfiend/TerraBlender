@@ -5,8 +5,8 @@
   "refmap": "${refmap_target}refmap.json",
   "mixins": [
     "MixinBiomeSource",
+    "MixinLevelStem",
     "MixinMultiNoiseBiomeSource",
-    "MixinNoiseBasedChunkGenerator",
     "MixinParameterList",
     "MixinPrimaryLevelData",
     "MixinWorldStem"
