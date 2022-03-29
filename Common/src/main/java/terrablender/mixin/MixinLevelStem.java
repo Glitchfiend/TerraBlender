@@ -57,13 +57,18 @@ public class MixinLevelStem
         else if (dimensionType.is(DimensionType.OVERWORLD_LOCATION)) regionType = RegionType.OVERWORLD;
         else regionType = null;
 
-        // Don't continue if region type is uninitialized
-        if (regionType == null)
-            return;
-
         NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;
         MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)chunkGenerator.getBiomeSource();
         IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
+        
+        // Don't continue if region type is uninitialized
+        if (regionType == null)
+        {
+            // We don't have any biomes to append to the list.
+            biomeSourceEx.appendDeferredBiomesList(ImmutableList.of());
+            return;
+        }
+
         Climate.ParameterList parameters = biomeSource.parameters;
         IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
         NoiseGeneratorSettings currentSettings = noiseBasedChunkGenerator.settings.value();
