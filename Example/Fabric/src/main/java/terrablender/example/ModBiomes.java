@@ -29,8 +29,8 @@ public class ModBiomes
         register(TestBiomes.COLD_BLUE, TestOverworldBiomes.coldBlue());
     }
 
-    private static Biome register(ResourceKey<Biome> key, Biome biome)
+    private static void register(ResourceKey<Biome> key, Biome biome)
     {
-        return BuiltinRegistries.registerMapping(BuiltinRegistries.BIOME, key, biome);
+        BuiltinRegistries.register(BuiltinRegistries.BIOME, key, biome);
     }
 }

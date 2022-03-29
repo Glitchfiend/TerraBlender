@@ -19,7 +19,8 @@ package terrablender.example;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
-import terrablender.api.BiomeProviders;
+import terrablender.api.Regions;
+import terrablender.api.SurfaceRuleManager;
 import terrablender.api.TerraBlenderApi;
 
 public class TestMod implements ModInitializer, TerraBlenderApi
@@ -36,6 +37,9 @@ public class TestMod implements ModInitializer, TerraBlenderApi
     public void onTerraBlenderInitialized()
     {
         // Given we only add two biomes, we should keep our weight relatively low.
-        BiomeProviders.register(new TestBiomeProvider(new ResourceLocation(MOD_ID, "biome_provider"), 2));
+        Regions.register(new TestRegion(new ResourceLocation(MOD_ID, "overworld"), 2));
+
+        // Register our surface rules
+        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TestSurfaceRuleData.makeRules());
     }
 }

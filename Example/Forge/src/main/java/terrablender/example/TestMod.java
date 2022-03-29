@@ -21,7 +21,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import terrablender.api.BiomeProviders;
+import terrablender.api.Regions;
+import terrablender.api.SurfaceRuleManager;
 
 @Mod(TestMod.MOD_ID)
 public class TestMod
@@ -38,7 +39,10 @@ public class TestMod
         event.enqueueWork(() ->
         {
             // Given we only add two biomes, we should keep our weight relatively low.
-            BiomeProviders.register(new TestBiomeProvider(new ResourceLocation(MOD_ID, "biome_provider"), 2));
+            Regions.register(new TestRegion(new ResourceLocation(MOD_ID, "overworld"), 2));
+
+            // Register our surface rules
+            SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TestSurfaceRuleData.makeRules());
         });
     }
 }
