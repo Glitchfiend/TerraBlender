@@ -19,8 +19,6 @@ package terrablender.api;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 
 import java.util.Arrays;
@@ -39,7 +37,6 @@ public class ParameterUtils
         private List<Climate.Parameter> erosions = Lists.newArrayList();
         private List<Climate.Parameter> depths = Lists.newArrayList();
         private List<Climate.Parameter> weirdnesses = Lists.newArrayList();
-        private List<Climate.Parameter> uniquenesses = Lists.newArrayList();
         private List<Long> offsets = Lists.newArrayList();
 
         /**
@@ -191,9 +188,9 @@ public class ParameterUtils
             this.populateIfEmpty();
             ImmutableList.Builder<Climate.ParameterPoint> builder = new ImmutableList.Builder<>();
             this.temperatures.forEach(temperature -> this.humidities.forEach(humidity -> this.continentalnesses.forEach(continentalness -> this.erosions.forEach(erosion ->
-                this.depths.forEach(depth -> this.weirdnesses.forEach(weirdness -> this.uniquenesses.forEach(uniqueness -> this.offsets.forEach(offset -> {
+                this.depths.forEach(depth -> this.weirdnesses.forEach(weirdness -> this.offsets.forEach(offset -> {
                     builder.add(new Climate.ParameterPoint(temperature, humidity, continentalness, erosion, depth, weirdness, offset));
-                }))))))));
+                })))))));
             return builder.build();
         }
 
