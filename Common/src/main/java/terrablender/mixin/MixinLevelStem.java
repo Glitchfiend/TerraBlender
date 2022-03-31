@@ -71,14 +71,6 @@ public class MixinLevelStem
 
         Climate.ParameterList parameters = biomeSource.parameters;
         IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
-        NoiseGeneratorSettings currentSettings = noiseBasedChunkGenerator.settings.value();
-
-        // If necessary, replace the settings to use our surface rules. Important note: Surface rules are responsible for the vast majority of world generation lag :(
-        if (!(currentSettings.surfaceRule() instanceof NamespacedSurfaceRuleSource))
-        {
-            SurfaceRules.RuleSource surfaceRules = regionType == RegionType.NETHER ? SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.NETHER, currentSettings.surfaceRule()) : SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.OVERWORLD, currentSettings.surfaceRule());
-            noiseBasedChunkGenerator.settings = new Holder.Direct<>(new NoiseGeneratorSettings(currentSettings.noiseSettings(), currentSettings.defaultBlock(), currentSettings.defaultFluid(), currentSettings.noiseRouter(), surfaceRules, currentSettings.seaLevel(), currentSettings.disableMobGeneration(), currentSettings.aquifersEnabled(), currentSettings.oreVeinsEnabled(), currentSettings.useLegacyRandomSource()));
-        }
 
         // Initialize the parameter list for TerraBlender
         parametersEx.initializeForTerraBlender(regionType, noiseBasedChunkGenerator.seed);
