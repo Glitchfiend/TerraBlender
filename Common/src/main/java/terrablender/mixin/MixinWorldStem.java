@@ -18,19 +18,24 @@
 package terrablender.mixin;
 
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.WorldStem;
+import net.minecraft.server.packs.resources.CloseableResourceManager;
+import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import terrablender.core.TerraBlender;
 import terrablender.util.RegistryUtils;
 
 @Mixin(WorldStem.class)
 public class MixinWorldStem
 {
-    @Inject(method = "registryAccess", at = @At("RETURN"))
-    private void captureCurrentRegistryAccess(CallbackInfoReturnable<RegistryAccess.Frozen> cir)
+    @Inject(method = "<init>(Lnet/minecraft/server/packs/resources/CloseableResourceManager;Lnet/minecraft/server/ReloadableServerResources;Lnet/minecraft/core/RegistryAccess$Frozen;Lnet/minecraft/world/level/storage/WorldData;)V", at = @At("RETURN"))
+    private void captureCurrentRegistryAccess(CloseableResourceManager resourceManager, ReloadableServerResources dataPackResources, RegistryAccess.Frozen registryAccess, WorldData worldData, CallbackInfo ci)
     {
-        RegistryUtils.captureCurrentRegistryAccess(cir.getReturnValue());
+        RegistryUtils.captureCurrentRegistryAccess(registryAccess);
     }
 }

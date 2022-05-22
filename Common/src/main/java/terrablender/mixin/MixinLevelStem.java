@@ -23,24 +23,19 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
-import terrablender.api.SurfaceRuleManager;
 import terrablender.util.RegistryUtils;
 import terrablender.worldgen.IExtendedBiomeSource;
 import terrablender.worldgen.IExtendedParameterList;
-import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 
 @Mixin(LevelStem.class)
 public class MixinLevelStem
@@ -76,7 +71,7 @@ public class MixinLevelStem
         parametersEx.initializeForTerraBlender(regionType, noiseBasedChunkGenerator.seed);
 
         // Append modded biomes to the biome source biome list
-        RegistryUtils.addRegistryAccessCaptureOneShotListener(registryAccess -> {
+        RegistryUtils.doWithRegistryAccess(registryAccess -> {
             Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
             ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
             Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getOrCreateHolder(pair.getSecond()))));

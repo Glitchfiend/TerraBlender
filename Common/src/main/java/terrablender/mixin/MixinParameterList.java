@@ -61,7 +61,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
         this.uniqueness = LayeredNoiseUtil.uniqueness(regionType, seed);
         this.uniqueTrees = new Climate.RTree[Regions.getCount(regionType)];
 
-        RegistryUtils.addRegistryAccessCaptureOneShotListener(registryAccess -> {
+        RegistryUtils.doWithRegistryAccess(registryAccess -> {
             Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
 
             for (Region region : Regions.get(regionType))

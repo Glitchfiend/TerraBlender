@@ -22,27 +22,29 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.BuiltinRegistries;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class RegistryUtils
 {
-    private static RegistryAccess registryAccess = BuiltinRegistries.ACCESS;
+    private static Optional<RegistryAccess> registryAccess = Optional.empty();
     private static List<Consumer<RegistryAccess>> registryAccessCaptureOneShotListeners = Lists.newArrayList();
 
     public static void captureCurrentRegistryAccess(RegistryAccess access)
     {
-        registryAccess = access;
+        registryAccess = Optional.of(access);
         registryAccessCaptureOneShotListeners.forEach(listener -> listener.accept(access));
         registryAccessCaptureOneShotListeners.clear();
     }
 
-    public static void addRegistryAccessCaptureOneShotListener(Consumer<RegistryAccess> listener)
+    public static void doWithRegistryAccess(Consumer<RegistryAccess> listener)
     {
-        registryAccessCaptureOneShotListeners.add(listener);
+        if (registryAccess.isPresent()) listener.accept(registryAccess.get());
+        else registryAccessCaptureOneShotListeners.add(listener);
     }
 
     public static RegistryAccess getCurrentRegistryAccess()
     {
-        return registryAccess;
+        return registryAccess.orElse(BuiltinRegistries.ACCESS);
     }
 }
