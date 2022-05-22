@@ -32,49 +32,19 @@ accessible field net/minecraft/world/level/biome/MultiNoiseBiomeSource parameter
 accessible field net/minecraft/world/level/levelgen/NoiseChunk noiseSettings Lnet/minecraft/world/level/levelgen/NoiseSettings;
 accessible field net/minecraft/world/level/levelgen/NoiseChunk firstNoiseX I
 accessible field net/minecraft/world/level/levelgen/NoiseChunk firstNoiseZ I
-accessible field net/minecraft/world/level/levelgen/NoiseChunk noiseData [[Lnet/minecraft/world/level/levelgen/NoiseSampler$FlatNoiseData;
-mutable field net/minecraft/world/level/levelgen/NoiseChunk noiseData [[Lnet/minecraft/world/level/levelgen/NoiseSampler$FlatNoiseData;
 accessible field net/minecraft/world/level/levelgen/NoiseChunk preliminarySurfaceLevel Lit/unimi/dsi/fastutil/longs/Long2IntMap;
-accessible field net/minecraft/world/level/levelgen/NoiseChunk sampler Lnet/minecraft/world/level/levelgen/NoiseSampler;
 accessible field net/minecraft/world/level/levelgen/NoiseChunk blender Lnet/minecraft/world/level/levelgen/blending/Blender;
-extendable method net/minecraft/world/level/levelgen/NoiseChunk <init> (IIILnet/minecraft/world/level/levelgen/NoiseSampler;IILnet/minecraft/world/level/levelgen/NoiseChunk$NoiseFiller;Lnet/minecraft/world/level/levelgen/NoiseGeneratorSettings;Lnet/minecraft/world/level/levelgen/Aquifer$FluidPicker;Lnet/minecraft/world/level/levelgen/blending/Blender;)V
-accessible method net/minecraft/world/level/levelgen/NoiseChunk createNoiseInterpolator (Lnet/minecraft/world/level/levelgen/NoiseChunk$NoiseFiller;)Lnet/minecraft/world/level/levelgen/NoiseChunk$NoiseInterpolator;
 
 # NoiseBasedChunkGenerator
 extendable class net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator
 accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator noises Lnet/minecraft/core/Registry;
 accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator seed J
-accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator sampler Lnet/minecraft/world/level/levelgen/NoiseSampler;
 accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator globalFluidPicker Lnet/minecraft/world/level/levelgen/Aquifer$FluidPicker;
 accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator settings Lnet/minecraft/core/Holder;
 mutable field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator settings Lnet/minecraft/core/Holder;
-mutable field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator sampler Lnet/minecraft/world/level/levelgen/NoiseSampler;
-
-# NoiseGeneratorSettings
-accessible method net/minecraft/world/level/levelgen/NoiseGeneratorSettings <init> (Lnet/minecraft/world/level/levelgen/StructureSettings;Lnet/minecraft/world/level/levelgen/NoiseSettings;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/levelgen/SurfaceRules$RuleSource;IZZZZZZ)V
-
-# NoiseSampler
-accessible field net/minecraft/world/level/levelgen/NoiseSampler baseNoise Lnet/minecraft/world/level/levelgen/NoiseChunk$InterpolatableNoise;
-mutable field net/minecraft/world/level/levelgen/NoiseSampler baseNoise Lnet/minecraft/world/level/levelgen/NoiseChunk$InterpolatableNoise;
-mutable field net/minecraft/world/level/levelgen/NoiseSampler spawnTarget Ljava/util/List;
-accessible field net/minecraft/world/level/levelgen/NoiseSampler spawnTarget Ljava/util/List;
-accessible method net/minecraft/world/level/levelgen/NoiseSampler getPreliminarySurfaceLevel (IILnet/minecraft/world/level/levelgen/TerrainInfo;)I
-accessible method net/minecraft/world/level/levelgen/NoiseSampler calculateBaseNoise (IIILnet/minecraft/world/level/levelgen/TerrainInfo;Lnet/minecraft/world/level/levelgen/blending/Blender;)D
-accessible method net/minecraft/world/level/levelgen/NoiseSampler computeBaseDensity (ILnet/minecraft/world/level/levelgen/TerrainInfo;)D
-accessible method net/minecraft/world/level/levelgen/NoiseSampler getTemperature (DDD)D
-accessible method net/minecraft/world/level/levelgen/NoiseSampler getHumidity (DDD)D
 
 # OverworldBiomeBuilder
 accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder addBiomes (Ljava/util/function/Consumer;)V
-
-# RegistryReadOps
-accessible field net/minecraft/resources/RegistryReadOps registryAccess Lnet/minecraft/core/RegistryAccess;
-
-# StructureSettings
-accessible field net/minecraft/world/level/levelgen/StructureSettings structureConfig Ljava/util/Map;
-accessible field net/minecraft/world/level/levelgen/StructureSettings configuredStructures Lcom/google/common/collect/ImmutableMap;
-mutable field net/minecraft/world/level/levelgen/StructureSettings configuredStructures Lcom/google/common/collect/ImmutableMap;
-accessible field net/minecraft/world/level/levelgen/StructureSettings stronghold Lnet/minecraft/world/level/levelgen/feature/configurations/StrongholdConfiguration;
 
 # SurfaceRules
 accessible class net/minecraft/world/level/levelgen/SurfaceRules$Context
@@ -84,15 +54,11 @@ accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context biome L
 
 # WorldGenSettings
 accessible field net/minecraft/world/level/levelgen/WorldGenSettings legacyCustomOptions Ljava/util/Optional;
-accessible method net/minecraft/world/level/levelgen/WorldGenSettings <init> (JZZLnet/minecraft/core/MappedRegistry;Ljava/util/Optional;)V
 accessible method net/minecraft/world/level/levelgen/WorldGenSettings guardExperimental ()Lcom/mojang/serialization/DataResult;
 
 # WorldGenSettingsComponent
 accessible field net/minecraft/client/gui/screens/worldselection/WorldGenSettingsComponent settings Lnet/minecraft/world/level/levelgen/WorldGenSettings;
 mutable field net/minecraft/client/gui/screens/worldselection/WorldGenSettingsComponent settings Lnet/minecraft/world/level/levelgen/WorldGenSettings;
-accessible field net/minecraft/client/gui/screens/worldselection/WorldGenSettingsComponent registryHolder Lnet/minecraft/core/RegistryAccess$RegistryHolder;
-mutable field net/minecraft/client/gui/screens/worldselection/WorldGenSettingsComponent registryHolder Lnet/minecraft/core/RegistryAccess$RegistryHolder;
-accessible field net/minecraft/client/gui/screens/worldselection/WorldGenSettingsComponent LOGGER Lorg/apache/logging/log4j/Logger;
 
 # WorldPreset
 extendable method net/minecraft/client/gui/screens/worldselection/WorldPreset <init> (Ljava/lang/String;)V
