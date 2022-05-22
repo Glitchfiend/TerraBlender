@@ -50,6 +50,8 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
 
     private List<Holder<Biome>> originalBiomeList;
 
+    private boolean hasAppended = false;
+
     @Shadow
     abstract List<BiomeSource.StepFeatureData> buildFeaturesPerStep(List<Holder<Biome>> biomeList, boolean ignoreOrderCycle);
 
@@ -71,6 +73,10 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
     @Override
     public void appendDeferredBiomesList(List<Holder<Biome>> biomesToAppend)
     {
+        // Don't append the biomes list again if we have already done so
+        if (this.hasAppended)
+            return;
+
         ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
         builder.addAll(this.originalBiomeList);
         builder.addAll(biomesToAppend);
@@ -80,5 +86,7 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
         this.featuresPerStep = Suppliers.memoize(() -> {
             return this.buildFeaturesPerStep(biomeList, true);
         });
+
+        this.hasAppended = true;
     }
 }
