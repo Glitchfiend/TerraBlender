@@ -37,6 +37,11 @@ public class RegistryUtils
         registryAccessCaptureOneShotListeners.clear();
     }
 
+    public static void clearCurrentRegistryAccess()
+    {
+        registryAccess = Optional.empty();
+    }
+
     public static void doWithRegistryAccess(Consumer<RegistryAccess> listener)
     {
         if (registryAccess.isPresent()) listener.accept(registryAccess.get());

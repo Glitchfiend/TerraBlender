@@ -6,6 +6,7 @@
   "mixins": [
     "MixinBiomeSource",
     "MixinLevelStem",
+    "MixinMinecraftServer",
     "MixinMultiNoiseBiomeSource",
     "MixinNoiseGeneratorSettings",
     "MixinParameterList",
