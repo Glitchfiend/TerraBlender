@@ -48,9 +48,8 @@ public class LevelUtils {
         else if (dimensionType.is(DimensionTypeTags.OVERWORLD_REGIONS)) regionType = RegionType.OVERWORLD;
         else regionType = null;
 
-        NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator) chunkGenerator;
-        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource) chunkGenerator.getBiomeSource();
-        IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource) biomeSource;
+        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)chunkGenerator.getBiomeSource();
+        IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
 
         // Don't continue if region type is uninitialized
         if (regionType == null) {
