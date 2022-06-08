@@ -3,7 +3,7 @@
 pipeline {
     agent {
         docker {
-            image 'gradle:7-jdk16'
+            image 'gradle:7-jdk17'
         }
     }
     environment {
