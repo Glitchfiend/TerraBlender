@@ -1,15 +1,9 @@
 @Library('forge-shared-library')_
 
 pipeline {
-    agent {
-        docker {
-            image 'gradle:7-jdk17'
-        }
-    }
     environment {
         GRADLE_ARGS = '-Dorg.gradle.daemon.idletimeout=5000'
     }
-
     stages {
         stage('fetch') {
             steps {
