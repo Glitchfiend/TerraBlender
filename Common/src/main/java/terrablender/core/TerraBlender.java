@@ -51,7 +51,8 @@ public class TerraBlender {
 
     }
 
-    public static void setConfig(TerraBlenderConfig config) {
+    public static void setConfig(TerraBlenderConfig config)
+    {
         TerraBlender.CONFIG = config;
     }
 }
