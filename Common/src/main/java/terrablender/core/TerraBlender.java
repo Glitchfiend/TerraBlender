@@ -36,16 +36,17 @@ public class TerraBlender {
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static TerraBlenderConfig CONFIG;
 
-    public TerraBlender() {
-
-
+    public TerraBlender()
+    {
     }
 
-    public static void registerBiome(BiConsumer<ResourceKey<Biome>, Supplier<? extends Biome>> registerBiome) {
+    public static void registerBiome(BiConsumer<ResourceKey<Biome>, Supplier<? extends Biome>> registerBiome)
+    {
         registerBiome.accept(Region.DEFERRED_PLACEHOLDER, OverworldBiomes::theVoid);
     }
 
-    public static void registerRule(BiConsumer<String, Supplier<Codec<? extends SurfaceRules.RuleSource>>> register) {
+    public static void registerRule(BiConsumer<String, Supplier<Codec<? extends SurfaceRules.RuleSource>>> register)
+    {
        register.accept("merged", NamespacedSurfaceRuleSource.CODEC::codec);
 
     }

@@ -37,11 +37,11 @@ import terrablender.worldgen.IExtendedChunkGenerator;
 import terrablender.worldgen.IExtendedParameterList;
 
 public class LevelUtils {
-    public static void initializeBiomes(Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed) {
+    public static void initializeBiomes(Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed)
+    {
         // Only apply to NoiseBasedChunkGenerator with MultiNoiseBiomeSources
-        if (!(chunkGenerator instanceof NoiseBasedChunkGenerator) || !(chunkGenerator.getBiomeSource() instanceof MultiNoiseBiomeSource)) {
+        if (!(chunkGenerator instanceof NoiseBasedChunkGenerator) || !(chunkGenerator.getBiomeSource() instanceof MultiNoiseBiomeSource))
             return;
-        }
 
         final RegionType regionType;
         if (dimensionType.is(DimensionTypeTags.NETHER_REGIONS)) regionType = RegionType.NETHER;
