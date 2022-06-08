@@ -44,13 +44,9 @@ public class LevelUtils {
         }
 
         final RegionType regionType;
-        if (dimensionType.is(DimensionTypeTags.NETHER_REGIONS)) {
-            regionType = RegionType.NETHER;
-        } else if (dimensionType.is(DimensionTypeTags.OVERWORLD_REGIONS)) {
-            regionType = RegionType.OVERWORLD;
-        } else {
-            regionType = null;
-        }
+        if (dimensionType.is(DimensionTypeTags.NETHER_REGIONS)) regionType = RegionType.NETHER;
+        else if (dimensionType.is(DimensionTypeTags.OVERWORLD_REGIONS)) regionType = RegionType.OVERWORLD;
+        else regionType = null;
 
         NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator) chunkGenerator;
         MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource) chunkGenerator.getBiomeSource();
@@ -80,7 +76,7 @@ public class LevelUtils {
 
         ((IExtendedChunkGenerator) chunkGenerator).appendFeaturesPerStep();
 
-        TerraBlender.LOGGER.info(String.format("Initialized biomes for Level Stem: %s", levelResourceKey.location()));
+        TerraBlender.LOGGER.info(String.format("Initialized terrablender biomes for Level Stem: %s", levelResourceKey.location()));
 
     }
 }
