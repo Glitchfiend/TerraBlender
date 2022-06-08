@@ -26,22 +26,24 @@ import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import terrablender.DimensionTypeTags;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
 import terrablender.worldgen.IExtendedBiomeSource;
+import terrablender.worldgen.IExtendedChunkGenerator;
 import terrablender.worldgen.IExtendedParameterList;
 
 public class LevelUtils
 {
-    public static void initializeBiomes(Holder<DimensionType> dimensionType, ChunkGenerator chunkGenerator)
+    public static void initializeBiomes(Holder<DimensionType> dimensionType, ChunkGenerator chunkGenerator, long seed)
     {
         // Only apply to NoiseBasedChunkGenerator with MultiNoiseBiomeSources
         if (!(chunkGenerator instanceof NoiseBasedChunkGenerator) || !(chunkGenerator.getBiomeSource() instanceof MultiNoiseBiomeSource))
             return;
 
         final RegionType regionType;
-        if (dimensionType.is(DimensionType.NETHER_LOCATION)) regionType = RegionType.NETHER;
-        else if (dimensionType.is(DimensionType.OVERWORLD_LOCATION)) regionType = RegionType.OVERWORLD;
+        if (dimensionType.is(DimensionTypeTags.NETHER_REGIONS)) regionType = RegionType.NETHER;
+        else if (dimensionType.is(DimensionTypeTags.OVERWORLD_REGIONS)) regionType = RegionType.OVERWORLD;
         else regionType = null;
 
         NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;
@@ -60,14 +62,16 @@ public class LevelUtils
         IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
 
         // Initialize the parameter list for TerraBlender
-        parametersEx.initializeForTerraBlender(regionType, noiseBasedChunkGenerator.seed);
+        parametersEx.initializeForTerraBlender(regionType, seed);
 
         // Append modded biomes to the biome source biome list
         RegistryUtils.doWithRegistryAccess(registryAccess -> {
             Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
             ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
-            Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getOrCreateHolder(pair.getSecond()))));
+            Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getHolderOrThrow(pair.getSecond()))));
             biomeSourceEx.appendDeferredBiomesList(builder.build());
         });
+
+        ((IExtendedChunkGenerator) chunkGenerator).appendFeaturesPerStep();
     }
 }

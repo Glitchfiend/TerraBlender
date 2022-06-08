@@ -37,7 +37,7 @@ public class TerraBlenderFabric implements ModInitializer
     public void onInitialize()
     {
         TerraBlender.setConfig(CONFIG);
-        TerraBlender.register((key, biome) -> BuiltinRegistries.register(BuiltinRegistries.BIOME, key, biome));
+        TerraBlender.register((key, biome) -> BuiltinRegistries.register(BuiltinRegistries.BIOME, key, biome.get()));
 
         FabricLoader.getInstance().getEntrypointContainers("terrablender", TerraBlenderApi.class).forEach(entrypoint -> {
             TerraBlenderApi api = entrypoint.getEntrypoint();
