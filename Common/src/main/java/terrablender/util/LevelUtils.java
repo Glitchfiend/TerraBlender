@@ -20,46 +20,52 @@ package terrablender.util;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import terrablender.DimensionTypeTags;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
+import terrablender.core.TerraBlender;
 import terrablender.worldgen.IExtendedBiomeSource;
 import terrablender.worldgen.IExtendedChunkGenerator;
 import terrablender.worldgen.IExtendedParameterList;
 
-public class LevelUtils
-{
-    public static void initializeBiomes(Holder<DimensionType> dimensionType, ChunkGenerator chunkGenerator, long seed)
-    {
+public class LevelUtils {
+    public static void initializeBiomes(Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed) {
         // Only apply to NoiseBasedChunkGenerator with MultiNoiseBiomeSources
-        if (!(chunkGenerator instanceof NoiseBasedChunkGenerator) || !(chunkGenerator.getBiomeSource() instanceof MultiNoiseBiomeSource))
+        if (!(chunkGenerator instanceof NoiseBasedChunkGenerator) || !(chunkGenerator.getBiomeSource() instanceof MultiNoiseBiomeSource)) {
             return;
+        }
 
         final RegionType regionType;
-        if (dimensionType.is(DimensionTypeTags.NETHER_REGIONS)) regionType = RegionType.NETHER;
-        else if (dimensionType.is(DimensionTypeTags.OVERWORLD_REGIONS)) regionType = RegionType.OVERWORLD;
-        else regionType = null;
+        if (dimensionType.is(DimensionTypeTags.NETHER_REGIONS)) {
+            regionType = RegionType.NETHER;
+        } else if (dimensionType.is(DimensionTypeTags.OVERWORLD_REGIONS)) {
+            regionType = RegionType.OVERWORLD;
+        } else {
+            regionType = null;
+        }
 
-        NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;
-        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)chunkGenerator.getBiomeSource();
-        IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
+        NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator) chunkGenerator;
+        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource) chunkGenerator.getBiomeSource();
+        IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource) biomeSource;
 
         // Don't continue if region type is uninitialized
-        if (regionType == null)
-        {
+        if (regionType == null) {
             // We don't have any biomes to append to the list.
             biomeSourceEx.appendDeferredBiomesList(ImmutableList.of());
             return;
         }
 
+
         Climate.ParameterList parameters = biomeSource.parameters;
-        IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
+        IExtendedParameterList parametersEx = (IExtendedParameterList) parameters;
 
         // Initialize the parameter list for TerraBlender
         parametersEx.initializeForTerraBlender(regionType, seed);
@@ -73,5 +79,8 @@ public class LevelUtils
         });
 
         ((IExtendedChunkGenerator) chunkGenerator).appendFeaturesPerStep();
+
+        TerraBlender.LOGGER.info(String.format("Initialized biomes for Level Stem: %s", levelResourceKey.location()));
+
     }
 }

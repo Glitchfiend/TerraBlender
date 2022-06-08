@@ -43,7 +43,7 @@ public class MCreatorHandler
         for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : worldGenSettings.dimensions().entrySet())
         {
             LevelStem stem = entry.getValue();
-            LevelUtils.initializeBiomes(stem.typeHolder(), stem.generator(), worldGenSettings.seed());
+            LevelUtils.initializeBiomes(stem.typeHolder(), entry.getKey(), stem.generator(), worldGenSettings.seed());
         }
     }
 }

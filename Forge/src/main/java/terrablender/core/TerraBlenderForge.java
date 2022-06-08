@@ -17,9 +17,10 @@
  */
 package terrablender.core;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -27,8 +28,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.DeferredRegister;
 import terrablender.config.TerraBlenderConfig;
-
-import java.util.function.Supplier;
 
 @Mod(value = TerraBlender.MOD_ID)
 public class TerraBlenderForge {
@@ -39,12 +38,10 @@ public class TerraBlenderForge {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
         TerraBlender.setConfig(CONFIG);
         DeferredRegister<Biome> biomeDeferredRegister = DeferredRegister.create(Registry.BIOME_REGISTRY, TerraBlender.MOD_ID);
+        DeferredRegister<Codec<? extends SurfaceRules.RuleSource>> ruleSourceDeferredRegister = DeferredRegister.create(Registry.RULE_REGISTRY, TerraBlender.MOD_ID);
 
-        TerraBlender.register((key, biome) -> {
-            Supplier<Biome> biome1 = biome;
-            ResourceKey<Biome> key1 = key;
-            biomeDeferredRegister.register(key1, biome1);
-        });
+        TerraBlender.registerBiome((key, biome) -> biomeDeferredRegister.register(key.location().getPath(), biome));
+        TerraBlender.registerRule((key, rule) -> ruleSourceDeferredRegister.register(key, rule));
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

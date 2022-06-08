@@ -37,8 +37,8 @@ public class MixinChunkGenerator implements IExtendedChunkGenerator {
     @Final
     private Function<Holder<Biome>, BiomeGenerationSettings> generationSettingsGetter;
 
-    @Inject(method = "lambda$new$2(Ljava/util/function/Function;Lnet/minecraft/core/Holder;)Ljava/util/List;", at = @At("HEAD"), cancellable = true)
-    private static void skipInitialFeaturesPerStep(Function<Holder<Biome>, BiomeGenerationSettings> $$0x, Holder $$1x, CallbackInfoReturnable<List> cir) {
+    @Inject(method = "method_44215(Lnet/minecraft/world/level/biome/BiomeSource;Ljava/util/function/Function;)Ljava/util/List;", at = @At("HEAD"), cancellable = true)
+    private static void skipInitialFeaturesPerStep(BiomeSource biomeSource, Function function, CallbackInfoReturnable<List> cir) {
         cir.setReturnValue(new ArrayList<>());
     }
 
