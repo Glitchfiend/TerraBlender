@@ -76,7 +76,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
                 else
                 {
                     ImmutableList.Builder<Pair<Climate.ParameterPoint, Holder<Biome>>> builder = ImmutableList.builder();
-                    region.addBiomes(biomeRegistry, pair -> builder.add(pair.mapSecond(biomeRegistry::getOrCreateHolder)));
+                    region.addBiomes(biomeRegistry, pair -> builder.add(pair.mapSecond(biomeRegistry::getHolderOrThrow)));
                     ImmutableList<Pair<Climate.ParameterPoint, Holder<Biome>>> uniqueValues = builder.build();
 
                     // We can't create an RTree if there are no values present.

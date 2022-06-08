@@ -26,7 +26,7 @@
     "depends": {
       "fabricloader": "*",
       "fabric": "*",
-      "minecraft": "1.18.x",
+      "minecraft": "1.19.x",
       "java": ">=17"
     },
     "accessWidener": "terrablender.accesswidener",
