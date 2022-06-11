@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Final;
@@ -29,7 +30,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import terrablender.api.Region;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
-import terrablender.util.RegistryUtils;
 import terrablender.worldgen.IExtendedParameterList;
 import terrablender.worldgen.noise.Area;
 import terrablender.worldgen.noise.LayeredNoiseUtil;
@@ -52,41 +52,39 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
     private Climate.RTree[] uniqueTrees;
 
     @Override
-    public void initializeForTerraBlender(RegionType regionType, long seed)
+    public void initializeForTerraBlender(RegistryAccess registryAccess, RegionType regionType, long seed)
     {
         // We don't want to initialize multiple times
         if (this.initialized)
             return;
 
-        this.uniqueness = LayeredNoiseUtil.uniqueness(regionType, seed);
+        this.uniqueness = LayeredNoiseUtil.uniqueness(registryAccess, regionType, seed);
         this.uniqueTrees = new Climate.RTree[Regions.getCount(regionType)];
 
-        RegistryUtils.doWithRegistryAccess(registryAccess -> {
-            Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
 
-            for (Region region : Regions.get(regionType))
+        for (Region region : Regions.get(regionType))
+        {
+            int regionIndex = Regions.getIndex(regionType, region.getName());
+
+            // Use the existing values for index 0, rather than those from the region. This is for datapack support.
+            if (regionIndex == 0)
             {
-                int regionIndex = Regions.getIndex(regionType, region.getName());
-
-                // Use the existing values for index 0, rather than those from the region. This is for datapack support.
-                if (regionIndex == 0)
-                {
-                    this.uniqueTrees[0] = Climate.RTree.create(this.values);
-                }
-                else
-                {
-                    ImmutableList.Builder<Pair<Climate.ParameterPoint, Holder<Biome>>> builder = ImmutableList.builder();
-                    region.addBiomes(biomeRegistry, pair -> builder.add(pair.mapSecond(biomeRegistry::getHolderOrThrow)));
-                    ImmutableList<Pair<Climate.ParameterPoint, Holder<Biome>>> uniqueValues = builder.build();
-
-                    // We can't create an RTree if there are no values present.
-                    if (!uniqueValues.isEmpty())
-                        this.uniqueTrees[regionIndex] = Climate.RTree.create(uniqueValues);
-                }
+                this.uniqueTrees[0] = Climate.RTree.create(this.values);
             }
+            else
+            {
+                ImmutableList.Builder<Pair<Climate.ParameterPoint, Holder<Biome>>> builder = ImmutableList.builder();
+                region.addBiomes(biomeRegistry, pair -> builder.add(pair.mapSecond(biomeRegistry::getHolderOrThrow)));
+                ImmutableList<Pair<Climate.ParameterPoint, Holder<Biome>>> uniqueValues = builder.build();
 
-            this.treesPopulated = true;
-        });
+                // We can't create an RTree if there are no values present.
+                if (!uniqueValues.isEmpty())
+                    this.uniqueTrees[regionIndex] = Climate.RTree.create(uniqueValues);
+            }
+        }
+
+        this.treesPopulated = true;
 
         // Mark as initialized
         this.initialized = true;

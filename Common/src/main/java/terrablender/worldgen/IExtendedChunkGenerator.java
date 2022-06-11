@@ -1,5 +1,3 @@
-package terrablender.worldgen;
-
 /**
  * Copyright (C) Glitchfiend
  * <p>
@@ -17,8 +15,9 @@ package terrablender.worldgen;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-public interface IExtendedChunkGenerator {
+package terrablender.worldgen;
 
-
+public interface IExtendedChunkGenerator
+{
     void appendFeaturesPerStep();
 }

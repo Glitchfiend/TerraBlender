@@ -49,12 +49,7 @@ public class TerraBlenderFabric implements ModInitializer
         });
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            WorldGenSettings worldGenSettings = server.getWorldData().worldGenSettings();
-            for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : worldGenSettings.dimensions().entrySet())
-            {
-                LevelStem stem = entry.getValue();
-                LevelUtils.initializeBiomes(stem.typeHolder(), entry.getKey(), stem.generator(),  worldGenSettings.seed());
-            }
+            LevelUtils.initializeOnServerStart(server);
         });
     }
 }

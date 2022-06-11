@@ -4,12 +4,10 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "${refmap_target}refmap.json",
   "mixins": [
-    "MixinMinecraftServer",
     "MixinMultiNoiseBiomeSource",
     "MixinNoiseGeneratorSettings",
     "MixinParameterList",
-    "MixinPrimaryLevelData",
-    "MixinWorldStem"
+    "MixinPrimaryLevelData"
   ],
   "client": [
   ],

@@ -518,6 +518,11 @@ public class TBSurfaceRuleData
         return SurfaceRules.sequence(builder.build().toArray(SurfaceRules.RuleSource[]::new));
     }
 
+    public static SurfaceRules.RuleSource air()
+    {
+        return AIR;
+    }
+
     private static SurfaceRules.ConditionSource surfaceNoiseAbove(double value) 
     {
         return SurfaceRules.noiseCondition(Noises.SURFACE, value / 8.25D, Double.MAX_VALUE);
