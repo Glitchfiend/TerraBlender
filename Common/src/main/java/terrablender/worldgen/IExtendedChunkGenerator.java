@@ -19,5 +19,5 @@ package terrablender.worldgen;
 
 public interface IExtendedChunkGenerator
 {
-    void appendFeaturesPerStep();
+    void updateFeaturesPerStep();
 }

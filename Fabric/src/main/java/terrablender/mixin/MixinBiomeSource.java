@@ -35,9 +35,8 @@ import java.util.List;
 import java.util.Set;
 
 @Mixin(BiomeSource.class)
-public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeSource {
-
-
+public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeSource
+{
     @Mutable
     @Shadow private Set<Holder<Biome>> possibleBiomes;
 
@@ -45,14 +44,15 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
 
     private boolean hasAppended = false;
 
-
     @Inject(method = "<init>(Ljava/util/List;)V", at = @At("RETURN"))
-    protected void onInit(List<Holder<Biome>> biomeList, CallbackInfo ci) {
+    protected void onInit(List<Holder<Biome>> biomeList, CallbackInfo ci)
+    {
         this.originalBiomeList = biomeList;
     }
 
     @Override
-    public void appendDeferredBiomesList(List<Holder<Biome>> biomesToAppend) {
+    public void appendDeferredBiomesList(List<Holder<Biome>> biomesToAppend)
+    {
         // Don't append the biomes list again if we have already done so
         if (this.hasAppended) {
             return;

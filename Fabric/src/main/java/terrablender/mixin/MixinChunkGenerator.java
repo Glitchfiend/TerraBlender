@@ -59,14 +59,11 @@ public class MixinChunkGenerator implements IExtendedChunkGenerator
     @Inject(method = "method_44215(Lnet/minecraft/world/level/biome/BiomeSource;Ljava/util/function/Function;)Ljava/util/List;", at = @At("HEAD"), cancellable = true)
     private static void skipInitialFeaturesPerStep(BiomeSource biomeSource, Function function, CallbackInfoReturnable<List> cir)
     {
-        if (LevelUtils.shouldApplyToBiomeSource(biomeSource))
-        {
-            cir.setReturnValue(new ArrayList<>());
-        }
+        cir.setReturnValue(new ArrayList<>());
     }
 
     @Override
-    public void appendFeaturesPerStep()
+    public void updateFeaturesPerStep()
     {
         this.featuresPerStep = Suppliers.memoize(() ->
         {

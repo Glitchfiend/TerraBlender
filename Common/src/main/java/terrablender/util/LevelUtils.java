@@ -77,8 +77,13 @@ public class LevelUtils
 
     private static void initializeBiomes(RegistryAccess registryAccess, Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed)
     {
+        IExtendedChunkGenerator chunkGeneratorEx = (IExtendedChunkGenerator)chunkGenerator;
+
         if (!shouldApplyToChunkGenerator(chunkGenerator))
+        {
+            chunkGeneratorEx.updateFeaturesPerStep();
             return;
+        }
 
         RegionType regionType = getRegionTypeForDimension(dimensionType);
         NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;
@@ -89,8 +94,7 @@ public class LevelUtils
         // Don't continue if region type is uninitialized
         if (regionType == null)
         {
-            // We don't have any biomes to append to the list.
-            biomeSourceEx.appendDeferredBiomesList(ImmutableList.of());
+            chunkGeneratorEx.updateFeaturesPerStep();
             return;
         }
 
@@ -108,8 +112,8 @@ public class LevelUtils
         ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
         Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getHolderOrThrow(pair.getSecond()))));
         biomeSourceEx.appendDeferredBiomesList(builder.build());
+        chunkGeneratorEx.updateFeaturesPerStep();
 
-        ((IExtendedChunkGenerator) chunkGenerator).appendFeaturesPerStep();
         TerraBlender.LOGGER.info(String.format("Initialized TerraBlender biomes for level stem %s", levelResourceKey.location()));
     }
 }

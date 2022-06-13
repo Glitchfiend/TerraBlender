@@ -35,12 +35,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 @Mixin(BiomeSource.class)
-public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeSource {
-
-
+public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeSource
+{
     @Shadow public Supplier<Set<Holder<Biome>>> lazyPossibleBiomes;
-
-
 
     private List<Holder<Biome>> originalBiomeList;
 
@@ -48,12 +45,14 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
 
 
     @Inject(method = "<init>(Ljava/util/List;)V", at = @At("RETURN"))
-    protected void onInit(List<Holder<Biome>> biomeList, CallbackInfo ci) {
+    protected void onInit(List<Holder<Biome>> biomeList, CallbackInfo ci)
+    {
         this.originalBiomeList = biomeList;
     }
 
     @Override
-    public void appendDeferredBiomesList(List<Holder<Biome>> biomesToAppend) {
+    public void appendDeferredBiomesList(List<Holder<Biome>> biomesToAppend)
+    {
         // Don't append the biomes list again if we have already done so
         if (this.hasAppended) {
             return;
@@ -65,7 +64,6 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
         ImmutableList<Holder<Biome>> biomeList = builder.build().stream().distinct().collect(ImmutableList.toImmutableList());
 
         this.lazyPossibleBiomes = () -> new ObjectLinkedOpenHashSet<>(biomeList);
-
         this.hasAppended = true;
     }
 }
