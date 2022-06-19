@@ -10,11 +10,11 @@
 
 ### Documentation
 
-Documentation on setting up and using **TerraBlender** can be found on our [Wiki](https://github.com/Glitchfiend/TerraBlender/wiki). It's also worth checking the [Common](https://github.com/Glitchfiend/TerraBlender/tree/TB-1.18.x-1.x.x/Common/src/main/java/terrablender/api) and [Fabric](https://github.com/Glitchfiend/TerraBlender/tree/TB-1.18.x-1.x.x/Fabric/src/main/java/terrablender/api) api packages to view the api docstrings.
+Documentation on setting up and using **TerraBlender** can be found on our [Wiki](https://github.com/Glitchfiend/TerraBlender/wiki). It's also worth checking the [Common](https://github.com/Glitchfiend/TerraBlender/tree/TB-1.19.x-2.x.x/Common/src/main/java/terrablender/api) and [Fabric](https://github.com/Glitchfiend/TerraBlender/tree/TB-1.19.x-2.x.x/Fabric/src/main/java/terrablender/api) api packages to view the api docstrings.
 
 ## Example
 
-Examples of using **TerraBlender** can be found [here](https://github.com/Glitchfiend/TerraBlender/tree/TB-1.18.x-1.x.x/Example).
+Examples of using **TerraBlender** can be found [here](https://github.com/Glitchfiend/TerraBlender/tree/TB-1.19.x-2.x.x/Example).
 
 -----------------
 
