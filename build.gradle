@@ -8,15 +8,16 @@ subprojects {
     java.withJavadocJar()
 
     version = rootProject.version
+    mod_build_version = "$${mod_version}.${System.getenv().BUILD_NUMBER}"
 
     jar {
         manifest {
             attributes([
                 'Specification-Title'     : mod_name,
                 'Specification-Vendor'    : mod_author,
-                'Specification-Version'   : project.jar.archiveVersion,
+                'Specification-Version'   : mod_build_version,
                 'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Version'  : mod_build_version,
                 'Implementation-Vendor'   : mod_author,
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                 'Timestampe'              : System.currentTimeMillis(),
