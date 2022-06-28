@@ -8,7 +8,7 @@ subprojects {
     java.withJavadocJar()
 
     version = rootProject.version
-    mod_build_version = "$${mod_version}.${System.getenv().BUILD_NUMBER}"
+    def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
     jar {
         manifest {
