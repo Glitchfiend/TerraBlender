@@ -220,7 +220,7 @@ public class ParameterUtils
         UNFROZEN(Climate.Parameter.span(-0.45F, 1.0F)),
         FULL_RANGE(Climate.Parameter.span(-1.0F, 1.0F));
 
-        private Climate.Parameter parameter;
+        private final Climate.Parameter parameter;
 
         Temperature(Climate.Parameter parameter)
         {
@@ -250,7 +250,7 @@ public class ParameterUtils
         HUMID(Climate.Parameter.span(0.3F, 1.0F)),
         FULL_RANGE(Climate.Parameter.span(-1.0F, 1.0F));
 
-        private Climate.Parameter parameter;
+        private final Climate.Parameter parameter;
 
         Humidity(Climate.Parameter parameter)
         {
@@ -283,7 +283,7 @@ public class ParameterUtils
         INLAND(Climate.Parameter.span(-0.11F, 0.55F)),
         FULL_RANGE(Climate.Parameter.span(-1.0F, 1.0F));
 
-        private Climate.Parameter parameter;
+        private final Climate.Parameter parameter;
 
         Continentalness(Climate.Parameter parameter)
         {
@@ -315,7 +315,7 @@ public class ParameterUtils
         EROSION_6(Climate.Parameter.span(0.55F, 1.0F)),
         FULL_RANGE(Climate.Parameter.span(-1.0F, 1.0F));
 
-        private Climate.Parameter parameter;
+        private final Climate.Parameter parameter;
 
         Erosion(Climate.Parameter parameter)
         {
@@ -343,7 +343,7 @@ public class ParameterUtils
         FLOOR(Climate.Parameter.point(1.0F)),
         FULL_RANGE(Climate.Parameter.span(-1.0F, 1.0F));
 
-        private Climate.Parameter parameter;
+        private final Climate.Parameter parameter;
 
         Depth(Climate.Parameter parameter)
         {
@@ -381,7 +381,7 @@ public class ParameterUtils
         MID_SLICE_VARIANT_DESCENDING(Climate.Parameter.span(0.93333334F, 1.0F)),
         FULL_RANGE(Climate.Parameter.span(-1.0F, 1.0F));
 
-        private Climate.Parameter parameter;
+        private final Climate.Parameter parameter;
 
         Weirdness(Climate.Parameter parameter)
         {
