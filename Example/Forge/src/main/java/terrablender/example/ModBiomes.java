@@ -17,20 +17,28 @@
  */
 package terrablender.example;
 
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
+
+import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModBiomes
 {
-    @SubscribeEvent
-    public static void registerBiomes(RegistryEvent.Register<Biome> event)
+    protected static DeferredRegister<Biome> BIOME_REGISTER = DeferredRegister.create(Registry.BIOME_REGISTRY, TestMod.MOD_ID);
+
+    public static void registerBiomes()
     {
-        IForgeRegistry<Biome> registry = event.getRegistry();
-        registry.register(TestOverworldBiomes.hotRed().setRegistryName(TestBiomes.HOT_RED.location()));
-        registry.register(TestOverworldBiomes.coldBlue().setRegistryName(TestBiomes.COLD_BLUE.location()));
+        register(TestBiomes.HOT_RED, TestOverworldBiomes::hotRed);
+        register(TestBiomes.COLD_BLUE, TestOverworldBiomes::coldBlue);
+    }
+
+    public static RegistryObject<Biome> register(ResourceKey<Biome> key, Supplier<Biome> biomeSupplier)
+    {
+        return BIOME_REGISTER.register(key.location().getPath(), biomeSupplier);
     }
 }

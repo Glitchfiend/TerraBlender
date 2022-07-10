@@ -10,4 +10,3 @@ pluginManagement {
 }
 
 rootProject.name = 'Example'
-include("Fabric", "Forge")
