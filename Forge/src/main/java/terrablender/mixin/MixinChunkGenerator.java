@@ -31,8 +31,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import terrablender.core.TerraBlender;
-import terrablender.util.LevelUtils;
 import terrablender.worldgen.IExtendedChunkGenerator;
 
 import java.util.ArrayList;

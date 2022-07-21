@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id "com.matthewprenger.cursegradle" version "1.4.0"
+    id 'com.github.spotbugs' version '5.0.9'
 }
 
 archivesBaseName = "${mod_name}-fabric"
@@ -12,7 +13,6 @@ dependencies {
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compileOnly project(":Common")
     include implementation("com.electronwill.night-config:toml:${nightconfig_version}")
     include implementation("com.electronwill.night-config:core:${nightconfig_version}")
