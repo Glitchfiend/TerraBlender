@@ -1,6 +1,6 @@
 modLoader="javafml"
 license="LGPLv3"
-loaderVersion="[39,)"
+loaderVersion="[42,)"
 issueTrackerURL="https://github.com/Glitchfiend/TerraBlender/issues"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/terrablender"
 logoFile="tb_logo.png"
@@ -15,6 +15,6 @@ logoFile="tb_logo.png"
 [[dependencies.terrablender]]
     modId="forge"
     mandatory=true
-    versionRange="[41.0.64,)"
+    versionRange="[42.0.1,)"
     ordering="NONE"
     side="BOTH"
