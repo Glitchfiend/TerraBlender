@@ -70,6 +70,16 @@ public class SurfaceRuleManager
     }
 
     /**
+     * Remove surface rules for biomes belonging to a modded namespace.
+     * @param category the category to add surface rules for.
+     * @param namespace the namespace to use these rules for.
+     */
+    public static void removeSurfaceRules(RuleCategory category, String namespace)
+    {
+        surfaceRules.get(category).remove(namespace);
+    }
+
+    /**
      * Gets the namespaced rules for a given category.
      * @param category the category to get the surface rules for.
      * @param fallback the surface rules to fallback on.
