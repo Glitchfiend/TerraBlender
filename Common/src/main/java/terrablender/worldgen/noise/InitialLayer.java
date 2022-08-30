@@ -18,6 +18,7 @@
 package terrablender.worldgen.noise;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Biome;
 import terrablender.api.Region;
 import terrablender.api.RegionType;
@@ -25,7 +26,6 @@ import terrablender.api.Regions;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
-import terrablender.util.RegistryUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +36,11 @@ public class InitialLayer implements AreaTransformer0
     private final RegionType regionType;
     private final WeightedRandomList<WeightedEntry.Wrapper<Region>> weightedEntries;
 
-    public InitialLayer(RegionType type)
+    public InitialLayer(RegistryAccess registryAccess, RegionType type)
     {
+        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
         this.regionType = type;
         this.weightedEntries = WeightedRandomList.create(Regions.get(this.regionType).stream().filter(region -> {
-            Registry<Biome> biomeRegistry = RegistryUtils.getCurrentRegistryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
             AtomicBoolean biomesAdded = new AtomicBoolean(false);
             region.addBiomes(biomeRegistry, pair -> biomesAdded.set(true));
 

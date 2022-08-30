@@ -24,14 +24,12 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import terrablender.core.TerraBlender;
 import terrablender.worldgen.IExtendedBiomeSource;
 
 import java.util.ArrayList;
@@ -55,38 +53,38 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
     @Shadow
     abstract List<BiomeSource.StepFeatureData> buildFeaturesPerStep(List<Holder<Biome>> biomeList, boolean ignoreOrderCycle);
 
-    @Inject(method="<init>(Ljava/util/List;)V", at=@At("RETURN"))
+    @Inject(method = "<init>(Ljava/util/List;)V", at = @At("RETURN"))
     protected void onInit(List<Holder<Biome>> biomeList, CallbackInfo ci)
     {
         this.originalBiomeList = biomeList;
     }
 
-    @Inject(method = "Lnet/minecraft/world/level/biome/BiomeSource;lambda$new$0(Ljava/util/List;)Ljava/util/List;", at = @At("HEAD"), cancellable = true)
-    private void skipInitialFeaturesPerStep(List<Holder<Biome>> $$0x, CallbackInfoReturnable<List<BiomeSource.StepFeatureData>> cir)
+    @Inject(method = "Lnet/minecraft/world/level/biome/BiomeSource;method_40141(Ljava/util/List;)Ljava/util/List;", at = @At("HEAD"), cancellable = true)
+    private void skipInitialFeaturesPerStep(List<Holder<Biome>> possibleBiomes, CallbackInfoReturnable<List<BiomeSource.StepFeatureData>> cir)
     {
-        if ((Object)this instanceof MultiNoiseBiomeSource)
-        {
-            cir.setReturnValue(new ArrayList<>());
-        }
+        cir.setReturnValue(new ArrayList<>());
     }
 
     @Override
     public void appendDeferredBiomesList(List<Holder<Biome>> biomesToAppend)
     {
         // Don't append the biomes list again if we have already done so
-        if (this.hasAppended)
+        if (this.hasAppended) {
             return;
+        }
 
         ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
         builder.addAll(this.originalBiomeList);
         builder.addAll(biomesToAppend);
         ImmutableList<Holder<Biome>> biomeList = builder.build().stream().distinct().collect(ImmutableList.toImmutableList());
 
-        this.possibleBiomes = new ObjectLinkedOpenHashSet(biomeList);
-        this.featuresPerStep = Suppliers.memoize(() -> {
-            return this.buildFeaturesPerStep(biomeList, true);
-        });
-
+        this.possibleBiomes = new ObjectLinkedOpenHashSet<>(biomeList);
         this.hasAppended = true;
+    }
+
+    @Override
+    public void updateFeaturesPerStep()
+    {
+        this.featuresPerStep = Suppliers.memoize(() -> this.buildFeaturesPerStep(ImmutableList.copyOf(this.possibleBiomes), true));
     }
 }

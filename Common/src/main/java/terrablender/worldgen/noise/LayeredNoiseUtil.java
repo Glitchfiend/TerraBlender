@@ -17,6 +17,7 @@
  */
 package terrablender.worldgen.noise;
 
+import net.minecraft.core.RegistryAccess;
 import terrablender.api.RegionType;
 import terrablender.core.TerraBlender;
 
@@ -24,7 +25,7 @@ import java.util.function.LongFunction;
 
 public class LayeredNoiseUtil
 {
-    public static Area uniqueness(RegionType regionType, long worldSeed)
+    public static Area uniqueness(RegistryAccess registryAccess, RegionType regionType, long worldSeed)
     {
         int numZooms = TerraBlender.CONFIG.overworldRegionSize;
 
@@ -32,7 +33,7 @@ public class LayeredNoiseUtil
             numZooms = TerraBlender.CONFIG.netherRegionSize;
 
         LongFunction<AreaContext> contextFactory = (seedModifier) -> new AreaContext(25, worldSeed, seedModifier);
-        AreaFactory factory = new InitialLayer(regionType).run(contextFactory.apply(1L));
+        AreaFactory factory = new InitialLayer(registryAccess, regionType).run(contextFactory.apply(1L));
         factory = ZoomLayer.FUZZY.run(contextFactory.apply(2000L), factory);
         factory = zoom(2001L, ZoomLayer.NORMAL, factory, 3, contextFactory);
         factory = zoom(1001L, ZoomLayer.NORMAL, factory, numZooms, contextFactory);

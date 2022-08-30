@@ -17,11 +17,12 @@
  */
 package terrablender.worldgen;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Climate;
 import terrablender.api.RegionType;
 
 public interface IExtendedParameterList<T>
 {
-    void initializeForTerraBlender(RegionType regionType, long seed);
+    void initializeForTerraBlender(RegistryAccess registryAccess, RegionType regionType, long seed);
     T findValuePositional(Climate.TargetPoint target, int x, int y, int z);
 }

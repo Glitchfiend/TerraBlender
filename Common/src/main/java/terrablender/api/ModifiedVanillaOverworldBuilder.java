@@ -18,6 +18,7 @@
 package terrablender.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceKey;
@@ -34,6 +35,7 @@ public class ModifiedVanillaOverworldBuilder
     private Map<ResourceKey<Biome>, ResourceKey<Biome>> originalBiomeMappings = Maps.newHashMap();
     private Map<Climate.ParameterPoint, ResourceKey<Biome>> parameterBiomeMappings = Maps.newHashMap();
     private Map<Climate.ParameterPoint, Climate.ParameterPoint> parameterMappings = Maps.newHashMap();
+    private List<Climate.ParameterPoint> parametersToRemove = Lists.newArrayList();
     private final OverworldBiomeBuilder biomeBuilder = new OverworldBiomeBuilder();
 
     public ModifiedVanillaOverworldBuilder() {}
@@ -69,6 +71,15 @@ public class ModifiedVanillaOverworldBuilder
     }
 
     /**
+     * Removes a {@link Climate.ParameterPoint} parameter.
+     * @param parameter the {@link Climate.ParameterPoint} to be removed.
+     */
+    public void removeParameter(Climate.ParameterPoint parameter)
+    {
+        parametersToRemove.add(parameter);
+    }
+
+    /**
      * Builds a list of {@link Climate.ParameterPoint} and {@link ResourceKey<Biome>} pairs.
      * @return the built list.
      */
@@ -79,17 +90,20 @@ public class ModifiedVanillaOverworldBuilder
             Climate.ParameterPoint parameters = pair.getFirst();
             ResourceKey<Biome> biome = pair.getSecond();
 
-            // Replace the biome if required.
-            if (originalBiomeMappings.containsKey(biome))
-                biome = originalBiomeMappings.get(biome);
-            else if (parameterBiomeMappings.containsKey(parameters))
-                biome = parameterBiomeMappings.get(parameters);
+            if (!parametersToRemove.contains(parameters))
+            {
+                // Replace the biome if required.
+                if (originalBiomeMappings.containsKey(biome))
+                    biome = originalBiomeMappings.get(biome);
+                else if (parameterBiomeMappings.containsKey(parameters))
+                    biome = parameterBiomeMappings.get(parameters);
 
-            // Replace the original parameters if required
-            if (parameterMappings.containsKey(parameters))
-                parameters = parameterMappings.get(parameters);
+                // Replace the original parameters if required
+                if (parameterMappings.containsKey(parameters))
+                    parameters = parameterMappings.get(parameters);
 
-            builder.add(Pair.of(parameters, biome));
+                builder.add(Pair.of(parameters, biome));
+            }
         };
 
         biomeBuilder.addBiomes(mapper);

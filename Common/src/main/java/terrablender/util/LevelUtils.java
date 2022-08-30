@@ -20,54 +20,98 @@ package terrablender.util;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
+import terrablender.DimensionTypeTags;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
+import terrablender.core.TerraBlender;
 import terrablender.worldgen.IExtendedBiomeSource;
+import terrablender.worldgen.IExtendedNoiseGeneratorSettings;
 import terrablender.worldgen.IExtendedParameterList;
+
+import java.util.Map;
 
 public class LevelUtils
 {
-    public static void initializeBiomes(Holder<DimensionType> dimensionType, ChunkGenerator chunkGenerator)
+    public static void initializeOnServerStart(MinecraftServer server)
     {
-        // Only apply to NoiseBasedChunkGenerator with MultiNoiseBiomeSources
-        if (!(chunkGenerator instanceof NoiseBasedChunkGenerator) || !(chunkGenerator.getBiomeSource() instanceof MultiNoiseBiomeSource))
-            return;
+        RegistryAccess registryAccess = server.registryAccess();
+        WorldGenSettings worldGenSettings = server.getWorldData().worldGenSettings();
 
-        final RegionType regionType;
-        if (dimensionType.is(DimensionType.NETHER_LOCATION)) regionType = RegionType.NETHER;
-        else if (dimensionType.is(DimensionType.OVERWORLD_LOCATION)) regionType = RegionType.OVERWORLD;
-        else regionType = null;
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : worldGenSettings.dimensions().entrySet())
+        {
+            LevelStem stem = entry.getValue();
+            initializeBiomes(registryAccess, stem.typeHolder(), entry.getKey(), stem.generator(), worldGenSettings.seed());
+        }
+    }
 
-        NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;
-        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)chunkGenerator.getBiomeSource();
+    public static boolean shouldApplyToChunkGenerator(ChunkGenerator chunkGenerator)
+    {
+        return chunkGenerator instanceof NoiseBasedChunkGenerator && shouldApplyToBiomeSource(chunkGenerator.getBiomeSource());
+    }
+
+    public static boolean shouldApplyToBiomeSource(BiomeSource biomeSource)
+    {
+        return biomeSource instanceof MultiNoiseBiomeSource;
+    }
+
+    public static RegionType getRegionTypeForDimension(Holder<DimensionType> dimensionType)
+    {
+        if (dimensionType.is(DimensionTypeTags.NETHER_REGIONS)) return RegionType.NETHER;
+        else if (dimensionType.is(DimensionTypeTags.OVERWORLD_REGIONS)) return RegionType.OVERWORLD;
+        else return null;
+    }
+
+    private static void initializeBiomes(RegistryAccess registryAccess, Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed)
+    {
+        BiomeSource biomeSource = chunkGenerator.getBiomeSource();
         IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
+
+        if (!shouldApplyToChunkGenerator(chunkGenerator))
+        {
+            biomeSourceEx.updateFeaturesPerStep();
+            return;
+        }
+
+        RegionType regionType = getRegionTypeForDimension(dimensionType);
+        NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;
+        NoiseGeneratorSettings generatorSettings = noiseBasedChunkGenerator.settings.value();
 
         // Don't continue if region type is uninitialized
         if (regionType == null)
         {
-            // We don't have any biomes to append to the list.
-            biomeSourceEx.appendDeferredBiomesList(ImmutableList.of());
+            biomeSourceEx.updateFeaturesPerStep();
             return;
         }
 
-        Climate.ParameterList parameters = biomeSource.parameters;
+        // Set the chunk generator settings' region type
+        ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRegionType(regionType);
+
+        Climate.ParameterList parameters = ((MultiNoiseBiomeSource)biomeSource).parameters;
         IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
 
         // Initialize the parameter list for TerraBlender
-        parametersEx.initializeForTerraBlender(regionType, noiseBasedChunkGenerator.seed);
+        parametersEx.initializeForTerraBlender(registryAccess, regionType, seed);
 
         // Append modded biomes to the biome source biome list
-        RegistryUtils.doWithRegistryAccess(registryAccess -> {
-            Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
-            ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
-            Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getOrCreateHolder(pair.getSecond()))));
-            biomeSourceEx.appendDeferredBiomesList(builder.build());
-        });
+        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+        ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
+        Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getHolderOrThrow(pair.getSecond()))));
+        biomeSourceEx.appendDeferredBiomesList(builder.build());
+        biomeSourceEx.updateFeaturesPerStep();
+
+        TerraBlender.LOGGER.info(String.format("Initialized TerraBlender biomes for level stem %s", levelResourceKey.location()));
     }
 }

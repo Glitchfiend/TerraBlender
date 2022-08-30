@@ -38,20 +38,6 @@ public class MixinNoiseGeneratorSettings implements IExtendedNoiseGeneratorSetti
     private RegionType regionType = null;
     private SurfaceRules.RuleSource namespacedSurfaceRuleSource = null;
 
-    @Inject(method = "overworld", at = @At("RETURN"))
-    private static void onOverworld(boolean amplified, boolean largeBiomes, CallbackInfoReturnable<NoiseGeneratorSettings> cir)
-    {
-        NoiseGeneratorSettings settings = cir.getReturnValue();
-        ((IExtendedNoiseGeneratorSettings)(Object)settings).setRegionType(RegionType.OVERWORLD);
-    }
-
-    @Inject(method = "nether", at = @At("RETURN"))
-    private static void onNether(CallbackInfoReturnable<NoiseGeneratorSettings> cir)
-    {
-        NoiseGeneratorSettings settings = cir.getReturnValue();
-        ((IExtendedNoiseGeneratorSettings)(Object)settings).setRegionType(RegionType.NETHER);
-    }
-
     @Inject(method = "surfaceRule", at = @At("HEAD"), cancellable = true)
     private void surfaceRule(CallbackInfoReturnable<SurfaceRules.RuleSource> cir)
     {

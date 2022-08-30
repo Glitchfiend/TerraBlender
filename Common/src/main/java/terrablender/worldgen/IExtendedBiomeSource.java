@@ -25,4 +25,5 @@ import java.util.List;
 public interface IExtendedBiomeSource
 {
     void appendDeferredBiomesList(List<Holder<Biome>> biomesToAppend);
+    void updateFeaturesPerStep();
 }

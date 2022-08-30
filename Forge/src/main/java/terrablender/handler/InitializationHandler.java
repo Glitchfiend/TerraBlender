@@ -15,22 +15,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package terrablender.mixin;
+package terrablender.handler;
 
-import net.minecraft.server.MinecraftServer;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import terrablender.core.TerraBlender;
-import terrablender.util.RegistryUtils;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import terrablender.util.LevelUtils;
 
-@Mixin(MinecraftServer.class)
-public class MixinMinecraftServer
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+public class InitializationHandler
 {
-    @Inject(method = "halt", at = @At("HEAD"))
-    public void onHalt(boolean stopThread, CallbackInfo ci)
+    // Use the lowest priority to account for nonsense from e.g. MCreator.
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onServerAboutToStart(ServerAboutToStartEvent event)
     {
-        RegistryUtils.clearCurrentRegistryAccess();
+        LevelUtils.initializeOnServerStart(event.getServer());
     }
 }

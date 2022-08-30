@@ -18,16 +18,19 @@
 package terrablender.core;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.worldgen.biome.OverworldBiomes;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import terrablender.api.Region;
-import terrablender.api.SurfaceRuleManager;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import terrablender.api.TerraBlenderApi;
 import terrablender.config.TerraBlenderConfig;
+import terrablender.util.LevelUtils;
 
-import java.util.Optional;
+import java.util.Map;
 
 public class TerraBlenderFabric implements ModInitializer
 {
@@ -37,11 +40,16 @@ public class TerraBlenderFabric implements ModInitializer
     public void onInitialize()
     {
         TerraBlender.setConfig(CONFIG);
-        TerraBlender.register((key, biome) -> BuiltinRegistries.register(BuiltinRegistries.BIOME, key, biome));
+        TerraBlender.registerBiome((key, biome) -> BuiltinRegistries.register(BuiltinRegistries.BIOME, key, biome.get()));
+        TerraBlender.registerRule((key, rule) -> Registry.register(Registry.RULE, new ResourceLocation(TerraBlender.MOD_ID, key), rule.get()));
 
         FabricLoader.getInstance().getEntrypointContainers("terrablender", TerraBlenderApi.class).forEach(entrypoint -> {
             TerraBlenderApi api = entrypoint.getEntrypoint();
             api.onTerraBlenderInitialized();
+        });
+
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+            LevelUtils.initializeOnServerStart(server);
         });
     }
 }

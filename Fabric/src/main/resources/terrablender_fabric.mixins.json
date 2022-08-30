@@ -3,6 +3,7 @@
   "package": "terrablender.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MixinBiomeSource"
   ],
   "client": [
   ],
