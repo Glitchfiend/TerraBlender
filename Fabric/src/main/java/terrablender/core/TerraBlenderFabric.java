@@ -47,9 +47,5 @@ public class TerraBlenderFabric implements ModInitializer
             TerraBlenderApi api = entrypoint.getEntrypoint();
             api.onTerraBlenderInitialized();
         });
-
-        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            LevelUtils.initializeOnServerStart(server);
-        });
     }
 }
