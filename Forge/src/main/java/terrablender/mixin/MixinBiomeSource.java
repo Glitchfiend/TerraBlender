@@ -39,16 +39,7 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
 {
     @Shadow public Supplier<Set<Holder<Biome>>> lazyPossibleBiomes;
 
-    private List<Holder<Biome>> originalBiomeList;
-
     private boolean hasAppended = false;
-
-
-    @Inject(method = "<init>(Ljava/util/List;)V", at = @At("RETURN"))
-    protected void onInit(List<Holder<Biome>> biomeList, CallbackInfo ci)
-    {
-        this.originalBiomeList = biomeList;
-    }
 
     @Override
     public void appendDeferredBiomesList(List<Holder<Biome>> biomesToAppend)
@@ -59,7 +50,7 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
         }
 
         ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
-        builder.addAll(this.originalBiomeList);
+        builder.addAll(this.lazyPossibleBiomes.get());
         builder.addAll(biomesToAppend);
         ImmutableList<Holder<Biome>> biomeList = builder.build().stream().distinct().collect(ImmutableList.toImmutableList());
 
