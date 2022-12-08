@@ -22,6 +22,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Final;
@@ -61,7 +62,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
         this.uniqueness = LayeredNoiseUtil.uniqueness(registryAccess, regionType, seed);
         this.uniqueTrees = new Climate.RTree[Regions.getCount(regionType)];
 
-        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
 
         for (Region region : Regions.get(regionType))
         {

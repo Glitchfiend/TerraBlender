@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.biome.Biome;
@@ -49,12 +50,13 @@ public class LevelUtils
     public static void initializeOnServerStart(MinecraftServer server)
     {
         RegistryAccess registryAccess = server.registryAccess();
-        WorldGenSettings worldGenSettings = server.getWorldData().worldGenSettings();
+        Registry<LevelStem> levelStemRegistry = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
+        long seed = server.getWorldData().worldGenOptions().seed();
 
-        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : worldGenSettings.dimensions().entrySet())
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : levelStemRegistry.entrySet())
         {
             LevelStem stem = entry.getValue();
-            initializeBiomes(registryAccess, stem.typeHolder(), entry.getKey(), stem.generator(), worldGenSettings.seed());
+            initializeBiomes(registryAccess, stem.type(), entry.getKey(), stem.generator(), seed);
         }
     }
 
@@ -108,7 +110,7 @@ public class LevelUtils
         parametersEx.initializeForTerraBlender(registryAccess, regionType, seed);
 
         // Append modded biomes to the biome source biome list
-        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
         ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
         Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getHolderOrThrow(pair.getSecond()))));
         biomeSourceEx.appendDeferredBiomesList(builder.build());

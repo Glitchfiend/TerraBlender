@@ -19,6 +19,7 @@ package terrablender.core;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -39,13 +40,6 @@ public class TerraBlenderForge {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::loadComplete);
         TerraBlender.setConfig(CONFIG);
-        DeferredRegister<Biome> biomeDeferredRegister = DeferredRegister.create(Registry.BIOME_REGISTRY, TerraBlender.MOD_ID);
-        DeferredRegister<Codec<? extends SurfaceRules.RuleSource>> ruleSourceDeferredRegister = DeferredRegister.create(Registry.RULE_REGISTRY, TerraBlender.MOD_ID);
-
-        TerraBlender.registerBiome((key, biome) -> biomeDeferredRegister.register(key.location().getPath(), biome));
-        TerraBlender.registerRule(ruleSourceDeferredRegister::register);
-        biomeDeferredRegister.register(modEventBus);
-        ruleSourceDeferredRegister.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

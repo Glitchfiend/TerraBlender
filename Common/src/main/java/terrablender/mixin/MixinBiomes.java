@@ -15,38 +15,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package terrablender.core;
+package terrablender.mixin;
 
-import com.mojang.serialization.Codec;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.biome.Biomes;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
-import net.minecraft.data.worldgen.placement.MiscOverworldPlacements;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.biome.*;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import terrablender.api.Region;
-import terrablender.config.TerraBlenderConfig;
-import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
+import terrablender.core.TerraBlender;
 
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-
-public class TerraBlender {
-    public static final String MOD_ID = "terrablender";
-    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-    public static TerraBlenderConfig CONFIG;
-
-    public TerraBlender()
+@Mixin(Biomes.class)
+public class MixinBiomes
+{
+    @Inject(method="bootstrap(Lnet/minecraft/data/worldgen/BootstapContext;)V", at=@At("HEAD"))
+    private static void bootstrap(BootstapContext<Biome> context, CallbackInfo ci)
     {
-    }
-
-    public static void setConfig(TerraBlenderConfig config)
-    {
-        TerraBlender.CONFIG = config;
+        TerraBlender.LOGGER.info("BOOTSTRAP!");
+        HolderGetter<PlacedFeature> featureGetter = context.lookup(Registries.PLACED_FEATURE);
+        HolderGetter<ConfiguredWorldCarver<?>> carverGetter = context.lookup(Registries.CONFIGURED_CARVER);
+        context.register(Region.DEFERRED_PLACEHOLDER, OverworldBiomes.theVoid(featureGetter, carverGetter));
     }
 }
