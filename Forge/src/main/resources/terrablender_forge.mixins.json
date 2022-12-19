@@ -4,8 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "terrablender.refmap.json",
   "mixins": [
-    "MixinBiomeSource",
-    "MixinChunkGenerator"
+    "MixinBiomeSource"
   ],
   "client": [
   ],

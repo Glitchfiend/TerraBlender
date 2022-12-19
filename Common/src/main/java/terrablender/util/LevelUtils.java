@@ -38,7 +38,6 @@ import terrablender.api.RegionType;
 import terrablender.api.Regions;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.IExtendedBiomeSource;
-import terrablender.worldgen.IExtendedChunkGenerator;
 import terrablender.worldgen.IExtendedNoiseGeneratorSettings;
 import terrablender.worldgen.IExtendedParameterList;
 
@@ -75,15 +74,10 @@ public class LevelUtils
         else return null;
     }
 
-    private static void initializeBiomes(RegistryAccess registryAccess, Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed)
+    public static void initializeBiomes(RegistryAccess registryAccess, Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed)
     {
-        IExtendedChunkGenerator chunkGeneratorEx = (IExtendedChunkGenerator)chunkGenerator;
-
         if (!shouldApplyToChunkGenerator(chunkGenerator))
-        {
-            chunkGeneratorEx.updateFeaturesPerStep();
             return;
-        }
 
         RegionType regionType = getRegionTypeForDimension(dimensionType);
         NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;
@@ -93,10 +87,7 @@ public class LevelUtils
 
         // Don't continue if region type is uninitialized
         if (regionType == null)
-        {
-            chunkGeneratorEx.updateFeaturesPerStep();
             return;
-        }
 
         // Set the chunk generator settings' region type
         ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRegionType(regionType);
@@ -112,7 +103,6 @@ public class LevelUtils
         ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
         Regions.get(regionType).forEach(region -> region.addBiomes(biomeRegistry, pair -> builder.add(biomeRegistry.getHolderOrThrow(pair.getSecond()))));
         biomeSourceEx.appendDeferredBiomesList(builder.build());
-        chunkGeneratorEx.updateFeaturesPerStep();
 
         TerraBlender.LOGGER.info(String.format("Initialized TerraBlender biomes for level stem %s", levelResourceKey.location()));
     }
