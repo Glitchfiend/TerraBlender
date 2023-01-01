@@ -17,21 +17,12 @@
  */
 package terrablender.core;
 
-import com.mojang.serialization.Codec;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.registries.DeferredRegister;
-import terrablender.api.VanillaParameterOverlayBuilder;
 import terrablender.config.TerraBlenderConfig;
 
 @Mod(value = TerraBlender.MOD_ID)
@@ -46,15 +37,6 @@ public class TerraBlenderForge {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        VanillaParameterOverlayBuilder builder = new VanillaParameterOverlayBuilder();
-        builder.add(Climate.parameters(Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(-1.0F, -0.5F), 0), Biomes.FOREST);
-        builder.add(Climate.parameters(Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(0.2F, 0.3F), Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(-1.0F, -0.5F), Climate.Parameter.span(-1.0F, -0.5F), 0), Biomes.FOREST);
-        var points = builder.build();
-
-        for (var point : points)
-        {
-            TerraBlender.LOGGER.info(point);
-        }
     }
 
     private void loadComplete(final FMLLoadCompleteEvent event) {
