@@ -34,17 +34,15 @@ public class TestMod
     {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.addListener(this::commonSetup);
-
-        ModBiomes.BIOME_REGISTER.register(bus);
-        ModBiomes.registerBiomes();
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         event.enqueueWork(() ->
         {
-            // Given we only add two biomes, we should keep our weight relatively low.
-            Regions.register(new TestRegion(new ResourceLocation(MOD_ID, "overworld"), 2));
+            // Weights are kept intentionally low as we add minimal biomes
+            Regions.register(new TestRegion1(new ResourceLocation(MOD_ID, "overworld_1"), 2));
+            Regions.register(new TestRegion2(new ResourceLocation(MOD_ID, "overworld_2"), 2));
 
             // Register our surface rules
             SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TestSurfaceRuleData.makeRules());
