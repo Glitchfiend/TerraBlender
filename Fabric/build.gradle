@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "com.modrinth.minotaur" version "2.7.+"
 }
 
 archivesBaseName = "${mod_name}-fabric"
@@ -73,7 +74,7 @@ curseforge {
             changelog = changelog_file
         }
 
-        releaseType = 'beta'
+        releaseType = release_channel
         addGameVersion minecraft_version
         addGameVersion 'Fabric'
 
@@ -89,6 +90,29 @@ curseforge {
     options {
         forgeGradleIntegration = false
     }
+}
+
+modrinth {
+    if (project.hasProperty('modrinthToken')) {
+        token = project.getProperty('modrinthToken')
+    }
+    projectId = "terrablender"
+    versionNumber = mod_version
+    versionName = mod_version + " for Fabric " + minecraft_version
+    versionType = release_channel // can be release, beta, or alpha
+    uploadFile = remapJar
+    gameVersions = [ minecraft_version ]
+    loaders = [ 'fabric' ]
+
+    if (changelog_file.exists()) {
+        // only include changelog for this version, replace the rest with empty string
+        changelog = changelog_file.replaceFirst(/\s\\=========.+/mgs, "")
+    }
+
+    dependencies {
+        required.project "fabric-api"
+    }
+    // debugMode = true
 }
 
 publishing {

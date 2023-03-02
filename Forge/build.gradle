@@ -12,6 +12,7 @@ buildscript {
 
 plugins {
     id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "com.modrinth.minotaur" version "2.7.+"
 }
 
 apply plugin: 'java'
@@ -114,13 +115,32 @@ curseforge {
             changelog = changelog_file
         }
 
-        releaseType = 'beta'
+        releaseType = release_channel
         addGameVersion minecraft_version
 
         mainArtifact(jar) {
             displayName = "TerraBlender Forge ${version}"
         }
     }
+}
+
+modrinth {
+    if (project.hasProperty('modrinthToken')) {
+        token = project.getProperty('modrinthToken')
+    }
+    projectId = "terrablender"
+    versionNumber = mod_version
+    versionName = mod_version + " for Forge " + minecraft_version
+    versionType = release_channel // can be release, beta, or alpha
+    uploadFile = jar
+    gameVersions = [ minecraft_version ]
+    loaders = [ 'forge' ]
+
+    if (changelog_file.exists()) {
+        // only include changelog for this version, replace the rest with empty string
+        changelog = changelog_file.replaceFirst(/\s\\=========.+/mgs, "")
+    }
+    // debugMode = true
 }
 
 publishing {
