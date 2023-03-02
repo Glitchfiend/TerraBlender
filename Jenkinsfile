@@ -43,7 +43,7 @@ pipeline {
             steps {
                 withGradle {
                     sh 'rm -rf ./Forge/build/classes' // Ensure refmaps are generated/included
-                    sh './gradlew ${GRADLE_ARGS} curseforge -PcurseApiKey=${CURSE_API_KEY}'
+                    sh './gradlew ${GRADLE_ARGS} curseforge modrinth -PcurseApiKey=${CURSE_API_KEY} -PmodrinthToken=${MODRINTH_TOKEN}'
                 }
                 withCredentials([usernamePassword(credentialsId: 'maven-adubbz-user', usernameVariable: 'MAVEN_USER', passwordVariable: 'MAVEN_PASSWORD')]) {
                     sh 'rm -rf ./Forge/build/classes' // Ensure refmaps are generated/included
