@@ -7,6 +7,7 @@ plugins {
 }
 
 archivesBaseName = "${mod_name}-fabric"
+def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
@@ -42,7 +43,7 @@ processResources {
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": "${mod_version}.${System.getenv().BUILD_NUMBER}"
+        expand "version": mod_build_version
     }
     
     filesMatching("${mod_id}.mixins.json") {
@@ -97,16 +98,16 @@ modrinth {
         token = project.getProperty('modrinthToken')
     }
     projectId = "terrablender"
-    versionNumber = mod_version
-    versionName = mod_version + " for Fabric " + minecraft_version
+    versionNumber = mod_build_version
+    versionName = mod_build_version + " for Fabric " + minecraft_version
     versionType = release_channel // can be release, beta, or alpha
     uploadFile = remapJar
     gameVersions = [ minecraft_version ]
     loaders = [ 'fabric' ]
 
     if (changelog_file.exists()) {
-        // only include changelog for this version, replace the rest with empty string
-        changelog = changelog_file.replaceFirst("/=========.+/s", "")
+        def changelog_text = changelog_file.text
+        changelog = "```" + changelog_text.substring(0, changelog_text.indexOf("=========")) + "```"
     }
 
     dependencies {

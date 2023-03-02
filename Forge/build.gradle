@@ -21,6 +21,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
 archivesBaseName = "${mod_name}-forge"
+def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 minecraft {
     mappings channel: 'official', version: minecraft_version
@@ -129,16 +130,16 @@ modrinth {
         token = project.getProperty('modrinthToken')
     }
     projectId = "terrablender"
-    versionNumber = mod_version
-    versionName = mod_version + " for Forge " + minecraft_version
+    versionNumber = mod_build_version
+    versionName = mod_build_version + " for Forge " + minecraft_version
     versionType = release_channel // can be release, beta, or alpha
     uploadFile = jar
     gameVersions = [ minecraft_version ]
     loaders = [ 'forge' ]
 
     if (changelog_file.exists()) {
-        // only include changelog for this version, replace the rest with empty string
-        changelog = changelog_file.replaceFirst(/\s\\=========.+/mgs, "")
+        def changelog_text = changelog_file.text
+        changelog = "```" + changelog_text.substring(0, changelog_text.indexOf("=========")) + "```"
     }
     // debugMode = true
 }

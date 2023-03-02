@@ -39,6 +39,7 @@ pipeline {
             }
             environment {
                 CURSE_API_KEY = credentials('curse-api-key')
+                MODRINTH_TOKEN = credentials('modrinth-token')
             }
             steps {
                 withGradle {
