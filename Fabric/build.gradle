@@ -106,7 +106,7 @@ modrinth {
 
     if (changelog_file.exists()) {
         // only include changelog for this version, replace the rest with empty string
-        changelog = changelog_file.replaceFirst(/\s\\=========.+/mgs, "")
+        changelog = changelog_file.replaceFirst("/=========.+/s", "")
     }
 
     dependencies {
