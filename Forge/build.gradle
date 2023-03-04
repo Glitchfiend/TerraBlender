@@ -139,7 +139,7 @@ modrinth {
 
     if (changelog_file.exists()) {
         def changelog_text = changelog_file.text
-        changelog = "```\n" + changelog_text.substring(0, changelog_text.indexOf("=========")) + "```"
+        changelog = "```\n" + changelog_text.substring(0, changelog_text.indexOf("=========")).replace("\t", "    ") + "```"
     }
     // debugMode = true
 }
