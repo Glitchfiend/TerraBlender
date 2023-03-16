@@ -17,14 +17,12 @@
  */
 package terrablender.mixin;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.SurfaceRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,7 +38,7 @@ public abstract class MixinBuiltInRegistries
     private static <T> Registry<T> registerSimple(ResourceKey<? extends Registry<T>> key, Lifecycle lifecycle, BuiltInRegistries.RegistryBootstrap<T> bootstrap) { return null; }
 
     @Inject(method="registerSimple(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap;)Lnet/minecraft/core/Registry;", at=@At("HEAD"), cancellable = true)
-    private static void registerSimple(ResourceKey key, BuiltInRegistries.RegistryBootstrap bootstrap, CallbackInfoReturnable<Registry> cir)
+    private static <T> void registerSimple(ResourceKey<? extends Registry<T>> key, BuiltInRegistries.RegistryBootstrap<T> bootstrap, CallbackInfoReturnable<Registry<?>> cir)
     {
         if (key == Registries.MATERIAL_RULE)
         {
@@ -49,7 +47,7 @@ public abstract class MixinBuiltInRegistries
                 bootstrap.run(registry);
 
                 // Run our bootstrap
-                return Registry.register(registry, new ResourceLocation(TerraBlender.MOD_ID, "merged"), NamespacedSurfaceRuleSource.CODEC.codec());
+                return Registry.register(registry, new ResourceLocation(TerraBlender.MOD_ID, "merged"), (T) NamespacedSurfaceRuleSource.CODEC.codec());
             })));
         }
     }

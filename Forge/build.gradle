@@ -13,6 +13,7 @@ buildscript {
 plugins {
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.modrinth.minotaur" version "2.7.+"
+    id 'idea'
 }
 
 apply plugin: 'java'
@@ -89,7 +90,7 @@ mixin {
     config "${mod_id}_forge.mixins.json"
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     source(project(":Common").sourceSets.main.allSource)
 }
 

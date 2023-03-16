@@ -506,10 +506,7 @@ public class TBSurfaceRuleData
         builder.add(checkAbovePreliminarySurface ? surfaceRulesWithPreliminarySurfaceCheck : surfaceRules);
         builder.add(SurfaceRules.ifTrue(SurfaceRules.verticalGradient("deepslate", VerticalAnchor.absolute(0), VerticalAnchor.absolute(8)), DEEPSLATE));
 
-        return SurfaceRules.sequence(builder.build().toArray((count) ->
-        {
-            return new SurfaceRules.RuleSource[count];
-        }));
+        return SurfaceRules.sequence(builder.build().toArray(SurfaceRules.RuleSource[]::new));
     }
     
     public static SurfaceRules.RuleSource nether()

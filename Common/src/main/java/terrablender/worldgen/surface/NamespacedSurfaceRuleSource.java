@@ -20,10 +20,7 @@ package terrablender.worldgen.surface;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -51,7 +48,7 @@ public record NamespacedSurfaceRuleSource(SurfaceRules.RuleSource base, Map<Stri
     public SurfaceRules.SurfaceRule apply(SurfaceRules.Context context)
     {
         ImmutableMap.Builder<String, SurfaceRules.SurfaceRule> rules = new ImmutableMap.Builder<>();
-        this.sources.entrySet().forEach(entry -> rules.put(entry.getKey(), entry.getValue().apply(context)));
+        this.sources.forEach((key, value) -> rules.put(key, value.apply(context)));
         return new NamespacedRule(context, this.base.apply(context), rules.build());
     }
 

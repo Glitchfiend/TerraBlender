@@ -17,24 +17,9 @@
  */
 package terrablender.core;
 
-import com.mojang.serialization.Codec;
-import net.minecraft.core.HolderGetter;
-import net.minecraft.data.worldgen.biome.OverworldBiomes;
-import net.minecraft.data.worldgen.placement.MiscOverworldPlacements;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.biome.*;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import terrablender.api.Region;
 import terrablender.config.TerraBlenderConfig;
-import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
-
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public class TerraBlender {
     public static final String MOD_ID = "terrablender";

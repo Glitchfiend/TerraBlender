@@ -25,15 +25,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldOpenFlows.class)
 public class MixinWorldOpenFlows
 {
+
     @Inject(method="confirmWorldCreation", at=@At("HEAD"), cancellable = true)
-    private static void skipConfirmation(Minecraft minecraft, CreateWorldScreen screen, Lifecycle lifecycle, Runnable next, CallbackInfo ci)
+    private static void skipConfirmation(Minecraft $$0, CreateWorldScreen $$1, Lifecycle $$2, Runnable $$3, boolean $$4, CallbackInfo ci)
     {
-        next.run();
+        $$3.run();
         ci.cancel();
     }
 }

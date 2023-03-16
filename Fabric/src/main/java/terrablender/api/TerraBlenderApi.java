@@ -17,10 +17,6 @@
  */
 package terrablender.api;
 
-import net.minecraft.world.level.levelgen.SurfaceRules;
-
-import java.util.Optional;
-
 /**
  * Called using the terrablender entrypoint.
  */

@@ -39,15 +39,15 @@ public class RegionUtils
         if (biomeParameterPointCache.containsKey(biome))
             return biomeParameterPointCache.get(biome);
 
-        List<Climate.ParameterPoint> points = VANILLA_POINTS.stream().filter(pair -> pair.getSecond() == biome).map(pair -> pair.getFirst()).collect(ImmutableList.toImmutableList());
+        List<Climate.ParameterPoint> points = VANILLA_POINTS.stream().filter(pair -> pair.getSecond() == biome).map(Pair::getFirst).collect(ImmutableList.toImmutableList());
         biomeParameterPointCache.put(biome, points);
         return points;
     }
 
     static
     {
-        ImmutableList.Builder<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> builder = new ImmutableList.Builder();
-        (new OverworldBiomeBuilder()).addBiomes(pair -> builder.add(pair));
+        ImmutableList.Builder<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> builder = new ImmutableList.Builder<>();
+        (new OverworldBiomeBuilder()).addBiomes(builder::add);
         VANILLA_POINTS = builder.build();
     }
 }
