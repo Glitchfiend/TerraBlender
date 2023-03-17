@@ -35,15 +35,14 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 @Mixin(MultiNoiseBiomeSource.class)
-public class MixinMultiNoiseBiomeSource
+public abstract class MixinMultiNoiseBiomeSource
 {
     @Shadow
-    @Final
-    public Climate.ParameterList<Holder<Biome>> parameters;
+    public abstract Climate.ParameterList<Holder<Biome>> parameters();
 
     @Inject(method="getNoiseBiome(IIILnet/minecraft/world/level/biome/Climate$Sampler;)Lnet/minecraft/core/Holder;", at=@At("HEAD"), cancellable = true)
     public void getNoiseBiome(int x, int y, int z, Climate.Sampler sampler, CallbackInfoReturnable<Holder<Biome>> cir)
     {
-        cir.setReturnValue(((IExtendedParameterList<Holder<Biome>>)parameters).findValuePositional(sampler.sample(x, y, z), x, y, z));
+        cir.setReturnValue(((IExtendedParameterList<Holder<Biome>>)this.parameters()).findValuePositional(sampler.sample(x, y, z), x, y, z));
     }
 }

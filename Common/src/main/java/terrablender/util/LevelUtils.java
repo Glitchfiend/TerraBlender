@@ -93,7 +93,7 @@ public class LevelUtils
         // Set the chunk generator settings' region type
         ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRegionType(regionType);
 
-        Climate.ParameterList parameters = biomeSource.parameters;
+        Climate.ParameterList parameters = biomeSource.parameters();
         IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
 
         // Initialize the parameter list for TerraBlender

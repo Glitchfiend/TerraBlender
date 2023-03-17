@@ -1,5 +1,8 @@
 accessWidener v1 named
 
+# BiomeSource
+mutable field net/minecraft/world/level/biome/BiomeSource possibleBiomes Ljava/util/function/Supplier;
+
 # BuiltInRegistries
 accessible class net/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap
 
@@ -10,7 +13,7 @@ accessible method net/minecraft/world/level/biome/Climate$RTree$Node distance ([
 accessible class net/minecraft/world/level/biome/Climate$DistanceMetric
 
 # MultiNoiseBiomeSource
-accessible field net/minecraft/world/level/biome/MultiNoiseBiomeSource parameters Lnet/minecraft/world/level/biome/Climate$ParameterList;
+accessible method net/minecraft/world/level/biome/MultiNoiseBiomeSource parameters ()Lnet/minecraft/world/level/biome/Climate$ParameterList;
 
 # OverworldBiomeBuilder
 accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder addBiomes (Ljava/util/function/Consumer;)V

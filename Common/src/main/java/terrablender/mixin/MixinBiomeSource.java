@@ -23,6 +23,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.biome.BiomeSource;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,7 +38,8 @@ import java.util.function.Supplier;
 @Mixin(BiomeSource.class)
 public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeSource
 {
-    @Shadow public Supplier<Set<Holder<Biome>>> lazyPossibleBiomes;
+    @Shadow
+    public Supplier<Set<Holder<Biome>>> possibleBiomes;
 
     private boolean hasAppended = false;
 
@@ -50,11 +52,11 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
         }
 
         ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
-        builder.addAll(this.lazyPossibleBiomes.get());
+        builder.addAll(this.possibleBiomes.get());
         builder.addAll(biomesToAppend);
         ImmutableList<Holder<Biome>> biomeList = builder.build().stream().distinct().collect(ImmutableList.toImmutableList());
 
-        this.lazyPossibleBiomes = () -> new ObjectLinkedOpenHashSet<>(biomeList);
+        this.possibleBiomes = () -> new ObjectLinkedOpenHashSet<>(biomeList);
         this.hasAppended = true;
     }
 }

@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinWorldOpenFlows
 {
     @Inject(method="confirmWorldCreation", at=@At("HEAD"), cancellable = true)
-    private static void skipConfirmation(Minecraft minecraft, CreateWorldScreen screen, Lifecycle lifecycle, Runnable next, CallbackInfo ci)
+    private static void skipConfirmation(Minecraft minecraft, CreateWorldScreen screen, Lifecycle lifecycle, Runnable next, boolean doWarning, CallbackInfo ci)
     {
         next.run();
         ci.cancel();
