@@ -9,10 +9,10 @@
     "MixinMultiNoiseBiomeSource",
     "MixinNoiseGeneratorSettings",
     "MixinParameterList",
-    "MixinPrimaryLevelData",
-    "MixinWorldOpenFlows"
+    "MixinPrimaryLevelData"
   ],
   "client": [
+    "MixinWorldOpenFlows"
   ],
   "injectors": {
     "defaultRequire": 1
