@@ -44,14 +44,7 @@ public class MixinNoiseGeneratorSettings implements IExtendedNoiseGeneratorSetti
         if (this.regionType != null)
         {
             if (this.namespacedSurfaceRuleSource == null)
-            {
-                // This case would only theoretically be applicable for Citadel, which is broken as per https://github.com/AlexModGuy/Citadel/issues/101.
-                // This may (or may not) partially compensate for that issue, though ultimately 
-                if (this.surfaceRule instanceof NamespacedSurfaceRuleSource)
-                    this.namespacedSurfaceRuleSource = this.surfaceRule;
-                else
-                    this.namespacedSurfaceRuleSource = regionType == RegionType.NETHER ? SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.NETHER, this.surfaceRule) : SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.OVERWORLD, this.surfaceRule);
-            }
+                this.namespacedSurfaceRuleSource = regionType == RegionType.NETHER ? SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.NETHER, this.surfaceRule) : SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.OVERWORLD, this.surfaceRule);
 
             cir.setReturnValue(this.namespacedSurfaceRuleSource);
         }
