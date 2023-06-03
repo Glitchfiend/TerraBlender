@@ -92,6 +92,24 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
     }
 
     @Override
+    public int getUniqueness(int x, int y, int z)
+    {
+        return this.uniqueness.get(x, z);
+    }
+
+    @Override
+    public Climate.RTree getTree(int uniqueness)
+    {
+        return this.uniqueTrees[uniqueness];
+    }
+
+    @Override
+    public int getTreeCount()
+    {
+        return this.uniqueTrees.length;
+    }
+
+    @Override
     public T findValuePositional(Climate.TargetPoint target, int x, int y, int z)
     {
         // Fallback on findValue if we are uninitialized (may be the case for non-TerraBlender dimensions)
@@ -101,8 +119,8 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
         if (!this.treesPopulated)
             throw new RuntimeException("Attempted to call findValuePositional whilst trees remain unpopulated!");
 
-        int uniqueness = this.uniqueness.get(x, z);
-        Holder<Biome> biome = (Holder<Biome>)this.uniqueTrees[uniqueness].search(target, Climate.RTree.Node::distance);
+        int uniqueness = this.getUniqueness(x, y, z);
+        Holder<Biome> biome = (Holder<Biome>)this.getTree(uniqueness).search(target, Climate.RTree.Node::distance);
 
         if (biome.is(Region.DEFERRED_PLACEHOLDER))
             return (T)this.uniqueTrees[0].search(target, Climate.RTree.Node::distance);
