@@ -110,6 +110,12 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
     }
 
     @Override
+    public boolean isInitialized()
+    {
+        return this.initialized && this.treesPopulated;
+    }
+
+    @Override
     public T findValuePositional(Climate.TargetPoint target, int x, int y, int z)
     {
         // Fallback on findValue if we are uninitialized (may be the case for non-TerraBlender dimensions)

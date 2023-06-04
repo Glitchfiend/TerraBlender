@@ -28,4 +28,5 @@ public interface IExtendedParameterList<T>
     int getUniqueness(int x, int y, int z);
     Climate.RTree getTree(int uniqueness);
     int getTreeCount();
+    boolean isInitialized();
 }
