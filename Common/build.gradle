@@ -1,9 +1,10 @@
 plugins {
     id 'java'
     id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
+    id 'maven-publish'
 }
 
-archivesBaseName = "${mod_name}-common-${minecraft_version}"
+archivesBaseName = "${mod_name}-common"
 
 minecraft {
     accessWideners(project.file("src/main/resources/terrablender.accesswidener"))
@@ -33,5 +34,55 @@ processResources {
 
     filesMatching(['pack.mcmeta']) {
         expand buildProps
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            from components.java
+
+            pom {
+                name = 'TerraBlender-common'
+                description = "A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
+                url = 'https://github.com/Glitchfiend/TerraBlender'
+                scm {
+                    url = 'https://github.com/Glitchfiend/TerraBlender'
+                    connection = 'scm:git:git://github.com/Glitchfiend/TerraBlender.git'
+                    developerConnection = 'scm:git:git@github.com:Glitchfiend/TerraBlender.git'
+                }
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/Glitchfiend/TerraBlender/issues'
+                }
+                licenses {
+                    license {
+                        name = 'LGPLv3'
+                        url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adubbz'
+                        name = 'Adubbz'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+       maven {
+           url "https://maven.minecraftforge.net/releases/"
+           authentication {
+               basic(BasicAuthentication)
+           }
+           credentials {
+               username = System.env.MAVEN_USER ?:'fake'
+               password = System.env.MAVEN_PASSWORD ?:'news'
+           }
+       }
     }
 }
