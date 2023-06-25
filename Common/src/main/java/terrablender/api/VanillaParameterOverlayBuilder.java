@@ -49,7 +49,7 @@ public class VanillaParameterOverlayBuilder
     }
 
     /**
-     * Builds a list of {@link Climate.ParameterPoint} and {@link ResourceKey <Biome>} pairs.
+     * Builds a list of {@link Climate.ParameterPoint} and {@link net.minecraft.resources.ResourceKey<Biome>} pairs.
      * @return the built list.
      */
     public List<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> build()
