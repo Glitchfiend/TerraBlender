@@ -17,23 +17,20 @@
  */
 package terrablender.mixin;
 
-import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.biome.BiomeSource;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import terrablender.worldgen.IExtendedBiomeSource;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Mixin(BiomeSource.class)
 public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeSource
@@ -51,12 +48,11 @@ public abstract class MixinBiomeSource implements BiomeResolver, IExtendedBiomeS
             return;
         }
 
-        ImmutableList.Builder<Holder<Biome>> builder = ImmutableList.builder();
-        builder.addAll(this.possibleBiomes.get());
-        builder.addAll(biomesToAppend);
-        ImmutableList<Holder<Biome>> biomeList = builder.build().stream().distinct().collect(ImmutableList.toImmutableList());
+        List<Holder<Biome>> possibleBiomes = new ArrayList<>();
+        possibleBiomes.addAll(this.possibleBiomes.get());
+        possibleBiomes.addAll(biomesToAppend);
 
-        this.possibleBiomes = () -> new ObjectLinkedOpenHashSet<>(biomeList);
+        this.possibleBiomes = () -> new ObjectLinkedOpenHashSet<>(possibleBiomes.stream().distinct().collect(Collectors.toList()));
         this.hasAppended = true;
     }
 }

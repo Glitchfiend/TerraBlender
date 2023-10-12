@@ -17,7 +17,6 @@
  */
 package terrablender.mixin;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -35,6 +34,7 @@ import terrablender.worldgen.IExtendedParameterList;
 import terrablender.worldgen.noise.Area;
 import terrablender.worldgen.noise.LayeredNoiseUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(Climate.ParameterList.class)
@@ -75,13 +75,12 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
             }
             else
             {
-                ImmutableList.Builder<Pair<Climate.ParameterPoint, Holder<Biome>>> builder = ImmutableList.builder();
-                region.addBiomes(biomeRegistry, pair -> builder.add(pair.mapSecond(biomeRegistry::getHolderOrThrow)));
-                ImmutableList<Pair<Climate.ParameterPoint, Holder<Biome>>> uniqueValues = builder.build();
+                List<Pair<Climate.ParameterPoint, Holder<Biome>>> pairs = new ArrayList<>();
+                region.addBiomes(biomeRegistry, pair -> pairs.add(pair.mapSecond(biomeRegistry::getHolderOrThrow)));
 
                 // We can't create an RTree if there are no values present.
-                if (!uniqueValues.isEmpty())
-                    this.uniqueTrees[regionIndex] = Climate.RTree.create(uniqueValues);
+                if (!pairs.isEmpty())
+                    this.uniqueTrees[regionIndex] = Climate.RTree.create(pairs);
             }
         }
 
