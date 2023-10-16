@@ -6,7 +6,7 @@ plugins {
     id "com.modrinth.minotaur" version "2.7.+"
 }
 
-archivesBaseName = "${mod_name}-fabric"
+archivesBaseName = "${mod_id}-fabric"
 def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 dependencies {
@@ -120,7 +120,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId project.group
-            artifactId "${mod_id}-fabric"
+            artifactId project.archivesBaseName
             version project.version
             from components.java
 

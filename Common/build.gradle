@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-archivesBaseName = "${mod_name}-common"
+archivesBaseName = "${mod_id}-common"
 
 minecraft {
     accessWideners(project.file("src/main/resources/terrablender.accesswidener"))
@@ -41,7 +41,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId project.group
-            artifactId "${mod_id}-common"
+            artifactId project.archivesBaseName
             version project.version
             from components.java
 
