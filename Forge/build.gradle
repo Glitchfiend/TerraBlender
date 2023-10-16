@@ -150,7 +150,7 @@ publishing {
             // We must use artifact jar to ensure the Forge dependency is excluded from the pom, breaking fg.deobf()
             artifact jar
             groupId project.group
-            artifactId "${mod_id}"
+            artifactId "${mod_id}-forge"
             version project.version
 
             pom {

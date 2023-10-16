@@ -120,7 +120,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId project.group
-            artifactId "${mod_id}"
+            artifactId "${mod_id}-fabric"
             version project.version
             from components.java
 
