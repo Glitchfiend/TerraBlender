@@ -41,7 +41,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId project.group
-            artifactId project.archivesBaseName
+            artifactId "${mod_id}"
             version project.version
             from components.java
 
