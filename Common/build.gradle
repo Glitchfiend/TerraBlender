@@ -74,15 +74,13 @@ publishing {
         }
     }
     repositories {
-       maven {
-           url "https://maven.minecraftforge.net/releases/"
-           authentication {
-               basic(BasicAuthentication)
-           }
-           credentials {
-               username = System.env.MAVEN_USER ?:'fake'
-               password = System.env.MAVEN_PASSWORD ?:'news'
-           }
-       }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/Glitchfiend/TerraBlender"
+            credentials {
+                username = System.getenv("GITHUB_USERNAME")
+                password = System.getenv("GITHUB_PASSWORD")
+            }
+        }
     }
 }
