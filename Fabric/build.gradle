@@ -153,15 +153,12 @@ publishing {
         }
     }
     repositories {
-       maven {
-           url "https://maven.minecraftforge.net/releases/"
-           authentication {
-               basic(BasicAuthentication)
-           }
-           credentials {
-               username = System.env.MAVEN_USER ?:'fake'
-               password = System.env.MAVEN_PASSWORD ?:'news'
-           }
-       }
+        maven {
+            url = "https://maven.minecraftforge.net/releases/"
+            credentials {
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
     }
 }
