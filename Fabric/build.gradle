@@ -6,7 +6,7 @@ plugins {
     id "com.modrinth.minotaur" version "2.7.+"
 }
 
-archivesBaseName = "${mod_id}-fabric"
+archivesBaseName = "${mod_name}-fabric"
 def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 dependencies {
@@ -154,11 +154,11 @@ publishing {
     }
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/Glitchfiend/TerraBlender"
+            name = "Forge Maven"
+            url = "https://maven.minecraftforge.net/releases/"
             credentials {
-                username = System.getenv("GITHUB_USERNAME")
-                password = System.getenv("GITHUB_PASSWORD")
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
     }
