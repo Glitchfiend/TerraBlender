@@ -102,8 +102,8 @@ modrinth {
     versionName = mod_build_version + " for Fabric " + minecraft_version
     versionType = release_channel // can be release, beta, or alpha
     uploadFile = remapJar
-    gameVersions = [ minecraft_version ]
-    loaders = [ 'fabric' ]
+    gameVersions.set {minecraft_version}
+    loaders.set {'fabric'}
 
     if (changelog_file.exists()) {
         def changelog_text = changelog_file.text
