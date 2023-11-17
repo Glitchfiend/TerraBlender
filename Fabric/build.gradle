@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.4-SNAPSHOT'
     id 'maven-publish'
     id 'idea'
     id "com.matthewprenger.cursegradle" version "1.4.0"
@@ -14,7 +14,7 @@ dependencies {
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     compileOnly project(":Common")
     include implementation("com.electronwill.night-config:toml:${nightconfig_version}")
     include implementation("com.electronwill.night-config:core:${nightconfig_version}")
@@ -102,8 +102,8 @@ modrinth {
     versionName = mod_build_version + " for Fabric " + minecraft_version
     versionType = release_channel // can be release, beta, or alpha
     uploadFile = remapJar
-    gameVersions = [ minecraft_version ]
-    loaders = [ 'fabric' ]
+    gameVersions.set {minecraft_version}
+    loaders.set {'fabric'}
 
     if (changelog_file.exists()) {
         def changelog_text = changelog_file.text
