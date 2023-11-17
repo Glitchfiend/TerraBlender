@@ -24,7 +24,7 @@ minecraft {
 
 dependencies {
     compileOnly group:'org.spongepowered', name: 'mixin', version: '0.8.5'
-    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     compileOnly("com.electronwill.night-config:toml:${nightconfig_version}")
     compileOnly("com.electronwill.night-config:core:${nightconfig_version}")
 }
