@@ -27,10 +27,7 @@ import net.minecraft.world.level.biome.Climate;
 import terrablender.api.Region;
 import terrablender.api.RegionType;
 
-import java.util.List;
 import java.util.function.Consumer;
-
-import static terrablender.api.ParameterUtils.*;
 
 public class TestRegion2 extends Region
 {
