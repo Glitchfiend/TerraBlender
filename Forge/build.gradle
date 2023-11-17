@@ -1,24 +1,12 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-    }
-}
-
 plugins {
+    id "net.minecraftforge.gradle" version "6.0.+"
+    id "org.spongepowered.mixin" version "0.7-SNAPSHOT"
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.modrinth.minotaur" version "2.+"
 }
 
 apply plugin: 'java'
-apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
-apply plugin: 'org.spongepowered.mixin'
 
 archivesBaseName = "${mod_name}-forge"
 def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
