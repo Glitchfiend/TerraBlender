@@ -5,7 +5,6 @@ plugins {
     id "com.modrinth.minotaur" version "2.+"
 }
 
-apply plugin: 'maven-publish'
 
 base.archivesName.set("${mod_name}-neoforge")
 def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
