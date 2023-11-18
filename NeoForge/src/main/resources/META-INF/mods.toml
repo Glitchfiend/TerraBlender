@@ -1,0 +1,21 @@
+modLoader="javafml"
+license="LGPLv3"
+loaderVersion="[48,)"
+issueTrackerURL="https://github.com/Glitchfiend/TerraBlender/issues"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/terrablender"
+logoFile="tb_logo.png"
+
+[[mods]]
+    modId="terrablender"
+    version="${file.jarVersion}"
+    displayName="TerraBlender"
+	authors="Adubbz"
+    credits="Joseph T. McQuigg"
+    description="A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
+
+[[dependencies.terrablender]]
+modId="neoforge"
+mandatory=true
+versionRange="[20.2,)"
+ordering="NONE"
+side="BOTH"

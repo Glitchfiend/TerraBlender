@@ -1,0 +1,127 @@
+plugins {
+    id "net.neoforged.gradle.userdev" version "7.+"
+    id "net.neoforged.gradle.mixin" version "7.+"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "com.modrinth.minotaur" version "2.+"
+}
+
+apply plugin: 'maven-publish'
+
+archivesBaseName = "${mod_name}-neoforge"
+def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
+
+minecraft {
+    mappings {
+        channel = official()
+        version.put "minecraft", minecraft_version
+    }
+    accessTransformers.file('src/main/resources/META-INF/accesstransformer.cfg')
+}
+
+runs {
+    client {
+        workingDirectory.set(project.file('run'))
+    }
+
+    server {
+        workingDirectory.set(project.file('run'))
+    }
+}
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neoforge_version}"
+    compileOnly project(":Common")
+}
+
+mixin {
+    config "${mod_id}.mixins.json"
+    config "${mod_id}_neoforge.mixins.json"
+}
+
+tasks.withType(JavaCompile) {
+    source(project(":Common").sourceSets.main.allSource)
+}
+
+processResources {
+    from project(":Common").sourceSets.main.resources
+
+    filesMatching("${mod_id}.mixins.json") {
+        expand "refmap_target": "${mod_id}."
+    }
+}
+
+curseforge {
+    if (project.hasProperty('curseApiKey')) {
+        apiKey = project.getProperty('curseApiKey')
+    }
+    project {
+        id = '563928'
+
+        releaseType = release_channel
+        addGameVersion minecraft_version
+
+        mainArtifact(jar) {
+            displayName = "TerraBlender NeoForge ${version}"
+        }
+    }
+}
+
+modrinth {
+    if (project.hasProperty('modrinthToken')) {
+        token = project.getProperty('modrinthToken')
+    }
+    projectId = "terrablender"
+    versionNumber = mod_build_version
+    versionName = mod_build_version + " for NeoForge " + minecraft_version
+    versionType = release_channel // can be release, beta, or alpha
+    uploadFile = jar
+    gameVersions.set {minecraft_version}
+    loaders.set {'neoforge'}
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+
+            pom {
+                name = 'TerraBlender-forge'
+                description = "A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
+                url = 'https://github.com/Glitchfiend/TerraBlender'
+                scm {
+                    url = 'https://github.com/Glitchfiend/TerraBlender'
+                    connection = 'scm:git:git://github.com/Glitchfiend/TerraBlender.git'
+                    developerConnection = 'scm:git:git@github.com:Glitchfiend/TerraBlender.git'
+                }
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/Glitchfiend/TerraBlender/issues'
+                }
+                licenses {
+                    license {
+                        name = 'LGPLv3'
+                        url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adubbz'
+                        name = 'Adubbz'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = "https://maven.minecraftforge.net/releases/"
+            credentials {
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}

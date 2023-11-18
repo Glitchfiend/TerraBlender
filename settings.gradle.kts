@@ -19,4 +19,4 @@ pluginManagement.repositories {
 }
 
 rootProject.name = "TerraBlender"
-include("Common", "Fabric", "Forge")
+include("Common", "Fabric", "Forge", "NeoForge")

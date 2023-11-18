@@ -83,3 +83,5 @@ publishing {
         }
     }
 }
+
+tasks.register("idePostSync")
