@@ -19,12 +19,19 @@ minecraft {
 }
 
 runs {
+    configureEach {
+        modSource project.sourceSets.main
+    }
+
     client {
         workingDirectory.set(project.file('run'))
+        systemProperty 'neoforge.enabledGameTestNamespaces', 'terrablender'
     }
 
     server {
         workingDirectory.set(project.file('run'))
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        programArgument '--nogui'
     }
 }
 
