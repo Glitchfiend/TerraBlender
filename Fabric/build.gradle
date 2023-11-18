@@ -6,7 +6,7 @@ plugins {
     id "com.modrinth.minotaur" version "2.+"
 }
 
-archivesBaseName = "${mod_name}-fabric"
+base.archivesName.set("${mod_name}-fabric")
 def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 dependencies {

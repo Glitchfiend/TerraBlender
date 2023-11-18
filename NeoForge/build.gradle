@@ -7,7 +7,7 @@ plugins {
 
 apply plugin: 'maven-publish'
 
-archivesBaseName = "${mod_name}-neoforge"
+base.archivesName.set("${mod_name}-neoforge")
 def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 minecraft {

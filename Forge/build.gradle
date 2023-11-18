@@ -8,7 +8,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-archivesBaseName = "${mod_name}-forge"
+base.archivesName.set("${mod_name}-forge")
 def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 minecraft {

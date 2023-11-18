@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-archivesBaseName = "${mod_name}-common"
+base.archivesName.set("${mod_name}-common")
 
 minecraft {
     accessWideners(project.file("src/main/resources/terrablender.accesswidener"))
