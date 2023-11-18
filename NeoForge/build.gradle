@@ -38,13 +38,25 @@ mixin {
     config "${mod_id}_neoforge.mixins.json"
 }
 
-tasks.withType(JavaCompile) {
+// NeoGradle compiles the game, but we don't want to add our common code to the game's code
+TaskCollection.metaClass.excludingNeoTasks = { ->
+    delegate.matching { !it.name.startsWith("neo") }
+}
+
+tasks.withType(JavaCompile).excludingNeoTasks().configureEach {
     source(project(":Common").sourceSets.main.allSource)
 }
 
-processResources {
-    from project(":Common").sourceSets.main.resources
+tasks.withType(Javadoc).excludingNeoTasks().configureEach {
+    source(project(":Common").sourceSets.main.allJava)
+}
 
+tasks.named("sourcesJar", Jar) {
+    from(project(":Common").sourceSets.main.allSource)
+}
+
+tasks.withType(ProcessResources).excludingNeoTasks().configureEach {
+    from project(":Common").sourceSets.main.resources
     filesMatching("${mod_id}.mixins.json") {
         expand "refmap_target": "${mod_id}."
     }
