@@ -107,7 +107,7 @@ publishing {
             version project.version
 
             pom {
-                name = 'TerraBlender-forge'
+                name = 'TerraBlender-neoforge'
                 description = "A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
                 url = 'https://github.com/Glitchfiend/TerraBlender'
                 scm {
