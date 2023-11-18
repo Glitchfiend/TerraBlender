@@ -19,11 +19,7 @@ package terrablender.core;
 
 
 import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import terrablender.config.TerraBlenderConfig;
@@ -34,16 +30,7 @@ public class TerraBlenderNeoForge {
     private static final TerraBlenderConfig CONFIG = new TerraBlenderConfig(FMLPaths.CONFIGDIR.get().resolve(TerraBlender.MOD_ID + ".toml"));
 
     public TerraBlenderNeoForge() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::loadComplete);
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, InitializationHandler::onServerAboutToStart);
         TerraBlender.setConfig(CONFIG);
-    }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
-    }
-
-    private void loadComplete(final FMLLoadCompleteEvent event) {
     }
 }

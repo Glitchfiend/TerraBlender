@@ -17,11 +17,7 @@
  */
 package terrablender.core;
 
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import terrablender.config.TerraBlenderConfig;
 
@@ -30,15 +26,8 @@ public class TerraBlenderForge {
     private static final TerraBlenderConfig CONFIG = new TerraBlenderConfig(FMLPaths.CONFIGDIR.get().resolve(TerraBlender.MOD_ID + ".toml"));
 
     public TerraBlenderForge() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::loadComplete);
         TerraBlender.setConfig(CONFIG);
     }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
-    }
-
-    private void loadComplete(final FMLLoadCompleteEvent event) {
-    }
 }
+
+
