@@ -17,15 +17,19 @@
  */
 package terrablender.core;
 
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
 import terrablender.config.TerraBlenderConfig;
+import terrablender.handler.InitializationHandler;
 
 @Mod(value = TerraBlender.MOD_ID)
 public class TerraBlenderForge {
     private static final TerraBlenderConfig CONFIG = new TerraBlenderConfig(FMLPaths.CONFIGDIR.get().resolve(TerraBlender.MOD_ID + ".toml"));
 
     public TerraBlenderForge() {
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, InitializationHandler::onServerAboutToStart);
         TerraBlender.setConfig(CONFIG);
     }
 }

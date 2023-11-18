@@ -18,16 +18,10 @@
 package terrablender.handler;
 
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import terrablender.util.LevelUtils;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class InitializationHandler
 {
-    // Use the lowest priority to account for nonsense from e.g. MCreator.
-    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onServerAboutToStart(ServerAboutToStartEvent event)
     {
         LevelUtils.initializeOnServerStart(event.getServer());
