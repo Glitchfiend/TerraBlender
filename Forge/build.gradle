@@ -90,8 +90,6 @@ processResources {
 
 jar.finalizedBy('reobfJar')
 
-def changelog_file = rootProject.file("build/TerraBlender-${version}-changelog.txt")
-
 curseforge {
     if (project.hasProperty('curseApiKey')) {
         apiKey = project.getProperty('curseApiKey')
@@ -125,8 +123,7 @@ modrinth {
     loaders = ['forge']
 
     if (changelog_file.exists()) {
-        def changelog_text = changelog_file.text
-        changelog = "```\n" + changelog_text.substring(0, changelog_text.indexOf("=========")).replace("\t", "    ") + "```"
+        changelog = changelog_file.text
     }
     // debugMode = true
 }

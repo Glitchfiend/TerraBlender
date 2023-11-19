@@ -5,15 +5,16 @@ plugins {
     id 'net.minecraftforge.gradleutils' version '[2.1.3,)'
 }
 
-version = "${minecraft_version}-${mod_version}.${System.getenv().BUILD_NUMBER}"
-
-ext {
-    mod_version = gradleutils.getFilteredTagOffsetVersion(true, '[0-9]', MC_VERSION)
-}
-
 changelog {
     fromMergeBase()
 }
+
+ext {
+    mod_version = gradleutils.getTagOffsetVersion()
+    changelog_file = rootProject.file("build/changelog.txt")
+}
+
+version = "${minecraft_version}-${mod_version}"
 
 subprojects {
     apply plugin: 'java'
@@ -25,16 +26,15 @@ subprojects {
     java.withJavadocJar()
 
     version = rootProject.version
-    def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
     jar {
         manifest {
             attributes([
                 'Specification-Title'     : mod_name,
                 'Specification-Vendor'    : mod_author,
-                'Specification-Version'   : mod_build_version,
+                'Specification-Version'   : mod_version,
                 'Implementation-Title'    : project.name,
-                'Implementation-Version'  : mod_build_version,
+                'Implementation-Version'  : mod_version,
                 'Implementation-Vendor'   : mod_author,
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                 'Timestamp'               : System.currentTimeMillis(),

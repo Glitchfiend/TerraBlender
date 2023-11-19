@@ -74,6 +74,10 @@ curseforge {
     project {
         id = '940057'
 
+        if (changelog_file.exists()) {
+            changelog = changelog_file
+        }
+
         releaseType = release_channel
         addGameVersion minecraft_version
 
@@ -94,6 +98,10 @@ modrinth {
     uploadFile = jar
     gameVersions = [minecraft_version]
     loaders = ['neoforge']
+
+    if (changelog_file.exists()) {
+        changelog = changelog_file.text
+    }
 }
 
 publishing {
