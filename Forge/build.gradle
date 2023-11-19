@@ -121,8 +121,8 @@ modrinth {
     versionName = mod_build_version + " for Forge " + minecraft_version
     versionType = release_channel // can be release, beta, or alpha
     uploadFile = jar
-    gameVersions.set {minecraft_version}
-    loaders.set {'forge'}
+    gameVersions = [minecraft_version]
+    loaders = ['forge']
 
     if (changelog_file.exists()) {
         def changelog_text = changelog_file.text
