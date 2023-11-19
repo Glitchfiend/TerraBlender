@@ -6,7 +6,7 @@ plugins {
 }
 
 changelog {
-    fromMergeBase()
+    fromTag '3.2.0'
 }
 
 ext {
