@@ -99,7 +99,7 @@ modrinth {
     loaders = ['neoforge']
 
     if (changelog_file.exists()) {
-        changelog = changelog_file.text
+        changelog = '```\n' + changelog_file.text + '\n```'
     }
 }
 
