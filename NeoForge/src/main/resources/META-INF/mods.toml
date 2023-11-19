@@ -9,7 +9,7 @@ logoFile="tb_logo.png"
     modId="terrablender"
     version="${file.jarVersion}"
     displayName="TerraBlender"
-	authors="Adubbz"
+    authors="Adubbz"
     credits="Joseph T. McQuigg"
     description="A library mod for adding biomes in a simple and compatible manner with Minecraft's new biome/terrain system."
 
