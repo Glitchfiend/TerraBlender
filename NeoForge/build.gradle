@@ -73,7 +73,7 @@ curseforge {
         apiKey = project.getProperty('curseApiKey')
     }
     project {
-        id = '563928'
+        id = '940057'
 
         releaseType = release_channel
         addGameVersion minecraft_version
