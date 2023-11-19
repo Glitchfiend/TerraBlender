@@ -6,7 +6,6 @@ plugins {
 }
 
 base.archivesName.set("${mod_name}-neoforge")
-def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 minecraft {
     mappings {
@@ -92,8 +91,8 @@ modrinth {
         token = project.getProperty('modrinthToken')
     }
     projectId = "terrablender"
-    versionNumber = mod_build_version
-    versionName = mod_build_version + " for NeoForge " + minecraft_version
+    versionNumber = mod_version
+    versionName = mod_version + " for NeoForge " + minecraft_version
     versionType = release_channel // can be release, beta, or alpha
     uploadFile = jar
     gameVersions = [minecraft_version]

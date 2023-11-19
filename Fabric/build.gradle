@@ -5,7 +5,6 @@ plugins {
 }
 
 base.archivesName.set("${mod_name}-fabric")
-def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
@@ -41,7 +40,7 @@ processResources {
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": mod_build_version
+        expand "version": mod_version
     }
     
     filesMatching("${mod_id}.mixins.json") {
@@ -94,8 +93,8 @@ modrinth {
         token = project.getProperty('modrinthToken')
     }
     projectId = "terrablender"
-    versionNumber = mod_build_version
-    versionName = mod_build_version + " for Fabric " + minecraft_version
+    versionNumber = mod_version
+    versionName = mod_version + " for Fabric " + minecraft_version
     versionType = release_channel // can be release, beta, or alpha
     uploadFile = remapJar
     gameVersions = [minecraft_version]
