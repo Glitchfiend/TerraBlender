@@ -122,7 +122,7 @@ modrinth {
     loaders = ['forge']
 
     if (changelog_file.exists()) {
-        cchangelog = '```\n' + changelog_file.text + '\n```'
+        changelog = '```\n' + changelog_file.text + '\n```'
     }
     // debugMode = true
 }
