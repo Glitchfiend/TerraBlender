@@ -15,15 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package terrablender.handler;
+package terrablender.example;
 
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import terrablender.util.LevelUtils;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 
-public class InitializationHandler
+public class TestBiomes
 {
-    public static void onServerAboutToStart(ServerAboutToStartEvent event)
+    public static final ResourceKey<Biome> HOT_RED = register("hot_red");
+    public static final ResourceKey<Biome> COLD_BLUE = register("cold_blue");
+
+    private static ResourceKey<Biome> register(String name)
     {
-        LevelUtils.initializeOnServerStart(event.getServer());
+        return ResourceKey.create(Registries.BIOME, new ResourceLocation(TestMod.MOD_ID, name));
     }
 }

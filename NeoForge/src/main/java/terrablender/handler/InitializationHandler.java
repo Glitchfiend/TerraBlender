@@ -17,11 +17,13 @@
  */
 package terrablender.handler;
 
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
+
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import terrablender.util.LevelUtils;
 
 public class InitializationHandler
 {
+    // Use the lowest priority to account for nonsense from e.g. MCreator.
     public static void onServerAboutToStart(ServerAboutToStartEvent event)
     {
         LevelUtils.initializeOnServerStart(event.getServer());

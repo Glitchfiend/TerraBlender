@@ -1,0 +1,26 @@
+modLoader="javafml"
+license="LGPLv3"
+loaderVersion="[1,)"
+issueTrackerURL="https://github.com/Glitchfiend/TerraBlender/issues"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/terrablender"
+
+[[mods]]
+    modId="test"
+    version="${file.jarVersion}"
+    displayName="Test"
+	authors="Adubbz"
+    description="A simple test mod for TerraBlender."
+
+[[dependencies.test]]
+    modId="neoforge"
+    mandatory=true
+    versionRange="[20.2,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.test]]
+    modId="terrablender"
+    mandatory=true
+    versionRange="[1.0.0.59,)"
+    ordering="NONE"
+    side="BOTH"

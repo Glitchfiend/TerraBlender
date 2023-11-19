@@ -15,15 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package terrablender.handler;
+package terrablender.core;
 
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import terrablender.util.LevelUtils;
 
-public class InitializationHandler
-{
-    public static void onServerAboutToStart(ServerAboutToStartEvent event)
-    {
-        LevelUtils.initializeOnServerStart(event.getServer());
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.common.NeoForge;
+import terrablender.config.TerraBlenderConfig;
+import terrablender.handler.InitializationHandler;
+
+@Mod(value = TerraBlender.MOD_ID)
+public class TerraBlenderNeoForge {
+    private static final TerraBlenderConfig CONFIG = new TerraBlenderConfig(FMLPaths.CONFIGDIR.get().resolve(TerraBlender.MOD_ID + ".toml"));
+
+    public TerraBlenderNeoForge() {
+        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, InitializationHandler::onServerAboutToStart);
+        TerraBlender.setConfig(CONFIG);
     }
 }

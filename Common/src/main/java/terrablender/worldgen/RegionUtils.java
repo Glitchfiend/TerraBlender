@@ -32,7 +32,7 @@ public class RegionUtils
 {
     private static final List<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> VANILLA_POINTS;
 
-    private static Map<ResourceKey<Biome>, List<Climate.ParameterPoint>> biomeParameterPointCache = Maps.newHashMap();;
+    private static Map<ResourceKey<Biome>, List<Climate.ParameterPoint>> biomeParameterPointCache = Maps.newHashMap();
 
     public static List<Climate.ParameterPoint> getVanillaParameterPoints(ResourceKey<Biome> biome)
     {

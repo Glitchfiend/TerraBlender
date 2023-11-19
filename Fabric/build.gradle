@@ -1,12 +1,10 @@
 plugins {
-    id 'fabric-loom' version '1.4-SNAPSHOT'
-    id 'maven-publish'
-    id 'idea'
+    id "fabric-loom" version "1.4-SNAPSHOT"
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.modrinth.minotaur" version "2.+"
 }
 
-archivesBaseName = "${mod_name}-fabric"
+base.archivesName.set("${mod_name}-fabric")
 def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
 dependencies {
