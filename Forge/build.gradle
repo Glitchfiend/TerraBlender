@@ -88,7 +88,7 @@ processResources {
 jar.finalizedBy('reobfJar')
 
 curseforge {
-    apiKey = project.findProperty('curseApiKey')
+    apiKey = project.findProperty('curseApiKey') ?: 'unset'
     project {
         id = '563928'
 

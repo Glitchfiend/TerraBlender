@@ -67,7 +67,7 @@ tasks.withType(ProcessResources).excludingNeoTasks().configureEach {
 }
 
 curseforge {
-    apiKey = project.findProperty('curseApiKey')
+    apiKey = project.findProperty('curseApiKey') ?: 'unset'
     project {
         id = '940057'
 

@@ -59,7 +59,7 @@ jar {
 }
 
 curseforge {
-    apiKey = project.findProperty('curseApiKey')
+    apiKey = project.findProperty('curseApiKey') ?: 'unset'
     project {
         id = '565956'
 
