@@ -22,12 +22,12 @@ runs {
 
     client {
         workingDirectory.set(project.file('run'))
-        systemProperty 'neoforge.enabledGameTestNamespaces', 'terrablender'
+        systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
     }
 
     server {
         workingDirectory.set(project.file('run'))
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
         programArgument '--nogui'
     }
 }
@@ -67,9 +67,7 @@ tasks.withType(ProcessResources).excludingNeoTasks().configureEach {
 }
 
 curseforge {
-    if (project.hasProperty('curseApiKey')) {
-        apiKey = project.getProperty('curseApiKey')
-    }
+    apiKey = project.findProperty('curseApiKey')
     project {
         id = '940057'
 
@@ -79,6 +77,7 @@ curseforge {
 
         releaseType = release_channel
         addGameVersion minecraft_version
+        addGameVersion 'NeoForge' // NeoForge isn't auto-detected and must be manually specified
 
         mainArtifact(jar) {
             displayName = "TerraBlender NeoForge ${version}"
@@ -87,9 +86,7 @@ curseforge {
 }
 
 modrinth {
-    if (project.hasProperty('modrinthToken')) {
-        token = project.getProperty('modrinthToken')
-    }
+    token = project.findProperty('modrinthToken')
     projectId = "terrablender"
     versionNumber = mod_version
     versionName = mod_version + " for NeoForge " + minecraft_version

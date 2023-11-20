@@ -5,12 +5,10 @@ plugins {
     id "com.modrinth.minotaur" version "2.+"
 }
 
-
 base.archivesName.set("${mod_name}-forge")
 
 minecraft {
     mappings channel: 'official', version: minecraft_version
-
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -90,9 +88,7 @@ processResources {
 jar.finalizedBy('reobfJar')
 
 curseforge {
-    if (project.hasProperty('curseApiKey')) {
-        apiKey = project.getProperty('curseApiKey')
-    }
+    apiKey = project.findProperty('curseApiKey')
     project {
         id = '563928'
 
@@ -110,9 +106,7 @@ curseforge {
 }
 
 modrinth {
-    if (project.hasProperty('modrinthToken')) {
-        token = project.getProperty('modrinthToken')
-    }
+    token = project.findProperty('modrinthToken')
     projectId = "terrablender"
     versionNumber = mod_version
     versionName = mod_version + " for Forge " + minecraft_version
@@ -124,7 +118,6 @@ modrinth {
     if (changelog_file.exists()) {
         changelog = '```\n' + changelog_file.text + '\n```'
     }
-    // debugMode = true
 }
 
 publishing {

@@ -59,10 +59,7 @@ jar {
 }
 
 curseforge {
-    if (project.hasProperty('curseApiKey')) {
-        apiKey = project.getProperty('curseApiKey')
-    }
-
+    apiKey = project.findProperty('curseApiKey')
     project {
         id = '565956'
 
@@ -89,9 +86,7 @@ curseforge {
 }
 
 modrinth {
-    if (project.hasProperty('modrinthToken')) {
-        token = project.getProperty('modrinthToken')
-    }
+    token = project.findProperty('modrinthToken')
     projectId = "terrablender"
     versionNumber = mod_version
     versionName = mod_version + " for Fabric " + minecraft_version
@@ -107,7 +102,6 @@ modrinth {
     dependencies {
         required.project "fabric-api"
     }
-    // debugMode = true
 }
 
 publishing {
