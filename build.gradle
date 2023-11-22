@@ -2,7 +2,7 @@ plugins {
     // Required for NeoGradle
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
     // Used for changelog generation
-    id 'net.minecraftforge.gradleutils' version '[2.1.3,)'
+    id 'net.minecraftforge.gradleutils' version '2.2.0'
 }
 
 changelog {
@@ -12,6 +12,10 @@ changelog {
 ext {
     mod_version = gradleutils.getTagOffsetVersion()
     changelog_file = rootProject.file("build/changelog.txt")
+    trimChangelog = (String text) -> {
+        def m = text =~ /(?s) - (?:[0-9.]+) (.+?)(?=( - )|$)/
+        return '```\n' + m[0][1].replaceAll(/(?m)^ */, '')
+    }
 }
 
 version = "${minecraft_version}-${mod_version}"

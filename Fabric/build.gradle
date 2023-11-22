@@ -96,7 +96,7 @@ modrinth {
     loaders = ['fabric']
 
     if (changelog_file.exists()) {
-        changelog = '```\n' + changelog_file.text
+        trimChangelog(changelog_file.text)
     }
 
     dependencies {

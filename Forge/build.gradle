@@ -116,7 +116,7 @@ modrinth {
     loaders = ['forge']
 
     if (changelog_file.exists()) {
-        changelog = '```\n' + changelog_file.text
+        trimChangelog(changelog_file.text)
     }
 }
 
