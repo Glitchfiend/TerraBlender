@@ -96,7 +96,7 @@ modrinth {
     loaders = ['neoforge']
 
     if (changelog_file.exists()) {
-        trimChangelog(changelog_file.text)
+        changelog = trimChangelog(changelog_file.text)
     }
 }
 
