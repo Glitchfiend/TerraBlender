@@ -17,12 +17,6 @@ minecraft {
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}_forge.mixins.json"
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Client'
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
         }
 
         server {
@@ -30,12 +24,6 @@ minecraft {
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}_forge.mixins.json"
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Server'
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
         }
 
         data {
@@ -43,12 +31,6 @@ minecraft {
             ideaModule "${rootProject.name}.${project.name}.main"
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}_forge.mixins.json"
             taskName 'Data'
-            mods {
-                modDataRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
         }
     }
 }
@@ -75,6 +57,16 @@ mixin {
 
 tasks.withType(JavaCompile) {
     source(project(":Common").sourceSets.main.allSource)
+}
+
+// Merge the resources and classes into the same directory.
+// This is done because java expects modules to be in a single directory.
+// And if we have it in multiple we have to do performance intensive hacks like having the UnionFileSystem
+// This will eventually be migrated to ForgeGradle so modders don't need to manually do it. But that is later.
+sourceSets.each {
+    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+    it.output.resourcesDir = dir
+    it.java.destinationDirectory = dir
 }
 
 processResources {
