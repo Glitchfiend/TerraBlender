@@ -18,7 +18,10 @@ minecraft {
 }
 
 repositories {
-    maven "https://maven.minecraftforge.net"
+    maven {
+        name = "Forge"
+        url = "https://maven.minecraftforge.net"
+    }
 }
 
 dependencies {
