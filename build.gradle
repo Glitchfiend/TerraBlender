@@ -4,7 +4,7 @@ plugins {
 }
 
 changelog {
-    fromTag '3.2.0'
+    fromTag '3.0.1'
 }
 
 ext {
