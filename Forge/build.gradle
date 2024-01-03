@@ -1,37 +1,15 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-    }
-}
-
 plugins {
+    id "net.minecraftforge.gradle" version "[6.0,6.2.)"
+    id "org.spongepowered.mixin" version "0.7-SNAPSHOT"
     id "com.matthewprenger.cursegradle" version "1.4.0"
-    id "com.modrinth.minotaur" version "2.7.+"
+    id "com.modrinth.minotaur" version "2.+"
 }
 
-apply plugin: 'java'
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'maven-publish'
-apply plugin: 'org.spongepowered.mixin'
-
-archivesBaseName = "${mod_name}-forge"
-def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
+base.archivesName.set("${mod_name}-forge")
 
 minecraft {
     mappings channel: 'official', version: minecraft_version
-    
-    if (project.hasProperty('forge_ats_enabled') && project.findProperty('forge_ats_enabled').toBoolean()) {
-        // This location is hardcoded in Forge and can not be changed.
-        // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
-        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-        project.logger.debug('Forge Access Transformers are enabled for this project.')
-    }
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
@@ -39,12 +17,6 @@ minecraft {
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}_forge.mixins.json"
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Client'
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
         }
 
         server {
@@ -52,12 +24,6 @@ minecraft {
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}_forge.mixins.json"
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Server'
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
         }
 
         data {
@@ -65,12 +31,6 @@ minecraft {
             ideaModule "${rootProject.name}.${project.name}.main"
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}_forge.mixins.json"
             taskName 'Data'
-            mods {
-                modDataRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
         }
     }
 }
@@ -83,6 +43,12 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
+// Workaround for SpongePowered/MixinGradle#38
+afterEvaluate {
+    tasks.configureReobfTaskForReobfJar.mustRunAfter(tasks.compileJava)
+    tasks.configureReobfTaskForReobfJarJar.mustRunAfter(tasks.compileJava)
+}
+
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
     config "${mod_id}.mixins.json"
@@ -91,6 +57,16 @@ mixin {
 
 tasks.withType(JavaCompile) {
     source(project(":Common").sourceSets.main.allSource)
+}
+
+// Merge the resources and classes into the same directory.
+// This is done because java expects modules to be in a single directory.
+// And if we have it in multiple we have to do performance intensive hacks like having the UnionFileSystem
+// This will eventually be migrated to ForgeGradle so modders don't need to manually do it. But that is later.
+sourceSets.each {
+    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+    it.output.resourcesDir = dir
+    it.java.destinationDirectory = dir
 }
 
 processResources {
@@ -103,12 +79,8 @@ processResources {
 
 jar.finalizedBy('reobfJar')
 
-def changelog_file = rootProject.file("build/TerraBlender-${version}-changelog.txt")
-
 curseforge {
-    if (project.hasProperty('curseApiKey')) {
-        apiKey = project.getProperty('curseApiKey')
-    }
+    apiKey = project.findProperty('curseApiKey') ?: 'unset'
     project {
         id = '563928'
 
@@ -126,22 +98,18 @@ curseforge {
 }
 
 modrinth {
-    if (project.hasProperty('modrinthToken')) {
-        token = project.getProperty('modrinthToken')
-    }
+    token = project.findProperty('modrinthToken')
     projectId = "terrablender"
-    versionNumber = mod_build_version
-    versionName = mod_build_version + " for Forge " + minecraft_version
+    versionNumber = mod_version
+    versionName = mod_version + " for Forge " + minecraft_version
     versionType = release_channel // can be release, beta, or alpha
     uploadFile = jar
-    gameVersions = [ minecraft_version ]
-    loaders = [ 'forge' ]
+    gameVersions = [minecraft_version]
+    loaders = ['forge']
 
     if (changelog_file.exists()) {
-        def changelog_text = changelog_file.text
-        changelog = "```\n" + changelog_text.substring(0, changelog_text.indexOf("=========")).replace("\t", "    ") + "```"
+        changelog = trimChangelog(changelog_file.text)
     }
-    // debugMode = true
 }
 
 publishing {
@@ -183,13 +151,10 @@ publishing {
     }
     repositories {
         maven {
-            url "https://maven.minecraftforge.net/releases/"
-            authentication {
-                basic(BasicAuthentication)
-            }
+            url = "https://maven.minecraftforge.net/releases/"
             credentials {
-                username = System.env.MAVEN_USER ?:'fake'
-                password = System.env.MAVEN_PASSWORD ?:'news'
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
     }

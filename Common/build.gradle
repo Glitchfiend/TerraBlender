@@ -1,10 +1,8 @@
 plugins {
-    id 'java'
     id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
-    id 'maven-publish'
 }
 
-archivesBaseName = "${mod_name}-common"
+base.archivesName.set("${mod_name}-common")
 
 minecraft {
     accessWideners(project.file("src/main/resources/terrablender.accesswidener"))
@@ -24,7 +22,7 @@ minecraft {
 
 dependencies {
     compileOnly group:'org.spongepowered', name: 'mixin', version: '0.8.5'
-    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     compileOnly("com.electronwill.night-config:toml:${nightconfig_version}")
     compileOnly("com.electronwill.night-config:core:${nightconfig_version}")
 }
@@ -75,13 +73,10 @@ publishing {
     }
     repositories {
        maven {
-           url "https://maven.minecraftforge.net/releases/"
-           authentication {
-               basic(BasicAuthentication)
-           }
+           url = "https://maven.minecraftforge.net/releases/"
            credentials {
-               username = System.env.MAVEN_USER ?:'fake'
-               password = System.env.MAVEN_PASSWORD ?:'news'
+               username = System.getenv("MAVEN_USER")
+               password = System.getenv("MAVEN_PASSWORD")
            }
        }
     }

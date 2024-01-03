@@ -1,32 +1,51 @@
-version = "${minecraft_version}-${mod_version}.${System.getenv().BUILD_NUMBER}"
+plugins {
+    // Used for changelog generation
+    id 'net.minecraftforge.gradleutils' version '2.2.0'
+}
+
+changelog {
+    fromTag '3.0.1'
+}
+
+ext {
+    mod_version = gradleutils.getTagOffsetVersion()
+    changelog_file = rootProject.file("build/changelog.txt")
+    trimChangelog = (String text) -> {
+        def m = text =~ /(?s) - (?:[0-9.]+) (.+?)(?=( - )|$)/
+        return '```\n' + m[0][1].replaceAll(/(?m)^ */, '')
+    }
+}
+
+version = "${minecraft_version}-${mod_version}"
 
 subprojects {
     apply plugin: 'java'
-    
+    apply plugin: 'idea'
+    apply plugin: 'maven-publish'
+
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
     java.withJavadocJar()
 
     version = rootProject.version
-    def mod_build_version = "${mod_version}.${System.getenv().BUILD_NUMBER}"
 
     jar {
         manifest {
             attributes([
-                'Specification-Title'     : mod_name,
-                'Specification-Vendor'    : mod_author,
-                'Specification-Version'   : mod_build_version,
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : mod_build_version,
-                'Implementation-Vendor'   : mod_author,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'Timestampe'              : System.currentTimeMillis(),
-                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
-                'Build-On-Minecraft'      : minecraft_version
+                    'Specification-Title'     : mod_name,
+                    'Specification-Vendor'    : mod_author,
+                    'Specification-Version'   : mod_version,
+                    'Implementation-Title'    : project.name,
+                    'Implementation-Version'  : mod_version,
+                    'Implementation-Vendor'   : mod_author,
+                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    'Timestamp'               : System.currentTimeMillis(),
+                    'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+                    'Build-On-Minecraft'      : minecraft_version
             ])
         }
     }
-    
+
     repositories {
         mavenCentral()
         maven {
@@ -37,7 +56,7 @@ subprojects {
 
     tasks.withType(JavaCompile).configureEach {
         it.options.encoding = 'UTF-8'
-        it.options.release = 17
+        it.options.release.set(17)
     }
 
     // Disables Gradle's custom module metadata from being published to maven. The
