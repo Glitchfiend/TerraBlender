@@ -1,7 +1,3 @@
-package terrablender.worldgen;
-
-import terrablender.api.RegionType;
-
 /**
  * Copyright (C) Glitchfiend
  * <p>
@@ -19,8 +15,11 @@ import terrablender.api.RegionType;
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+package terrablender.worldgen;
+
+import terrablender.api.SurfaceRuleManager;
+
 public interface IExtendedNoiseGeneratorSettings
 {
-    void setRegionType(RegionType regionType);
-    RegionType getRegionType();
+    void setRuleCategory(SurfaceRuleManager.RuleCategory ruleCategory);
 }

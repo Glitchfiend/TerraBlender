@@ -36,31 +36,25 @@ public class MixinNoiseGeneratorSettings implements IExtendedNoiseGeneratorSetti
     private SurfaceRules.RuleSource surfaceRule;
 
     @Unique
-    private RegionType regionType = null;
+    private SurfaceRuleManager.RuleCategory ruleCategory = null;
     @Unique
     private SurfaceRules.RuleSource namespacedSurfaceRuleSource = null;
 
     @Inject(method = "surfaceRule", at = @At("HEAD"), cancellable = true)
     private void surfaceRule(CallbackInfoReturnable<SurfaceRules.RuleSource> cir)
     {
-        if (this.regionType != null)
+        if (this.ruleCategory != null)
         {
             if (this.namespacedSurfaceRuleSource == null)
-                this.namespacedSurfaceRuleSource = regionType == RegionType.NETHER ? SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.NETHER, this.surfaceRule) : SurfaceRuleManager.getNamespacedRules(SurfaceRuleManager.RuleCategory.OVERWORLD, this.surfaceRule);
+                this.namespacedSurfaceRuleSource = SurfaceRuleManager.getNamespacedRules(this.ruleCategory, this.surfaceRule);
 
             cir.setReturnValue(this.namespacedSurfaceRuleSource);
         }
     }
 
     @Override
-    public void setRegionType(RegionType regionType)
+    public void setRuleCategory(SurfaceRuleManager.RuleCategory ruleCategory)
     {
-        this.regionType = regionType;
-    }
-
-    @Override
-    public RegionType getRegionType()
-    {
-        return this.regionType;
+        this.ruleCategory = ruleCategory;
     }
 }

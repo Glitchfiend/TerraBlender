@@ -116,6 +116,9 @@ public class SurfaceRuleManager
 
         if (category == RuleCategory.NETHER)
             return TBSurfaceRuleData.nether();
+        else if (category == RuleCategory.END) {
+            return TBSurfaceRuleData.end();
+        }
 
         return TBSurfaceRuleData.overworld();
     }
@@ -125,7 +128,7 @@ public class SurfaceRuleManager
      */
     public enum RuleCategory
     {
-        OVERWORLD, NETHER
+        OVERWORLD, NETHER, END
     }
 
     /**
