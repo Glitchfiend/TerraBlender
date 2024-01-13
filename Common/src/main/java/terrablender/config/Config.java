@@ -17,165 +17,218 @@
  */
 package terrablender.config;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.*;
+import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.toml.TomlFormat;
-import net.minecraft.util.StringRepresentable;
+import com.google.common.base.Predicates;
+import terrablender.core.TerraBlender;
 
-import java.util.Comparator;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.function.Predicate;
 
-public class Config
+public abstract class Config implements UnmodifiableConfig, CommentedConfig
 {
-    private final CommentedConfig config;
+    private CommentedConfig config;
+    private final Path path;
 
-    public Config(CommentedConfig config)
+    protected Config(Path path)
     {
-        this.config = config;
+        this(path, readToml(path));
     }
 
-    public <T> List<T> addList(String comment, String key, List<T> defaultValue)
+    protected Config(Path path, String toml)
     {
-        if (config.get(key) == null)
-        {
-            config.set(key, defaultValue);
-        }
-
-        if (config.getComment(key) == null)
-        {
-            config.setComment(key, comment);
-        }
-        return config.get(key);
+        this.parse(toml);
+        this.path = path;
+        this.load();
+        this.write();
     }
 
-    public Config addSubConfig(String comment, String key, Config defaultValue)
+    public <T> T add(String key, T defaultValue, String comment)
     {
-        if (config.get(key) == null)
-        {
-            config.set(key, sortConfig(defaultValue.config));
-        }
-
-        CommentedConfig subConfig = config.get(key);
-        String commentValue = config.getComment(key);
-        if (commentValue == null)
-        {
-            config.setComment(key, comment);
-        }
-
-        return new Config(subConfig);
+        return this.add(key, defaultValue, comment, Predicates.alwaysTrue());
     }
 
-    public Map<?, ?> addMap(String comment, String key, Map<?, Number> defaultValue)
+    public <T> T add(String key, T defaultValue, String comment, Predicate<T> validator)
     {
-        if (config.get(key) == null)
+        var value = config.getOrElse(key, defaultValue);
+
+        // Revert to default if validation fails
+        if (!validator.test(value))
         {
-            CommentedConfig subConfig = config.createSubConfig();
-            defaultValue.forEach((a, b) -> {
-                String subConfigKey = a.toString();
-                if (subConfig.get(a.toString()) == null)
-                {
-                    subConfig.set(subConfigKey, b);
-                }
-            });
-            config.set(key, subConfig);
+            TerraBlender.LOGGER.warn("Invalid value {} for key {}. Reverting to default", value, key);
+            value = defaultValue;
         }
 
-        CommentedConfig subConfig = config.get(key);
-        String commentValue = config.getComment(key);
-        if (commentValue == null)
-        {
-            config.setComment(key, comment);
-        }
-
-        return subConfig.valueMap();
+        config.set(key, value);
+        config.setComment(key, comment);
+        return value;
     }
 
-    public <T> T add(String comment, String key, T defaultValue)
+    public <T extends Number & Comparable<T>> T addNumber(String key, T defaultValue, T min, T max, String comment)
     {
-        if (config.get(key) == null)
-        {
-            config.set(key, defaultValue);
-        }
-
-        if (config.getComment(key) == null)
-        {
-            config.setComment(key, comment);
-        }
-        return config.get(key);
+        return this.add(key, defaultValue, comment, (v) -> v.compareTo(max) <= 0 && v.compareTo(min) >= 0);
     }
 
-    public <T extends Number & Comparable<T>> T addNumber(String comment, String key, T defaultValue, T min, T max)
-    {
-        if (config.get(key) == null)
-        {
-            config.set(key, defaultValue);
-        }
+    public abstract void load();
 
-        if (config.getComment(key) == null)
-        {
-            config.setComment(key, comment + String.format("\nRange: %s-%s", min, max));
-        }
-        T value = config.get(key);
-        return value.compareTo(max) > 0 ? max : value.compareTo(min) < 0 ? min : value;
+    public void parse(String toml)
+    {
+        this.config = TomlFormat.instance().createParser().parse(toml);
     }
 
-    public <T extends Enum<T>> T addEnum(String comment, String key, T defaultValue)
+    public void read()
     {
-        if (config.get(key) == null)
-        {
-            config.set(key, defaultValue);
-        }
-
-        if (config.getComment(key) == null)
-        {
-            StringBuilder builder = new StringBuilder().append("Values: ").append(defaultValue instanceof StringRepresentable ? "\n" : "");
-            for (T value : defaultValue.getDeclaringClass().getEnumConstants())
-            {
-                if (defaultValue instanceof StringRepresentable)
-                {
-                    builder.append(((StringRepresentable) value).getSerializedName()).append("\n");
-                }
-                else
-                {
-                    builder.append(value.name()).append(", ");
-                }
-            }
-
-            config.setComment(key, comment + "\n" + builder.toString());
-        }
-
-        String value = config.get(key).toString();
-        return T.valueOf(defaultValue.getDeclaringClass(), value);
+        this.parse(readToml(this.path));
     }
 
-    public <T> T getValue(String key)
+    public void write()
     {
-        return this.config.get(key);
+        TomlFormat.instance().createWriter().write(this.config, this.path, WritingMode.REPLACE);
     }
 
-    public Config getSubConfig(String key)
+    public String encode()
     {
-        CommentedConfig sub = this.config.get(key);
-        return new Config(sub != null ? sub : CommentedConfig.inMemory());
+        return TomlFormat.instance().createWriter().writeToString(this.config);
     }
 
-    protected CommentedConfig getConfig()
+    public Path getPath()
     {
-        return this.config;
+        return this.path;
     }
 
-    protected static CommentedConfig sortConfig(CommentedConfig config)
+    private static String readToml(Path path)
     {
-        CommentedConfig newConfig = CommentedConfig.of(com.electronwill.nightconfig.core.Config.getDefaultMapCreator(false, true), TomlFormat.instance());
+        // Create parent directories as needed
+        path.getParent().toFile().mkdirs();
 
-        List<Map.Entry<String, Object>> organizedCollection = config.valueMap().entrySet().stream().sorted(Comparator.comparing(Objects::toString)).collect(Collectors.toList());
-        organizedCollection.forEach((stringObjectEntry -> {
-            newConfig.add(stringObjectEntry.getKey(), stringObjectEntry.getValue());
-        }));
+        try {
+            return Files.readString(path);
+        } catch (Exception ignored) {}
+        return "";
+    }
 
-        newConfig.commentMap().putAll(config.commentMap());
-        return newConfig;
+    @Override
+    public <T> T getRaw(List<String> path) {
+        return config.getRaw(path);
+    }
+
+    @Override
+    public Map<String, Object> valueMap() {
+        return config.valueMap();
+    }
+
+    @Override
+    public boolean contains(List<String> path) {
+        return config.contains(path);
+    }
+
+    @Override
+    public int size() {
+        return config.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return config.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return config.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return config.hashCode();
+    }
+
+    @Override
+    public ConfigFormat<?> configFormat() {
+        return config.configFormat();
+    }
+
+    @Override
+    public <T> T set(List<String> path, Object value) {
+        return config.set(path, value);
+    }
+
+    @Override
+    public boolean add(List<String> path, Object value) {
+        return config.add(path, value);
+    }
+
+    @Override
+    public <T> T remove(List<String> path) {
+        return config.remove(path);
+    }
+
+    @Override
+    public void clear() {
+        config.clear();
+    }
+
+    @Override
+    public String getComment(List<String> path) {
+        return config.getComment(path);
+    }
+
+    @Override
+    public boolean containsComment(List<String> path) {
+        return config.containsComment(path);
+    }
+
+    @Override
+    public String setComment(List<String> path, String comment) {
+        return config.setComment(path, comment);
+    }
+
+    @Override
+    public String removeComment(List<String> path) {
+        return config.removeComment(path);
+    }
+
+    @Override
+    public Map<String, String> commentMap() {
+        return config.commentMap();
+    }
+
+    @Override
+    public Set<? extends CommentedConfig.Entry> entrySet() {
+        return config.entrySet();
+    }
+
+    @Override
+    public void clearComments() {
+        config.clearComments();
+    }
+
+    @Override
+    public void putAllComments(Map<String, UnmodifiableCommentedConfig.CommentNode> comments) {
+        config.putAllComments(comments);
+    }
+
+    @Override
+    public void putAllComments(UnmodifiableCommentedConfig commentedConfig) {
+        config.putAllComments(commentedConfig);
+    }
+
+    @Override
+    public Map<String, UnmodifiableCommentedConfig.CommentNode> getComments() {
+        return config.getComments();
+    }
+
+    @Override
+    public CommentedConfig createSubConfig() {
+        return config.createSubConfig();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + ':' + config;
     }
 }

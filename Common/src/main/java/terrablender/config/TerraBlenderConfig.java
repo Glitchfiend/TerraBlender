@@ -19,27 +19,42 @@ package terrablender.config;
 
 import java.nio.file.Path;
 
-public class TerraBlenderConfig extends ConfigFile
+public class TerraBlenderConfig extends Config
 {
-    public final int overworldRegionSize;
-    public final int netherRegionSize;
-    public final int vanillaOverworldRegionWeight;
-    public final int vanillaNetherRegionWeight;
+    public int overworldRegionSize;
+    public int netherRegionSize;
+    public int vanillaOverworldRegionWeight;
+    public int vanillaNetherRegionWeight;
+
+    public int endHighlandsBiomeSize;
+    public int endMidlandsBiomeSize;
+    public int endEdgeBiomeSize;
+    public int endIslandBiomeSize;
+    public int vanillaEndHighlandsWeight;
+    public int vanillaEndMidlandsWeight;
+    public int vanillaEndBarrensWeight;
+    public int vanillaSmallEndIslandsWeight;
 
     public TerraBlenderConfig(Path path)
     {
         super(path);
+    }
 
-        Config generalConfig = this.getSubConfig("general");
-        this.addSubConfig("General settings", "general", generalConfig);
+    @Override
+    public void load()
+    {
+        this.overworldRegionSize = addNumber("general.overworld_region_size", 3, 2, 6, "The size of overworld biome regions from each mod that uses TerraBlender.");
+        this.netherRegionSize = addNumber("general.nether_region_size", 2, 2, 6, "The size of nether biome regions from each mod that uses TerraBlender.");
+        this.vanillaOverworldRegionWeight = addNumber("general.vanilla_overworld_region_weight", 10, 0, Integer.MAX_VALUE, "The weighting of vanilla biome regions in the overworld.");
+        this.vanillaNetherRegionWeight = addNumber("general.vanilla_nether_region_weight", 10, 0, Integer.MAX_VALUE, "The weighting of vanilla biome regions in the nether.");
 
-        Config generationSettings = this.getSubConfig("generation_settings");
-        this.overworldRegionSize = generationSettings.addNumber("The size of overworld biome regions from each mod that uses TerraBlender.", "overworld_region_size", 3, 2, 6);
-        this.netherRegionSize = generationSettings.addNumber("The size of nether biome regions from each mod that uses TerraBlender.", "nether_region_size", 2, 2, 6);
-        this.vanillaOverworldRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the overworld.", "vanilla_overworld_region_weight", 10, 0, Integer.MAX_VALUE);
-        this.vanillaNetherRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the nether.", "vanilla_nether_region_weight", 10, 0, Integer.MAX_VALUE);
-        this.addSubConfig("Generation settings", "generation_settings", generationSettings);
-
-        this.save();
+        this.endHighlandsBiomeSize = addNumber("end.highlands_biome_size", 4, 2, 6, "The size of highlands end biomes.");
+        this.endMidlandsBiomeSize = addNumber("end.midlands_biome_size", 4, 2, 6, "The size of midlands end biomes.");
+        this.endEdgeBiomeSize = addNumber("end.edge_biome_size", 3, 2, 6, "The size of edge end biomes.");
+        this.endIslandBiomeSize = addNumber("end.island_biome_size", 2, 2, 6, "The size of island end biomes.");
+        this.vanillaEndHighlandsWeight = addNumber("end.vanilla_end_highlands_weight", 10, 0, Integer.MAX_VALUE, "The weight of Vanilla end highlands biomes.");
+        this.vanillaEndMidlandsWeight = addNumber("end.vanilla_end_midlands_weight", 10, 0, Integer.MAX_VALUE, "The weight of Vanilla end midlands biomes.");
+        this.vanillaEndBarrensWeight = addNumber("end.vanilla_end_barrens_weight", 10, 0, Integer.MAX_VALUE, "The weight of Vanilla end barrens biomes.");
+        this.vanillaSmallEndIslandsWeight = addNumber("end.vanilla_small_end_islands_weight", 10, 0, Integer.MAX_VALUE, "The weight of Vanilla small end islands biomes.");
     }
 }

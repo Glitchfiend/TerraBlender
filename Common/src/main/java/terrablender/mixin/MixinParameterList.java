@@ -27,6 +27,7 @@ import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import terrablender.api.Region;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
@@ -47,9 +48,13 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
     @Shadow
     public abstract T findValue(Climate.TargetPoint target);
 
+    @Unique
     private boolean initialized = false;
+    @Unique
     private boolean treesPopulated = false;
+    @Unique
     private Area uniqueness;
+    @Unique
     private Climate.RTree[] uniqueTrees;
 
     @Override

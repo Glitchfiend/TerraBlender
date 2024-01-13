@@ -24,10 +24,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -40,6 +37,7 @@ import terrablender.core.TerraBlender;
 import terrablender.worldgen.IExtendedBiomeSource;
 import terrablender.worldgen.IExtendedNoiseGeneratorSettings;
 import terrablender.worldgen.IExtendedParameterList;
+import terrablender.worldgen.IExtendedTheEndBiomeSource;
 
 import java.util.Map;
 
@@ -77,8 +75,15 @@ public class LevelUtils
 
     public static void initializeBiomes(RegistryAccess registryAccess, Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed)
     {
-        if (!shouldApplyToChunkGenerator(chunkGenerator))
+        if (chunkGenerator.getBiomeSource() instanceof TheEndBiomeSource)
+        {
+            ((IExtendedTheEndBiomeSource)chunkGenerator.getBiomeSource()).initializeForTerraBlender(registryAccess, seed);
             return;
+        }
+        else if (!shouldApplyToChunkGenerator(chunkGenerator))
+        {
+            return;
+        }
 
         RegionType regionType = getRegionTypeForDimension(dimensionType);
         NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;

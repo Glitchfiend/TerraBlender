@@ -32,65 +32,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class InitialLayer implements AreaTransformer0
+public class InitialLayer extends WeightedRandomLayer<WeightedEntry.Wrapper<Region>>
 {
     private final RegionType regionType;
-    private final WeightedRandomList<WeightedEntry.Wrapper<Region>> weightedEntries;
 
-    public InitialLayer(RegistryAccess registryAccess, RegionType type)
+    public InitialLayer(RegistryAccess registryAccess, RegionType regionType)
+    {
+        super(createEntries(registryAccess, regionType));
+        this.regionType = regionType;
+    }
+
+    @Override
+    protected int getEntryIndex(WeightedEntry.Wrapper<Region> entry)
+    {
+        return Regions.getIndex(this.regionType, entry.getData().getName());
+    }
+
+    private static List<WeightedEntry.Wrapper<Region>> createEntries(RegistryAccess registryAccess, RegionType regionType)
     {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
-        this.regionType = type;
-        this.weightedEntries = WeightedRandomList.create(Regions.get(this.regionType).stream().filter(region -> {
+        return Regions.get(regionType).stream().filter(region -> {
             AtomicBoolean biomesAdded = new AtomicBoolean(false);
             region.addBiomes(biomeRegistry, pair -> biomesAdded.set(true));
 
             // Filter out irrelevant regions or regions without any biomes
-            return region.getType() == type && biomesAdded.get();
-        }).map(region -> WeightedEntry.wrap(region, region.getWeight())).collect(ImmutableList.toImmutableList()));
-    }
-
-    @Override
-    public int apply(AreaContext context, int x, int y)
-    {
-        Optional<WeightedEntry.Wrapper<Region>> entry = weightedEntries.getRandom(context);
-        return entry.isPresent() ? Regions.getIndex(this.regionType, entry.get().getData().getName()) : 0;
-    }
-
-    private static class WeightedRandomList<E extends WeightedEntry>
-    {
-        private final int totalWeight;
-        private final ImmutableList<E> items;
-
-        WeightedRandomList(List<? extends E> items)
-        {
-            this.items = ImmutableList.copyOf(items);
-            this.totalWeight = WeightedRandom.getTotalWeight(items);
-        }
-
-        public static <E extends WeightedEntry> WeightedRandomList<E> create() {
-            return new WeightedRandomList<>(ImmutableList.of());
-        }
-
-        @SafeVarargs
-        public static <E extends WeightedEntry> WeightedRandomList<E> create(E... entries)
-        {
-            return new WeightedRandomList<>(ImmutableList.copyOf(entries));
-        }
-
-        public static <E extends WeightedEntry> WeightedRandomList<E> create(List<E> entries)
-        {
-            return new WeightedRandomList<>(entries);
-        }
-
-        public Optional<E> getRandom(AreaContext context)
-        {
-            if (this.totalWeight == 0) {
-                return Optional.empty();
-            } else {
-                int i = context.nextRandom(this.totalWeight);
-                return WeightedRandom.getWeightedItem(this.items, i);
-            }
-        }
+            return region.getType() == regionType && biomesAdded.get();
+        }).map(region -> WeightedEntry.wrap(region, region.getWeight())).collect(ImmutableList.toImmutableList());
     }
 }
