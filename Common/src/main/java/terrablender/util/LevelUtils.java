@@ -33,6 +33,7 @@ import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import terrablender.DimensionTypeTags;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
+import terrablender.api.SurfaceRuleManager;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.IExtendedBiomeSource;
 import terrablender.worldgen.IExtendedNoiseGeneratorSettings;
@@ -75,19 +76,20 @@ public class LevelUtils
 
     public static void initializeBiomes(RegistryAccess registryAccess, Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed)
     {
+        if (!(chunkGenerator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator))
+            return;
+
+        NoiseGeneratorSettings generatorSettings = noiseBasedChunkGenerator.generatorSettings().value();
+
         if (chunkGenerator.getBiomeSource() instanceof TheEndBiomeSource)
         {
             ((IExtendedTheEndBiomeSource)chunkGenerator.getBiomeSource()).initializeForTerraBlender(registryAccess, seed);
+            ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(SurfaceRuleManager.RuleCategory.END);
             return;
         }
-        else if (!shouldApplyToChunkGenerator(chunkGenerator))
-        {
-            return;
-        }
+        else if (!shouldApplyToBiomeSource(chunkGenerator.getBiomeSource())) return;
 
         RegionType regionType = getRegionTypeForDimension(dimensionType);
-        NoiseBasedChunkGenerator noiseBasedChunkGenerator = (NoiseBasedChunkGenerator)chunkGenerator;
-        NoiseGeneratorSettings generatorSettings = noiseBasedChunkGenerator.generatorSettings().value();
         MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)chunkGenerator.getBiomeSource();
         IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
 
@@ -96,7 +98,12 @@ public class LevelUtils
             return;
 
         // Set the chunk generator settings' region type
-        ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRegionType(regionType);
+        SurfaceRuleManager.RuleCategory ruleCategory = switch(regionType) {
+            case OVERWORLD -> SurfaceRuleManager.RuleCategory.OVERWORLD;
+            case NETHER -> SurfaceRuleManager.RuleCategory.NETHER;
+            default -> throw new IllegalArgumentException("Attempted to get surface rule category for unsupported region type " + regionType);
+        };
+        ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(ruleCategory);
 
         Climate.ParameterList parameters = biomeSource.parameters();
         IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
