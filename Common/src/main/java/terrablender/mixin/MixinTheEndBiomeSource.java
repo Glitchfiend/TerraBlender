@@ -117,21 +117,19 @@ public class MixinTheEndBiomeSource implements IExtendedTheEndBiomeSource
         }
         else
         {
-            int densityX = (SectionPos.blockToSectionCoord(blockX) * 2 + 1) * 8;
-            int densityZ = (SectionPos.blockToSectionCoord(blockZ) * 2 + 1) * 8;
-            double heightNoise = sampler.erosion().compute(new DensityFunction.SinglePointContext(densityX, blockY, densityZ));
+            double heightNoise = sampler.erosion().compute(new DensityFunction.SinglePointContext(blockX, blockY, blockZ));
 
             if (heightNoise > 0.25)
             {
-                cir.setReturnValue(this.getBiomeHolder(this.highlandsArea.get(densityX, densityZ)));
+                cir.setReturnValue(this.getBiomeHolder(this.highlandsArea.get(x, z)));
             }
             else if (heightNoise >= -0.0625)
             {
-                cir.setReturnValue(this.getBiomeHolder(this.midlandsArea.get(densityX, densityZ)));
+                cir.setReturnValue(this.getBiomeHolder(this.midlandsArea.get(x, z)));
             }
             else
             {
-                cir.setReturnValue(heightNoise < -0.21875 ? this.getBiomeHolder(this.islandsArea.get(densityX, densityZ)) : this.getBiomeHolder(this.edgeArea.get(densityX, densityZ)));
+                cir.setReturnValue(heightNoise < -0.21875 ? this.getBiomeHolder(this.islandsArea.get(x, z)) : this.getBiomeHolder(this.edgeArea.get(x, z)));
             }
         }
     }

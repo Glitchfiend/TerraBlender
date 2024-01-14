@@ -15,7 +15,7 @@ logoFile="tb_logo.png"
 
 [[dependencies.terrablender]]
     modId="neoforge"
-    mandatory=true
-    versionRange="[20.2,)"
+    required=true
+    versionRange="[20.4,)"
     ordering="NONE"
     side="BOTH"
