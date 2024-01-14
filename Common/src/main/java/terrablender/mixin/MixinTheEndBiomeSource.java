@@ -24,6 +24,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.TheEndBiomeSource;
 import net.minecraft.world.level.levelgen.DensityFunction;
@@ -80,6 +81,7 @@ public class MixinTheEndBiomeSource implements IExtendedTheEndBiomeSource
         builder.addAll(midlands.stream().map(WeightedEntry.Wrapper::getData).toList());
         builder.addAll(edge.stream().map(WeightedEntry.Wrapper::getData).toList());
         builder.addAll(islands.stream().map(WeightedEntry.Wrapper::getData).toList());
+        builder.add(Biomes.THE_END);
         Set<ResourceKey<Biome>> allBiomes = builder.build();
 
         // Ensure all biomes are registered
