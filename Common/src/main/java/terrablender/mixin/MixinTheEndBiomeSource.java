@@ -53,6 +53,9 @@ public class MixinTheEndBiomeSource implements IExtendedTheEndBiomeSource
     private Holder<Biome> end;
 
     @Unique
+    private boolean tbInitialized = false;
+
+    @Unique
     private Registry<Biome> biomeRegistry;
     @Unique
     private Set<Holder<Biome>> tbPossibleBiomes;
@@ -95,17 +98,29 @@ public class MixinTheEndBiomeSource implements IExtendedTheEndBiomeSource
         this.midlandsArea = LayeredNoiseUtil.biomeArea(registryAccess, seed, TerraBlender.CONFIG.endMidlandsBiomeSize, midlands);
         this.edgeArea = LayeredNoiseUtil.biomeArea(registryAccess, seed, TerraBlender.CONFIG.endEdgeBiomeSize, edge);
         this.islandsArea = LayeredNoiseUtil.biomeArea(registryAccess, seed, TerraBlender.CONFIG.endIslandBiomeSize, edge);
+
+        // This may not be initialized with e.g. BCLib
+        this.tbInitialized = true;
     }
 
-    @Inject(method = "collectPossibleBiomes", at=@At("HEAD"), cancellable = true)
+    @Inject(method = "collectPossibleBiomes", at=@At("RETURN"), cancellable = true)
     protected void onCollectPossibleBiomes(CallbackInfoReturnable<Stream<Holder<Biome>>> cir)
     {
-        cir.setReturnValue(this.tbPossibleBiomes.stream());
+        if (!this.tbInitialized)
+            return;
+
+        var builder = ImmutableSet.<Holder<Biome>>builder();
+        builder.addAll(cir.getReturnValue().collect(Collectors.toSet()));
+        builder.addAll(this.tbPossibleBiomes);
+        cir.setReturnValue(builder.build().stream());
     }
 
     @Inject(method = "getNoiseBiome", at=@At("HEAD"), cancellable = true)
     public void onGetNoiseBiome(int x, int y, int z, Climate.Sampler sampler, CallbackInfoReturnable<Holder<Biome>> cir)
     {
+        if (!this.tbInitialized)
+            return;
+
         int blockX = QuartPos.toBlock(x);
         int blockY = QuartPos.toBlock(y);
         int blockZ = QuartPos.toBlock(z);
