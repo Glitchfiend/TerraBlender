@@ -57,26 +57,26 @@ public class TerrablenderOverworldBiomeBuilder extends OverworldBiomeBuilder {
      *                             [ ARID-NEUTRAL, DRY-NEUTRAL, NEUTRAL-NEUTRAL, WET-NEUTRAL, HUMID-NEUTRAL ],
      *                             [ ARID-WARM, DRY-WARM, NEUTRAL-WARM, WET-WARM, HUMID-WARM ],
      *                             [ ARID-HOT, DRY-HOT, NEUTRAL-HOT, WET-HOT, HUMID-HOT ]
-     * @param peakBiomes           - Appearing on mountainous terrain & BELOW weirdness 0, here is the "peak_biomes" layout:
+     * @param peakBiomes           - Appearing on mountainous terrain AND BELOW weirdness 0, here is the "peak_biomes" layout:
      *                             [ ARID-ICY, DRY-ICY, NEUTRAL-ICY, WET-ICY, HUMID-ICY ],
      *                             [ ARID-COLD, DRY-COLD, NEUTRAL-COLD, WET-COLD, HUMID-COLD ],
      *                             [ ARID-NEUTRAL, DRY-NEUTRAL, NEUTRAL-NEUTRAL, WET-NEUTRAL, HUMID-NEUTRAL ],
      *                             [ ARID-WARM, DRY-WARM, NEUTRAL-WARM, WET-WARM, HUMID-WARM ],
      *                             [ ARID-HOT, DRY-HOT, NEUTRAL-HOT, WET-HOT, HUMID-HOT ]
-     * @param peakBiomesVariant    - Appearing on mountainous terrain & ABOVE weirdness 0, here is the "peak_biome_variants" layout:
+     * @param peakBiomesVariant    - Appearing on mountainous terrain AND ABOVE weirdness 0, here is the "peak_biome_variants" layout:
      *                             [ ARID-ICY, DRY-ICY, NEUTRAL-ICY, WET-ICY, HUMID-ICY ],
      *                             [ ARID-COLD, DRY-COLD, NEUTRAL-COLD, WET-COLD, HUMID-COLD ],
      *                             [ ARID-NEUTRAL, DRY-NEUTRAL, NEUTRAL-NEUTRAL, WET-NEUTRAL, HUMID-NEUTRAL ],
      *                             [ ARID-WARM, DRY-WARM, NEUTRAL-WARM, WET-WARM, HUMID-WARM ],
      *                             [ ARID-HOT, DRY-HOT, NEUTRAL-HOT, WET-HOT, HUMID-HOT ]
      *                             Null values may be passed in, the equivalent biome at the equivalent temperature/humidity index in the peakBiomes array will be used.
-     * @param slopeBiomes          - Appearing on sloped terrain, near mountainous terrain, & BELOW weirdness 0, here is the "slope_biomes" layout:
+     * @param slopeBiomes          - Appearing on sloped terrain, near mountainous terrain, AND BELOW weirdness 0, here is the "slope_biomes" layout:
      *                             [ ARID-ICY, DRY-ICY, NEUTRAL-ICY, WET-ICY, HUMID-ICY ],
      *                             [ ARID-COLD, DRY-COLD, NEUTRAL-COLD, WET-COLD, HUMID-COLD ],
      *                             [ ARID-NEUTRAL, DRY-NEUTRAL, NEUTRAL-NEUTRAL, WET-NEUTRAL, HUMID-NEUTRAL ],
      *                             [ ARID-WARM, DRY-WARM, NEUTRAL-WARM, WET-WARM, HUMID-WARM ],
      *                             [ ARID-HOT, DRY-HOT, NEUTRAL-HOT, WET-HOT, HUMID-HOT ]
-     * @param slopeBiomesVariant   - Appearing on sloped terrain, near mountainous terrain, & ABOVE weirdness 0, here is the "slope_biome_variants" layout:
+     * @param slopeBiomesVariant   - Appearing on sloped terrain, near mountainous terrain, AND ABOVE weirdness 0, here is the "slope_biome_variants" layout:
      *                             [ ARID-ICY, DRY-ICY, NEUTRAL-ICY, WET-ICY, HUMID-ICY ],
      *                             [ ARID-COLD, DRY-COLD, NEUTRAL-COLD, WET-COLD, HUMID-COLD ],
      *                             [ ARID-NEUTRAL, DRY-NEUTRAL, NEUTRAL-NEUTRAL, WET-NEUTRAL, HUMID-NEUTRAL ],
