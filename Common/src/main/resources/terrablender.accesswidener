@@ -16,7 +16,34 @@ accessible class net/minecraft/world/level/biome/Climate$DistanceMetric
 accessible method net/minecraft/world/level/biome/MultiNoiseBiomeSource parameters ()Lnet/minecraft/world/level/biome/Climate$ParameterList;
 
 # OverworldBiomeBuilder
+accessible class net/minecraft/world/level/biome/OverworldBiomeBuilder
+extendable class net/minecraft/world/level/biome/OverworldBiomeBuilder
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder OCEANS [[Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder MIDDLE_BIOMES [[Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder MIDDLE_BIOMES_VARIANT [[Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder PLATEAU_BIOMES [[Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder PLATEAU_BIOMES_VARIANT [[Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder SHATTERED_BIOMES [[Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder temperatures [Lnet/minecraft/world/level/biome/Climate$Parameter;
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder humidities [Lnet/minecraft/world/level/biome/Climate$Parameter;
+mutable field net/minecraft/world/level/biome/OverworldBiomeBuilder OCEANS [[Lnet/minecraft/resources/ResourceKey;
+mutable field net/minecraft/world/level/biome/OverworldBiomeBuilder MIDDLE_BIOMES [[Lnet/minecraft/resources/ResourceKey;
+mutable field net/minecraft/world/level/biome/OverworldBiomeBuilder MIDDLE_BIOMES_VARIANT [[Lnet/minecraft/resources/ResourceKey;
+mutable field net/minecraft/world/level/biome/OverworldBiomeBuilder PLATEAU_BIOMES [[Lnet/minecraft/resources/ResourceKey;
+mutable field net/minecraft/world/level/biome/OverworldBiomeBuilder PLATEAU_BIOMES_VARIANT [[Lnet/minecraft/resources/ResourceKey;
+mutable field net/minecraft/world/level/biome/OverworldBiomeBuilder SHATTERED_BIOMES [[Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/biome/OverworldBiomeBuilder FULL_RANGE Lnet/minecraft/world/level/biome/Climate$Parameter;
 accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder addBiomes (Ljava/util/function/Consumer;)V
+accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder pickBeachBiome (II)Lnet/minecraft/resources/ResourceKey;
+accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder pickPeakBiome (IILnet/minecraft/world/level/biome/Climate$Parameter;)Lnet/minecraft/resources/ResourceKey;
+accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder pickSlopeBiome (IILnet/minecraft/world/level/biome/Climate$Parameter;)Lnet/minecraft/resources/ResourceKey;
+extendable method net/minecraft/world/level/biome/OverworldBiomeBuilder pickBeachBiome (II)Lnet/minecraft/resources/ResourceKey;
+extendable method net/minecraft/world/level/biome/OverworldBiomeBuilder pickPeakBiome (IILnet/minecraft/world/level/biome/Climate$Parameter;)Lnet/minecraft/resources/ResourceKey;
+extendable method net/minecraft/world/level/biome/OverworldBiomeBuilder pickSlopeBiome (IILnet/minecraft/world/level/biome/Climate$Parameter;)Lnet/minecraft/resources/ResourceKey;
+accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder addUndergroundBiomes (Ljava/util/function/Consumer;)V
+extendable method net/minecraft/world/level/biome/OverworldBiomeBuilder addUndergroundBiomes (Ljava/util/function/Consumer;)V
+accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder addUndergroundBiome (Ljava/util/function/Consumer;Lnet/minecraft/world/level/biome/Climate$Parameter;Lnet/minecraft/world/level/biome/Climate$Parameter;Lnet/minecraft/world/level/biome/Climate$Parameter;Lnet/minecraft/world/level/biome/Climate$Parameter;Lnet/minecraft/world/level/biome/Climate$Parameter;FLnet/minecraft/resources/ResourceKey;)V
+accessible method net/minecraft/world/level/biome/OverworldBiomeBuilder addBottomBiome (Ljava/util/function/Consumer;Lnet/minecraft/world/level/biome/Climate$Parameter;Lnet/minecraft/world/level/biome/Climate$Parameter;Lnet/minecraft/world/level/biome/Climate$Parameter;Lnet/minecraft/world/level/biome/Climate$Parameter;Lnet/minecraft/world/level/biome/Climate$Parameter;FLnet/minecraft/resources/ResourceKey;)V
 
 # SurfaceRules
 accessible class net/minecraft/world/level/levelgen/SurfaceRules$Context
