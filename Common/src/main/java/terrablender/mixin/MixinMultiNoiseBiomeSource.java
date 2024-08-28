@@ -17,6 +17,7 @@
  */
 package terrablender.mixin;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
@@ -25,8 +26,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import terrablender.worldgen.IExtendedParameterList;
+
+import java.util.List;
 
 @Mixin(MultiNoiseBiomeSource.class)
 public abstract class MixinMultiNoiseBiomeSource
@@ -38,5 +42,12 @@ public abstract class MixinMultiNoiseBiomeSource
     public void getNoiseBiome(int x, int y, int z, Climate.Sampler sampler, CallbackInfoReturnable<Holder<Biome>> cir)
     {
         cir.setReturnValue(((IExtendedParameterList<Holder<Biome>>)this.parameters()).findValuePositional(sampler.sample(x, y, z), x, y, z));
+    }
+
+    @Inject(method="addDebugInfo", at =@At("TAIL"))
+    public void addDebugInfo(List<String> debugLines, BlockPos pos, Climate.Sampler sampler, CallbackInfo ci)
+    {
+        IExtendedParameterList<Holder<Biome>> extension = (IExtendedParameterList<Holder<Biome>>) this.parameters();
+        debugLines.add("Region: " + extension.getRegion(extension.getUniqueness(pos.getX(), pos.getY(), pos.getZ())).getName().toString());
     }
 }

@@ -19,6 +19,7 @@ package terrablender.worldgen;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.biome.Climate;
+import terrablender.api.Region;
 import terrablender.api.RegionType;
 
 public interface IExtendedParameterList<T>
@@ -27,6 +28,7 @@ public interface IExtendedParameterList<T>
     T findValuePositional(Climate.TargetPoint target, int x, int y, int z);
     int getUniqueness(int x, int y, int z);
     Climate.RTree getTree(int uniqueness);
+    Region getRegion(int uniqueness);
     int getTreeCount();
     boolean isInitialized();
 }

@@ -31,6 +31,7 @@ import terrablender.api.Region;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
 import terrablender.worldgen.IExtendedParameterList;
+import terrablender.worldgen.RegionUtils.SearchTreeEntry;
 import terrablender.worldgen.noise.Area;
 import terrablender.worldgen.noise.LayeredNoiseUtil;
 
@@ -50,7 +51,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
     private boolean initialized = false;
     private boolean treesPopulated = false;
     private Area uniqueness;
-    private Climate.RTree[] uniqueTrees;
+    private SearchTreeEntry[] uniqueTrees;
 
     @Override
     public void initializeForTerraBlender(RegistryAccess registryAccess, RegionType regionType, long seed)
@@ -60,7 +61,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
             return;
 
         this.uniqueness = LayeredNoiseUtil.uniqueness(registryAccess, regionType, seed);
-        this.uniqueTrees = new Climate.RTree[Regions.getCount(regionType)];
+        this.uniqueTrees = new SearchTreeEntry[Regions.getCount(regionType)];
 
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
 
@@ -71,7 +72,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
             // Use the existing values for index 0, rather than those from the region. This is for datapack support.
             if (regionIndex == 0)
             {
-                this.uniqueTrees[0] = Climate.RTree.create(this.values);
+                this.uniqueTrees[0] = new SearchTreeEntry(region, Climate.RTree.create(this.values));
             }
             else
             {
@@ -83,7 +84,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
 
                 // We can't create an RTree if there are no values present.
                 if (!pairs.isEmpty())
-                    this.uniqueTrees[regionIndex] = Climate.RTree.create(pairs);
+                    this.uniqueTrees[regionIndex] = new SearchTreeEntry(region, Climate.RTree.create(pairs));
             }
         }
 
@@ -102,7 +103,13 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
     @Override
     public Climate.RTree getTree(int uniqueness)
     {
-        return this.uniqueTrees[uniqueness];
+        return this.uniqueTrees[uniqueness].tree();
+    }
+
+    @Override
+    public Region getRegion(int uniqueness)
+    {
+        return this.uniqueTrees[uniqueness].region();
     }
 
     @Override
@@ -131,7 +138,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
         Holder<Biome> biome = (Holder<Biome>)this.getTree(uniqueness).search(target, Climate.RTree.Node::distance);
 
         if (biome.is(Region.DEFERRED_PLACEHOLDER))
-            return (T)this.uniqueTrees[0].search(target, Climate.RTree.Node::distance);
+            return (T)this.uniqueTrees[0].tree().search(target, Climate.RTree.Node::distance);
         else
             return (T)biome;
     }

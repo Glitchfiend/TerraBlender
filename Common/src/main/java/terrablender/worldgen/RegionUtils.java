@@ -24,6 +24,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
+import terrablender.api.Region;
 
 import java.util.List;
 import java.util.Map;
@@ -50,4 +51,6 @@ public class RegionUtils
         (new OverworldBiomeBuilder()).addBiomes(pair -> builder.add(pair));
         VANILLA_POINTS = builder.build();
     }
+
+    public record SearchTreeEntry<T>(Region region, Climate.RTree<T> tree) {}
 }
