@@ -49,6 +49,8 @@ dependencies {
 
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
+    config("${mod_id}.mixins.json")
+    config("${mod_id}.forge.mixins.json")
 }
 
 // As of 1.20.6 Forge no longer has reobf tasks. This has broken mixins adding configs correctly into the manifest file
