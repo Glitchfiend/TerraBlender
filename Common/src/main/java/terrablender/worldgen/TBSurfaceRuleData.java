@@ -76,6 +76,7 @@ public class TBSurfaceRuleData
         return overworldLike(true, false, true);
     }
 
+    // Up-to-date as of 1.21.4
     public static SurfaceRules.RuleSource overworldLike(boolean checkAbovePreliminarySurface, boolean bedrockRoof, boolean bedrockFloor)
     {
         SurfaceRules.ConditionSource isBlockAboveY97WithVariationAbove = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(97), 2);
@@ -515,7 +516,7 @@ public class TBSurfaceRuleData
     public static SurfaceRules.RuleSource nether()
     {
         SurfaceRules.ConditionSource isAbove31 = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(31), 0);
-        SurfaceRules.ConditionSource surfacerules$conditionsource1 = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(32), 0);
+        SurfaceRules.ConditionSource isAbove32 = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(32), 0);
         SurfaceRules.ConditionSource yStart30 = SurfaceRules.yStartCheck(VerticalAnchor.absolute(30), 0);
         SurfaceRules.ConditionSource isBelow35 = SurfaceRules.not(SurfaceRules.yStartCheck(VerticalAnchor.absolute(35), 0));
         SurfaceRules.ConditionSource isTop5Blocks = SurfaceRules.yBlockCheck(VerticalAnchor.belowTop(5), 0);
@@ -575,7 +576,7 @@ public class TBSurfaceRuleData
                 SurfaceRules.ON_FLOOR,
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
-                        SurfaceRules.not(surfacerules$conditionsource1),
+                        SurfaceRules.not(isAbove32),
                         SurfaceRules.ifTrue(isHole, LAVA)
                     ),
                     SurfaceRules.ifTrue(
@@ -630,7 +631,7 @@ public class TBSurfaceRuleData
                                 SurfaceRules.ifTrue(
                                     surfacerules$conditionsource7,
                                     SurfaceRules.sequence(
-                                        SurfaceRules.ifTrue(surfacerules$conditionsource1, GRAVEL),
+                                        SurfaceRules.ifTrue(isAbove32, GRAVEL),
                                         SurfaceRules.ifTrue(SurfaceRules.not(isHole), GRAVEL)
                                     )
                                 )
