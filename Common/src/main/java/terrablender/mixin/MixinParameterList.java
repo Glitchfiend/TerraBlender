@@ -33,10 +33,12 @@ import terrablender.api.Regions;
 import terrablender.worldgen.IExtendedParameterList;
 import terrablender.worldgen.RegionUtils.SearchTreeEntry;
 import terrablender.worldgen.noise.Area;
+import terrablender.worldgen.noise.InitialLayer;
 import terrablender.worldgen.noise.LayeredNoiseUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Mixin(Climate.ParameterList.class)
 public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
@@ -50,6 +52,7 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
 
     private boolean initialized = false;
     private boolean treesPopulated = false;
+    private Supplier<Area> newUniqueness;
     private Area uniqueness;
     private SearchTreeEntry[] uniqueTrees;
 
@@ -60,7 +63,9 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
         if (this.initialized)
             return;
 
-        this.uniqueness = LayeredNoiseUtil.uniqueness(registryAccess, regionType, seed);
+        InitialLayer initialLayer = LayeredNoiseUtil.initialUniqueness(registryAccess, regionType);
+        this.newUniqueness = () -> LayeredNoiseUtil.finalUniqueness(regionType, seed, initialLayer);
+        this.uniqueness = this.newUniqueness.get();
         this.uniqueTrees = new SearchTreeEntry[Regions.getCount(regionType)];
 
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
@@ -141,5 +146,16 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
             return (T)this.uniqueTrees[0].tree().search(target, Climate.RTree.Node::distance);
         else
             return (T)biome;
+    }
+
+    @Override
+    public Climate.ParameterList<T> clone() {
+        try {
+            Climate.ParameterList<T> cloned = (Climate.ParameterList<T>) super.clone();
+            ((MixinParameterList<T>) (Object) cloned).uniqueness = ((MixinParameterList<T>) (Object) cloned).newUniqueness.get();
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

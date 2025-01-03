@@ -22,7 +22,7 @@ import net.minecraft.world.level.biome.Climate;
 import terrablender.api.Region;
 import terrablender.api.RegionType;
 
-public interface IExtendedParameterList<T>
+public interface IExtendedParameterList<T> extends Cloneable
 {
     void initializeForTerraBlender(RegistryAccess registryAccess, RegionType regionType, long seed);
     T findValuePositional(Climate.TargetPoint target, int x, int y, int z);
@@ -31,4 +31,5 @@ public interface IExtendedParameterList<T>
     Region getRegion(int uniqueness);
     int getTreeCount();
     boolean isInitialized();
+    Climate.ParameterList<T> clone();
 }

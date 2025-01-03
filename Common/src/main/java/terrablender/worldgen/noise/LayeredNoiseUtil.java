@@ -31,12 +31,20 @@ public class LayeredNoiseUtil
 {
     public static Area uniqueness(RegistryAccess registryAccess, RegionType regionType, long seed)
     {
+        return finalUniqueness(regionType, seed, initialUniqueness(registryAccess, regionType));
+    }
+
+    public static InitialLayer initialUniqueness(RegistryAccess registryAccess, RegionType regionType) {
+        return new InitialLayer(registryAccess, regionType);
+    }
+
+    public static Area finalUniqueness(RegionType regionType, long seed, InitialLayer initialLayer) {
         int numZooms = TerraBlender.CONFIG.overworldRegionSize;
 
         if (regionType == RegionType.NETHER)
             numZooms = TerraBlender.CONFIG.netherRegionSize;
 
-        return createZoomedArea(seed, numZooms, new InitialLayer(registryAccess, regionType));
+        return createZoomedArea(seed, numZooms, initialLayer);
     }
 
     public static Area biomeArea(RegistryAccess registryAccess, long seed, int size, List<WeightedEntry.Wrapper<ResourceKey<Biome>>> entries)
