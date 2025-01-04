@@ -8,10 +8,12 @@
     "MixinBuiltInRegistries",
     "MixinChunkGenerator",
     "MixinMultiNoiseBiomeSource",
+    "MixinNoiseBasedChunkGenerator",
     "MixinNoiseGeneratorSettings",
     "MixinParameterList",
     "MixinPrimaryLevelData",
-    "MixinTheEndBiomeSource"
+    "MixinTheEndBiomeSource",
+    "MultiNoiseBiomeSourceAccess"
   ],
   "client": [
     "MixinWorldOpenFlows"
