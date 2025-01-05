@@ -32,4 +32,5 @@ public interface IExtendedParameterList<T> extends Cloneable
     int getTreeCount();
     boolean isInitialized();
     Climate.ParameterList<T> clone();
+    void recreateUniqueness();
 }

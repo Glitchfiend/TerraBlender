@@ -44,9 +44,6 @@ public abstract class MixinMultiNoiseBiomeSource implements IExtendedMultiNoiseB
     @Shadow
     public abstract Climate.ParameterList<Holder<Biome>> parameters();
 
-    @Shadow @Final @Mutable
-    private Either<Climate.ParameterList<Holder<Biome>>, Holder<MultiNoiseBiomeSourceParameterList>> parameters;
-
     @Inject(method="getNoiseBiome(IIILnet/minecraft/world/level/biome/Climate$Sampler;)Lnet/minecraft/core/Holder;", at=@At("HEAD"), cancellable = true)
     public void getNoiseBiome(int x, int y, int z, Climate.Sampler sampler, CallbackInfoReturnable<Holder<Biome>> cir)
     {
@@ -65,9 +62,7 @@ public abstract class MixinMultiNoiseBiomeSource implements IExtendedMultiNoiseB
     @Override
     public MultiNoiseBiomeSource clone() {
         try {
-            MultiNoiseBiomeSource cloned = (MultiNoiseBiomeSource) super.clone();
-            ((MixinMultiNoiseBiomeSource) (Object) cloned).parameters = Either.left(((IExtendedParameterList<Holder<Biome>>) this.parameters()).clone());
-            return cloned;
+            return (MultiNoiseBiomeSource) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

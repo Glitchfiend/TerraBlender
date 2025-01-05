@@ -17,4 +17,7 @@ public interface MultiNoiseBiomeSourceAccess {
     @Accessor
     void setParameters(Either<Climate.ParameterList<Holder<Biome>>, Holder<MultiNoiseBiomeSourceParameterList>> parameters);
 
+    @Accessor
+    Either<Climate.ParameterList<Holder<Biome>>, Holder<MultiNoiseBiomeSourceParameterList>> getParameters();
+
 }
