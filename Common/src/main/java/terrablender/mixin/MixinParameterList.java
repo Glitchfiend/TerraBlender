@@ -27,6 +27,7 @@ import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import terrablender.api.Region;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
@@ -151,11 +152,18 @@ public abstract class MixinParameterList<T> implements IExtendedParameterList<T>
     @Override
     public Climate.ParameterList<T> clone() {
         try {
-            Climate.ParameterList<T> cloned = (Climate.ParameterList<T>) super.clone();
-            ((MixinParameterList<T>) (Object) cloned).uniqueness = ((MixinParameterList<T>) (Object) cloned).newUniqueness.get();
-            return cloned;
+            return (Climate.ParameterList<T>) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    @Unique
+    @Override
+    public void recreateUniqueness() {
+        if (!this.initialized) {
+            return;
+        }
+        this.uniqueness = this.newUniqueness.get();
     }
 }
