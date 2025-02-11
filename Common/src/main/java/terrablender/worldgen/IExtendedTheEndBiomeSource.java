@@ -17,9 +17,11 @@
  */
 package terrablender.worldgen;
 
-import terrablender.api.SurfaceRuleManager;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.biome.Climate;
+import terrablender.api.RegionType;
 
-public interface IExtendedNoiseGeneratorSettings
+public interface IExtendedTheEndBiomeSource
 {
-    void setRuleCategory(SurfaceRuleManager.RuleCategory ruleCategory);
+    void initializeForTerraBlender(RegistryAccess registryAccess, long seed);
 }
