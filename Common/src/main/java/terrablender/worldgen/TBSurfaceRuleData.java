@@ -650,6 +650,11 @@ public class TBSurfaceRuleData
         return SurfaceRules.sequence(builder.build().toArray(SurfaceRules.RuleSource[]::new));
     }
 
+    public static SurfaceRules.RuleSource end()
+    {
+        return ENDSTONE;
+    }
+
     public static SurfaceRules.RuleSource air()
     {
         return AIR;

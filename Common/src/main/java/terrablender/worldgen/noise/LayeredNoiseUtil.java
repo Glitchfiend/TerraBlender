@@ -18,25 +18,39 @@
 package terrablender.worldgen.noise;
 
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.world.level.biome.Biome;
 import terrablender.api.RegionType;
 import terrablender.core.TerraBlender;
 
+import java.util.List;
 import java.util.function.LongFunction;
 
 public class LayeredNoiseUtil
 {
-    public static Area uniqueness(RegistryAccess registryAccess, RegionType regionType, long worldSeed)
+    public static Area uniqueness(RegistryAccess registryAccess, RegionType regionType, long seed)
     {
         int numZooms = TerraBlender.CONFIG.overworldRegionSize;
 
         if (regionType == RegionType.NETHER)
             numZooms = TerraBlender.CONFIG.netherRegionSize;
 
-        LongFunction<AreaContext> contextFactory = (seedModifier) -> new AreaContext(25, worldSeed, seedModifier);
-        AreaFactory factory = new InitialLayer(registryAccess, regionType).run(contextFactory.apply(1L));
+        return createZoomedArea(seed, numZooms, new InitialLayer(registryAccess, regionType));
+    }
+
+    public static Area biomeArea(RegistryAccess registryAccess, long seed, int size, List<WeightedEntry.Wrapper<ResourceKey<Biome>>> entries)
+    {
+        return createZoomedArea(seed, size, new BiomeInitialLayer(registryAccess, entries));
+    }
+
+    public static Area createZoomedArea(long seed, int zooms, AreaTransformer0 initialTransformer)
+    {
+        LongFunction<AreaContext> contextFactory = (seedModifier) -> new AreaContext(25, seed, seedModifier);
+        AreaFactory factory = initialTransformer.run(contextFactory.apply(1L));
         factory = ZoomLayer.FUZZY.run(contextFactory.apply(2000L), factory);
         factory = zoom(2001L, ZoomLayer.NORMAL, factory, 3, contextFactory);
-        factory = zoom(1001L, ZoomLayer.NORMAL, factory, numZooms, contextFactory);
+        factory = zoom(1001L, ZoomLayer.NORMAL, factory, zooms, contextFactory);
         return factory.make();
     }
 
