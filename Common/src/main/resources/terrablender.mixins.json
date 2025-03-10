@@ -9,8 +9,7 @@
     "MixinMultiNoiseBiomeSource",
     "MixinNoiseGeneratorSettings",
     "MixinParameterList",
-    "MixinPrimaryLevelData",
-    "MixinTheEndBiomeSource"
+    "MixinPrimaryLevelData"
   ],
   "client": [
     "MixinWorldOpenFlows"
