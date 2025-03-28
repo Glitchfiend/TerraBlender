@@ -19,10 +19,10 @@ package terrablender.api;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import terrablender.core.TerraBlender;
+import terrablender.util.WeightedEntry;
 
 import java.util.ArrayList;
 import java.util.List;

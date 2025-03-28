@@ -19,10 +19,10 @@ package terrablender.worldgen.noise;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.level.biome.Biome;
 import terrablender.api.RegionType;
 import terrablender.core.TerraBlender;
+import terrablender.util.WeightedEntry;
 
 import java.util.List;
 import java.util.function.LongFunction;

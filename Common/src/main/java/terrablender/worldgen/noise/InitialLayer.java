@@ -25,8 +25,7 @@ import terrablender.api.Region;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.util.random.WeightedEntry;
-import net.minecraft.util.random.WeightedRandom;
+import terrablender.util.WeightedEntry;
 
 import java.util.List;
 import java.util.Optional;

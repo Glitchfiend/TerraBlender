@@ -17,7 +17,7 @@
  */
 package terrablender.worldgen.noise;
 
-import net.minecraft.util.random.WeightedEntry;
+import terrablender.util.WeightedEntry;
 import terrablender.util.WeightedRandomList;
 
 import java.util.List;

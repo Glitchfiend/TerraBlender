@@ -5,10 +5,8 @@
 package terrablender.util;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import terrablender.worldgen.noise.AreaContext;
-import terrablender.worldgen.noise.WeightedRandomLayer;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +19,7 @@ public class WeightedRandomList<E extends WeightedEntry>
     WeightedRandomList(List<? extends E> items)
     {
         this.items = ImmutableList.copyOf(items);
-        this.totalWeight = WeightedRandom.getTotalWeight(items);
+        this.totalWeight = WeightedRandom.getTotalWeight(items, e -> e.getWeight().asInt());
     }
 
     public static <E extends WeightedEntry> WeightedRandomList<E> create()
@@ -46,7 +44,7 @@ public class WeightedRandomList<E extends WeightedEntry>
             return Optional.empty();
         } else {
             int i = context.nextRandom(this.totalWeight);
-            return WeightedRandom.getWeightedItem(this.items, i);
+            return WeightedRandom.getWeightedItem(this.items, i, e -> e.getWeight().asInt());
         }
     }
 }
