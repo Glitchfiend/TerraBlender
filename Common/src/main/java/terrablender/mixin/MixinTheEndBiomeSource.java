@@ -97,7 +97,7 @@ public class MixinTheEndBiomeSource implements IExtendedTheEndBiomeSource
         this.highlandsArea = LayeredNoiseUtil.biomeArea(registryAccess, seed, TerraBlender.CONFIG.endHighlandsBiomeSize, highlands);
         this.midlandsArea = LayeredNoiseUtil.biomeArea(registryAccess, seed, TerraBlender.CONFIG.endMidlandsBiomeSize, midlands);
         this.edgeArea = LayeredNoiseUtil.biomeArea(registryAccess, seed, TerraBlender.CONFIG.endEdgeBiomeSize, edge);
-        this.islandsArea = LayeredNoiseUtil.biomeArea(registryAccess, seed, TerraBlender.CONFIG.endIslandBiomeSize, edge);
+        this.islandsArea = LayeredNoiseUtil.biomeArea(registryAccess, seed, TerraBlender.CONFIG.endIslandBiomeSize, islands);
 
         // This may not be initialized with e.g. BCLib
         this.tbInitialized = true;
