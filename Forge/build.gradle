@@ -59,7 +59,7 @@ mixin {
 jar {
     manifest {
         attributes([
-            'MixinConfigs': "${mod_id}.mixins.json" + "," + "${mod_id}_forge.mixins.json",
+            'MixinConfigs': "${mod_id}.mixins.json" + "," + "${mod_id}.forge.mixins.json",
         ])
     }
 }
