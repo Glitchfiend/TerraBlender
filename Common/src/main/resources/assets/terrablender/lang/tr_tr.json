@@ -1,0 +1,4 @@
+{
+  "commands.terrablender.biomeparams.success": "Konum %s %s %s'deki parametreler: %s",
+  "commands.terrablender.biomeparams.failed": "Parametreler belirlenemedi"
+}
