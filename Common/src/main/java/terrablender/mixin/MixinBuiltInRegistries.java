@@ -24,7 +24,7 @@ import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,7 +49,7 @@ public abstract class MixinBuiltInRegistries
                 bootstrap.run(registry);
 
                 // Run our bootstrap
-                return Registry.register(registry, ResourceLocation.fromNamespaceAndPath(TerraBlender.MOD_ID, "merged"), NamespacedSurfaceRuleSource.CODEC.codec());
+                return Registry.register(registry, Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, "merged"), NamespacedSurfaceRuleSource.CODEC.codec());
             })));
         }
     }

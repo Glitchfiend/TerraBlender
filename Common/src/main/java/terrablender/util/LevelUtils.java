@@ -120,6 +120,6 @@ public class LevelUtils
         }));
         biomeSourceEx.appendDeferredBiomesList(builder.build());
 
-        TerraBlender.LOGGER.info(String.format("Initialized TerraBlender biomes for level stem %s", levelResourceKey.location()));
+        TerraBlender.LOGGER.info(String.format("Initialized TerraBlender biomes for level stem %s", levelResourceKey.identifier()));
     }
 }

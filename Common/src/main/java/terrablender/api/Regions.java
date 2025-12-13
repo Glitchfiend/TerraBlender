@@ -20,7 +20,7 @@ package terrablender.api;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.DefaultNetherRegion;
 import terrablender.worldgen.DefaultOverworldRegion;
@@ -31,15 +31,15 @@ import java.util.Map;
 
 public class Regions
 {
-    private static Map<RegionType, LinkedHashMap<ResourceLocation, Region>> regions = Maps.newHashMap();
-    private static Map<RegionType, Map<ResourceLocation, Integer>> indices = Maps.newHashMap();
+    private static Map<RegionType, LinkedHashMap<Identifier, Region>> regions = Maps.newHashMap();
+    private static Map<RegionType, Map<Identifier, Integer>> indices = Maps.newHashMap();
 
     /**
      * Register a {@link Region}.
      * @param name the name of the region.
      * @param region the region.
      */
-    public static void register(ResourceLocation name, Region region)
+    public static void register(Identifier name, Region region)
     {
         regions.get(region.getType()).put(name, region);
         int index = regions.get(region.getType()).size() - 1;
@@ -53,10 +53,10 @@ public class Regions
      * @param index the index of the region.
      * @param region the region.
      */
-    public static void register(ResourceLocation name, int index, Region region)
+    public static void register(Identifier name, int index, Region region)
     {
         // Construct a list of the existing entries and add in our new entry
-        List<Map.Entry<ResourceLocation, Region>> entries = Lists.newArrayList(regions.get(region.getType()).entrySet());
+        List<Map.Entry<Identifier, Region>> entries = Lists.newArrayList(regions.get(region.getType()).entrySet());
         entries.add(index, Map.entry(name, region));
 
         // Clear the current regions and reconstruct the map
@@ -79,7 +79,7 @@ public class Regions
      * @param type the type of the region.
      * @param name the name of the region.
      */
-    public static void remove(RegionType type, ResourceLocation name)
+    public static void remove(RegionType type, Identifier name)
     {
         if (!regions.get(type).containsKey(name))
             return;
@@ -99,15 +99,15 @@ public class Regions
     }
 
     /**
-     * Gets the index associated with a region's {@link ResourceLocation}.
+     * Gets the index associated with a region's {@link Identifier}.
      * @param type the type of the region.
      * @param location the location of the region.
      * @return the index of the region.
      */
-    public static int getIndex(RegionType type, ResourceLocation location)
+    public static int getIndex(RegionType type, Identifier location)
     {
-        LinkedHashMap<ResourceLocation, Region> typedRegions = regions.get(type);
-        Map<ResourceLocation, Integer> typedIndices = indices.get(type);
+        LinkedHashMap<Identifier, Region> typedRegions = regions.get(type);
+        Map<Identifier, Integer> typedIndices = indices.get(type);
 
         if (typedIndices.containsKey(location))
             return typedIndices.get(location);

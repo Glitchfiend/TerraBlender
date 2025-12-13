@@ -20,7 +20,7 @@ package terrablender.worldgen;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 
 public class DefaultNetherRegion extends Region
 {
-    public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath("minecraft", "nether");
+    public static final Identifier LOCATION = Identifier.fromNamespaceAndPath("minecraft", "nether");
 
     public DefaultNetherRegion(int weight)
     {

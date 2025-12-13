@@ -22,7 +22,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import terrablender.core.TerraBlender;
@@ -38,13 +38,13 @@ import java.util.function.Consumer;
 public abstract class Region
 {
     /* A resource key used to indicate that biome selection should be deferred to Vanilla's region. */
-    public static final ResourceKey<Biome> DEFERRED_PLACEHOLDER = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(TerraBlender.MOD_ID, "deferred_placeholder"));
+    public static final ResourceKey<Biome> DEFERRED_PLACEHOLDER = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, "deferred_placeholder"));
 
-    private final ResourceLocation name;
+    private final Identifier name;
     private RegionType type;
     private int weight;
 
-    public Region(ResourceLocation name, RegionType type, int weight)
+    public Region(Identifier name, RegionType type, int weight)
     {
         this.name = name;
         this.type = type;
@@ -55,7 +55,7 @@ public abstract class Region
      * Get the name for this region.
      * @return the region name.
      */
-    public ResourceLocation getName()
+    public Identifier getName()
     {
         return this.name;
     }

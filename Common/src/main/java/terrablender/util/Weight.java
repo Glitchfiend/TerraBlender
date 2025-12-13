@@ -7,7 +7,7 @@ package terrablender.util;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import net.minecraft.SharedConstants;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import org.slf4j.Logger;
 
 public class Weight {
