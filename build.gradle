@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.modrinth.minotaur:Minotaur:2.+'
         classpath 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext:1.2' // Required for NeoGradle
-        classpath 'net.minecraftforge:gradleutils:2.2.0' // Required for changelog generation
+        classpath 'net.minecraftforge:gradleutils:2.6.4' // Required for changelog generation
     }
 }
 
