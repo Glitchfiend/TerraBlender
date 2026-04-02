@@ -1,0 +1,60 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '[7.0.17,8)'
+    id "de.maxhenkel.cursegradle" version "1.5.1"
+}
+
+base.archivesName.set("${mod_name}-forge")
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    accessTransformers = files(project(":Common").file('src/main/resources/META-INF/accesstransformer.cfg'))
+
+    runs {
+        configureEach {
+            workingDir = layout.projectDirectory.dir('run')
+
+            systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+            systemProperty 'forge.enabledGameTestNamespaces', 'examplemod'
+        }
+
+        register('client') {
+            args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
+        }
+
+        register('server') {
+            args '--nogui', "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
+        }
+    }
+}
+
+sourceSets.main.resources.srcDir 'src/generated/resources'
+
+repositories {
+    minecraft.mavenizer(it) // In Kotlin, it = this
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+
+dependencies {
+    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+}
+
+curseforge {
+    apiKey = project.findProperty('curseApiKey') ?: 'unset'
+    project {
+        id = '563928'
+
+        if (changelog_file.exists()) {
+            changelog = changelog_file
+        }
+
+        releaseType = release_channel
+        addGameVersion minecraft_version
+
+        mainArtifact(jar) {
+            displayName = "TerraBlender Forge ${version}"
+        }
+    }
+}
