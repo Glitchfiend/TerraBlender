@@ -18,3 +18,9 @@ logoFile="${mod_id}_logo.png"
     versionRange="${forge_version_range}"
     ordering="NONE"
     side="BOTH"
+
+[[mixins]]
+    config="${mod_id}.mixins.json"
+
+[[mixins]]
+    config="${mod_id}.neoforge.mixins.json"

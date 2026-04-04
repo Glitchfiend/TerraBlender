@@ -15,15 +15,22 @@ minecraft {
 
             systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
             systemProperty 'forge.enabledGameTestNamespaces', 'examplemod'
-        }
 
-        register('client') {
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
         }
 
+        register('client')
+
         register('server') {
-            args '--nogui', "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
+            args '--nogui'
         }
+    }
+}
+
+tasks.named('jar', Jar) {
+    manifest {
+        // Add our config to the manifest of our jar to have Mixin detect us at runtime.
+        attributes['MixinConfigs'] = "${mod_id}.mixins.json, ${mod_id}.forge.mixins.json"
     }
 }
 
