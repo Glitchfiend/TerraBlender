@@ -87,11 +87,8 @@ public class LevelUtils
             ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(SurfaceRuleManager.RuleCategory.END);
             return;
         }
-        else if (!shouldApplyToBiomeSource(chunkGenerator.getBiomeSource())) return;
 
         RegionType regionType = getRegionTypeForDimension(dimensionType);
-        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)chunkGenerator.getBiomeSource();
-        IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
 
         // Don't continue if region type is uninitialized
         if (regionType == null)
@@ -104,6 +101,11 @@ public class LevelUtils
             default -> throw new IllegalArgumentException("Attempted to get surface rule category for unsupported region type " + regionType);
         };
         ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(ruleCategory);
+
+        if (!shouldApplyToBiomeSource(chunkGenerator.getBiomeSource())) return;
+
+        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)chunkGenerator.getBiomeSource();
+        IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
 
         Climate.ParameterList parameters = biomeSource.parameters();
         IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
