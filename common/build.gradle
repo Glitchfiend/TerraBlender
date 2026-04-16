@@ -14,9 +14,9 @@ neoForge {
 }
 
 dependencies {
-    compileOnly group:'org.spongepowered', name: 'mixin', version: '0.8.5'
-    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
-    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+    compileOnly 'org.spongepowered:mixin:0.8.5'
+    compileOnly 'io.github.llamalad7:mixinextras-common:0.3.5'
+    annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.5'
     compileOnly("com.electronwill.night-config:toml:${nightconfig_version}")
     compileOnly("com.electronwill.night-config:core:${nightconfig_version}")
 }

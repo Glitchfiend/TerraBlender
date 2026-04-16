@@ -17,11 +17,11 @@ apply plugin: 'org.jetbrains.gradle.plugin.idea-ext'
 apply plugin: 'net.minecraftforge.gradleutils'
 
 changelog {
-    fromTag '3.2.0'
+    from '3.2.0'
 }
 
 ext {
-    mod_version = gradleutils.getTagOffsetVersion()
+    mod_version = gitversion.tagOffset
     changelog_file = rootProject.file("build/changelog.txt")
     trimChangelog = (String text) -> {
         def m = text =~ /(?s) - (?:[0-9.]+) (.+?)(?=( - )|$)/
@@ -222,9 +222,9 @@ subprojects {
         publishing {
             publications {
                 mavenJava(MavenPublication) {
-                    artifactId project.base.archivesName.get()
-                    groupId project.group
-                    version project.version
+                    artifactId = project.base.archivesName.get()
+                    groupId = project.group
+                    version = project.version
                     from components.java
 
                     pom {
@@ -257,18 +257,31 @@ subprojects {
                         }
                         withXml {
                             NodeList dependencies = asNode().dependencies
-                            NodeList allDeps = dependencies.'*'
+                            List<Node> forgeDeps = []
+                            List<Node> mappedDeps = []
+
+                            for (Object dependencyNode : dependencies.'*') {
+                                if (!(dependencyNode instanceof Node)) {
+                                    continue
+                                }
+
+                                Node dep = (Node) dependencyNode
+
+                                if (dep.artifactId.text() == 'forge' && dep.groupId.text() == 'net.minecraftforge') {
+                                    forgeDeps.add(dep)
+                                }
+
+                                if (dep.version.text().contains('_mapped_')) {
+                                    mappedDeps.add(dep)
+                                }
+                            }
 
                             // Remove forge deps
-                            allDeps.<Node> findAll() { Node el ->
-                                el.artifactId.text() == 'forge' && el.groupId.text() == 'net.minecraftforge'
-                            }.forEach() { Node el ->
+                            forgeDeps.forEach() { Node el ->
                                 el.parent().remove(el)
                             }
                             // Remove ForgeGradle's mapped suffix from versions & set as optional so anyone else doesn't inherit them
-                            allDeps.<Node> findAll() { Node el ->
-                                el.version.text().contains('_mapped_')
-                            }.each { Node el ->
+                            mappedDeps.each { Node el ->
                                 el.version.each { Node version ->
                                     def versionText = version.text()
                                     version.setValue(versionText.substring(0, versionText.indexOf('_mapped_')))
