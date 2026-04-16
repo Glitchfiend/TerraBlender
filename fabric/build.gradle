@@ -1,5 +1,5 @@
 plugins {
-    id "net.fabricmc.fabric-loom" version "1.15-SNAPSHOT"
+    id "net.fabricmc.fabric-loom" version "1.16-SNAPSHOT"
     id "de.maxhenkel.cursegradle" version "1.5.1"
 }
 
