@@ -20,6 +20,7 @@ package terrablender.core;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.registries.DataPackRegistryEvent;
 import terrablender.config.TerraBlenderConfig;
 import terrablender.handler.InitializationHandler;
 
@@ -29,6 +30,7 @@ public class TerraBlenderForge {
 
     public TerraBlenderForge() {
         ServerAboutToStartEvent.BUS.addListener(InitializationHandler::onServerAboutToStart);
+        DataPackRegistryEvent.NewRegistry.BUS.addListener(InitializationHandler::onRegisterRegistries);
         TerraBlender.setConfig(CONFIG);
     }
 }

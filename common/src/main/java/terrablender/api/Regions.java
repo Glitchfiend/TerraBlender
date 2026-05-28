@@ -20,7 +20,10 @@ package terrablender.api;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
+import terrablender.core.Registries;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.DefaultNetherRegion;
 import terrablender.worldgen.DefaultOverworldRegion;
@@ -33,6 +36,16 @@ public class Regions
 {
     private static Map<RegionType, LinkedHashMap<Identifier, Region>> regions = Maps.newHashMap();
     private static Map<RegionType, Map<Identifier, Integer>> indices = Maps.newHashMap();
+
+    public static void loadDataDrivenRegions(RegistryAccess registryAccess)
+    {
+        Registry<RegionDefinition> registry = registryAccess.lookupOrThrow(Registries.REGION);
+
+        for (RegionDefinition definition : registry)
+        {
+            register(new DataDrivenRegion(definition));
+        }
+    }
 
     /**
      * Register a {@link Region}.

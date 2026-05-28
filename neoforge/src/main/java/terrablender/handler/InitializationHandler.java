@@ -19,6 +19,10 @@ package terrablender.handler;
 
 
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import terrablender.api.RegionDefinition;
+import terrablender.api.Regions;
+import terrablender.core.Registries;
 import terrablender.util.LevelUtils;
 
 public class InitializationHandler
@@ -27,5 +31,11 @@ public class InitializationHandler
     public static void onServerAboutToStart(ServerAboutToStartEvent event)
     {
         LevelUtils.initializeOnServerStart(event.getServer());
+        Regions.loadDataDrivenRegions(event.getServer().registryAccess());
+    }
+
+    public static void onRegisterRegistries(DataPackRegistryEvent.NewRegistry event)
+    {
+        event.dataPackRegistry(Registries.REGION, RegionDefinition.CODEC);
     }
 }
