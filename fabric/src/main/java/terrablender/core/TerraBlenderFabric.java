@@ -18,7 +18,9 @@
 package terrablender.core;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.loader.api.FabricLoader;
+import terrablender.api.RegionDefinition;
 import terrablender.api.TerraBlenderApi;
 import terrablender.config.TerraBlenderConfig;
 
@@ -30,6 +32,7 @@ public class TerraBlenderFabric implements ModInitializer
     public void onInitialize()
     {
         TerraBlender.setConfig(CONFIG);
+        DynamicRegistries.registerSynced(Registries.REGION, RegionDefinition.CODEC);
 
         FabricLoader.getInstance().getEntrypointContainers("terrablender", TerraBlenderApi.class).forEach(entrypoint -> {
             TerraBlenderApi api = entrypoint.getEntrypoint();
