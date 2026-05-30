@@ -19,6 +19,7 @@ package terrablender.core;
 
 
 import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
@@ -29,9 +30,9 @@ import terrablender.handler.InitializationHandler;
 public class TerraBlenderNeoForge {
     private static final TerraBlenderConfig CONFIG = new TerraBlenderConfig(FMLPaths.CONFIGDIR.get().resolve(TerraBlender.MOD_ID + ".toml"));
 
-    public TerraBlenderNeoForge() {
+    public TerraBlenderNeoForge(IEventBus bus) {
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, InitializationHandler::onServerAboutToStart);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, InitializationHandler::onRegisterRegistries);
+        bus.addListener(InitializationHandler::onRegisterDataPackRegistries);
         TerraBlender.setConfig(CONFIG);
     }
 }
