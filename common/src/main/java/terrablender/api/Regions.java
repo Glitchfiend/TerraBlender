@@ -23,6 +23,8 @@ import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
+import terrablender.api.data.DataDrivenRegion;
+import terrablender.api.data.RegionDefinition;
 import terrablender.core.Registries;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.DefaultNetherRegion;

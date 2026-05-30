@@ -19,7 +19,7 @@ package terrablender.handler;
 
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.registries.DataPackRegistryEvent;
-import terrablender.api.RegionDefinition;
+import terrablender.api.data.RegionDefinition;
 import terrablender.api.Regions;
 import terrablender.core.Registries;
 import terrablender.util.LevelUtils;
