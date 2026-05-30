@@ -32,7 +32,7 @@ public class InitializationHandler
         Regions.loadDataDrivenRegions(event.getServer().registryAccess());
     }
 
-    public static void onRegisterRegistries(DataPackRegistryEvent.NewRegistry event)
+    public static void onRegisterDataPackRegistries(DataPackRegistryEvent.NewRegistry event)
     {
         event.dataPackRegistry(Registries.REGION, RegionDefinition.CODEC);
     }

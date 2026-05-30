@@ -30,7 +30,7 @@ public class TerraBlenderForge {
 
     public TerraBlenderForge() {
         ServerAboutToStartEvent.BUS.addListener(InitializationHandler::onServerAboutToStart);
-        DataPackRegistryEvent.NewRegistry.BUS.addListener(InitializationHandler::onRegisterRegistries);
+        DataPackRegistryEvent.NewRegistry.BUS.addListener(InitializationHandler::onRegisterDataPackRegistries);
         TerraBlender.setConfig(CONFIG);
     }
 }

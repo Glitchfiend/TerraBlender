@@ -1,4 +1,4 @@
-accessWidener v1 official
+accessWidener v2 official
 
 # BiomeSource
 mutable field net/minecraft/world/level/biome/BiomeSource possibleBiomes Ljava/util/function/Supplier;
