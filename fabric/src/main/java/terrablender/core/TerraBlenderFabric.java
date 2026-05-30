@@ -20,7 +20,7 @@ package terrablender.core;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.loader.api.FabricLoader;
-import terrablender.api.RegionDefinition;
+import terrablender.api.data.RegionDefinition;
 import terrablender.api.TerraBlenderApi;
 import terrablender.config.TerraBlenderConfig;
 

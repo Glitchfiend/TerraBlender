@@ -20,7 +20,7 @@ package terrablender.handler;
 
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
-import terrablender.api.RegionDefinition;
+import terrablender.api.data.RegionDefinition;
 import terrablender.api.Regions;
 import terrablender.core.Registries;
 import terrablender.util.LevelUtils;
