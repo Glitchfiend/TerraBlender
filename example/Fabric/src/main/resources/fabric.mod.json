@@ -13,6 +13,9 @@
       "main": [
         "terrablender.example.TestMod"
       ],
+      "fabric-datagen": [
+        "terrablender.example.datagen.DataGen"
+      ],
       "terrablender": [
         "terrablender.example.TestMod"
       ]
