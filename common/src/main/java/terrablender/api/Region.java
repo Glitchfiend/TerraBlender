@@ -25,6 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
+import terrablender.api.data.RegionDefinition;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.RegionUtils;
 
@@ -41,14 +42,19 @@ public abstract class Region
     public static final ResourceKey<Biome> DEFERRED_PLACEHOLDER = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, "deferred_placeholder"));
 
     private final Identifier name;
-    private RegionType type;
-    private int weight;
+    private final RegionType type;
+    private final int weight;
 
     public Region(Identifier name, RegionType type, int weight)
     {
         this.name = name;
         this.type = type;
         this.weight = weight;
+    }
+
+    public Region(RegionDefinition definition)
+    {
+        this(definition.name(), definition.type(), definition.weight());
     }
 
     /**
@@ -152,7 +158,7 @@ public abstract class Region
     {
         ModifiedVanillaOverworldBuilder builder = new ModifiedVanillaOverworldBuilder();
         onModify.accept(builder);
-        builder.build().forEach(mapper::accept);
+        builder.build().forEach(mapper);
     }
 
 }
