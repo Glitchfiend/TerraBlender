@@ -28,6 +28,10 @@ import terrablender.api.Region;
 
 import java.util.function.Consumer;
 
+/**
+ * A region that is defined by a {@link RegionDefinition} and can be serialized to and from JSON.
+ * @see RegionDefinition
+ */
 public class DataDrivenRegion extends Region
 {
     public static final Codec<DataDrivenRegion> CODEC = RecordCodecBuilder.create(regionInstance -> regionInstance.group(
@@ -38,7 +42,7 @@ public class DataDrivenRegion extends Region
 
     public DataDrivenRegion(RegionDefinition regionDefinition)
     {
-        super(regionDefinition.name(), regionDefinition.type(), regionDefinition.weight());
+        super(regionDefinition);
         this.definition = regionDefinition;
     }
 
