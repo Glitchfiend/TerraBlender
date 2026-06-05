@@ -21,15 +21,23 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.Identifier;
 import terrablender.api.RegionType;
+import terrablender.api.data.condition.AlwaysTrueCondition;
+import terrablender.api.data.condition.BiomeMappingCondition;
 
 import java.util.List;
 
-public record RegionDefinition(Identifier name, RegionType type, int weight, List<BiomeMapping> biomeMappings)
+public record RegionDefinition(Identifier name, RegionType type, int weight, List<BiomeMapping> biomeMappings, BiomeMappingCondition condition)
 {
+    public RegionDefinition(Identifier name, RegionType type, int weight, List<BiomeMapping> biomeMappings)
+    {
+        this(name, type, weight, biomeMappings, new AlwaysTrueCondition());
+    }
+
     public static final Codec<RegionDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Identifier.CODEC.fieldOf("name").forGetter(RegionDefinition::name),
             RegionType.CODEC.fieldOf("type").forGetter(RegionDefinition::type),
             Codec.INT.fieldOf("weight").forGetter(RegionDefinition::weight),
-            BiomeMapping.CODEC.listOf().fieldOf("biomeMappings").forGetter(RegionDefinition::biomeMappings)
+            BiomeMapping.CODEC.listOf().fieldOf("biomeMappings").forGetter(RegionDefinition::biomeMappings),
+            BiomeMappingCondition.CODEC.optionalFieldOf("condition", new AlwaysTrueCondition()).forGetter(RegionDefinition::condition)
     ).apply(instance, RegionDefinition::new));
 }

@@ -17,12 +17,20 @@
  */
 package terrablender.core;
 
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import terrablender.api.data.RegionDefinition;
 import terrablender.api.TerraBlenderApi;
 import terrablender.config.TerraBlenderConfig;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class TerraBlenderFabric implements ModInitializer
 {
@@ -32,6 +40,14 @@ public class TerraBlenderFabric implements ModInitializer
     public void onInitialize()
     {
         TerraBlender.setConfig(CONFIG);
+        TerraBlenderRegistries.initialize(new TerraBlenderRegistries.RegistryBootstrap() {
+            @Override
+            public <T> Supplier<Registry<T>> create(ResourceKey<Registry<T>> key, Consumer<BiConsumer<Identifier, T>> entryRegistrar) {
+                Registry<T> registry = FabricRegistryBuilder.create(key).buildAndRegister();
+                entryRegistrar.accept((id, value) -> Registry.register(registry, id, value));
+                return () -> registry;
+            }
+        });
         DynamicRegistries.registerSynced(Registries.REGION, RegionDefinition.CODEC);
 
         FabricLoader.getInstance().getEntrypointContainers("terrablender", TerraBlenderApi.class).forEach(entrypoint -> {

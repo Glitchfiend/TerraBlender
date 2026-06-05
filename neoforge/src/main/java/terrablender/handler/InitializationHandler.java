@@ -18,12 +18,22 @@
 package terrablender.handler;
 
 
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import terrablender.api.data.RegionDefinition;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.registries.RegistryBuilder;
 import terrablender.api.Regions;
 import terrablender.core.Registries;
+import terrablender.core.TerraBlenderRegistries;
 import terrablender.util.LevelUtils;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class InitializationHandler
 {
@@ -37,5 +47,17 @@ public class InitializationHandler
     public static void onRegisterDataPackRegistries(DataPackRegistryEvent.NewRegistry event)
     {
         event.dataPackRegistry(Registries.REGION, RegionDefinition.CODEC);
+    }
+
+    public static void onNewRegistry(NewRegistryEvent event)
+    {
+        TerraBlenderRegistries.initialize(new TerraBlenderRegistries.RegistryBootstrap() {
+            @Override
+            public <T> Supplier<Registry<T>> create(ResourceKey<Registry<T>> key, Consumer<BiConsumer<Identifier, T>> entryRegistrar) {
+                Registry<T> registry = event.create(new RegistryBuilder<>(key));
+                entryRegistrar.accept((id, value) -> Registry.register(registry, id, value));
+                return () -> registry;
+            }
+        });
     }
 }

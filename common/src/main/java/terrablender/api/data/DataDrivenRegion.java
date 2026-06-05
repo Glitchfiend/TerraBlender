@@ -51,7 +51,10 @@ public class DataDrivenRegion extends Region
     {
         for (BiomeMapping mapping : definition.biomeMappings())
         {
-            mapper.accept(Pair.of(mapping.parameters(), mapping.biome()));
+            if (definition.condition().test(mapping.biome(), mapping.parameters()))
+            {
+                mapper.accept(Pair.of(mapping.parameters(), mapping.biome()));
+            }
         }
     }
 }

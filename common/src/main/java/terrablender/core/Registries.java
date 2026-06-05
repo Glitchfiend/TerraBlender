@@ -21,7 +21,10 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import terrablender.api.data.RegionDefinition;
+import terrablender.api.data.condition.BiomeMappingConditionType;
 
 public class Registries {
     public static final ResourceKey<Registry<RegionDefinition>> REGION = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, "region"));
+
+    public static final ResourceKey<Registry<BiomeMappingConditionType<?>>> BIOME_MAPPING_CONDITION = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, "biome_mapping_condition"));
 }
