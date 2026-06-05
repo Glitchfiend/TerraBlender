@@ -33,6 +33,7 @@ public class TerraBlenderNeoForge {
     public TerraBlenderNeoForge(IEventBus bus) {
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, InitializationHandler::onServerAboutToStart);
         bus.addListener(InitializationHandler::onRegisterDataPackRegistries);
+        bus.addListener(InitializationHandler::onNewRegistry);
         TerraBlender.setConfig(CONFIG);
     }
 }
