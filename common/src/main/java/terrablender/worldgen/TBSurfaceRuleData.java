@@ -18,6 +18,9 @@
 package terrablender.worldgen;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -32,8 +35,8 @@ public class TBSurfaceRuleData
 {
     private static final SurfaceRules.RuleSource AIR = makeStateRule(Blocks.AIR);
     private static final SurfaceRules.RuleSource BEDROCK = makeStateRule(Blocks.BEDROCK);
-    private static final SurfaceRules.RuleSource WHITE_TERRACOTTA = makeStateRule(Blocks.WHITE_TERRACOTTA);
-    private static final SurfaceRules.RuleSource ORANGE_TERRACOTTA = makeStateRule(Blocks.ORANGE_TERRACOTTA);
+    private static final SurfaceRules.RuleSource WHITE_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.white());
+    private static final SurfaceRules.RuleSource ORANGE_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.orange());
     private static final SurfaceRules.RuleSource TERRACOTTA = makeStateRule(Blocks.TERRACOTTA);
     private static final SurfaceRules.RuleSource RED_SAND = makeStateRule(Blocks.RED_SAND);
     private static final SurfaceRules.RuleSource RED_SANDSTONE = makeStateRule(Blocks.RED_SANDSTONE);
@@ -71,13 +74,13 @@ public class TBSurfaceRuleData
         return SurfaceRules.state(block.defaultBlockState());
     }
 
-    public static SurfaceRules.RuleSource overworld()
+    public static SurfaceRules.RuleSource overworld(HolderGetter<Biome> biomes)
     {
-        return overworldLike(true, false, true);
+        return overworldLike(biomes, true, false, true);
     }
 
     // Up-to-date as of 1.21.4
-    public static SurfaceRules.RuleSource overworldLike(boolean checkAbovePreliminarySurface, boolean bedrockRoof, boolean bedrockFloor)
+    public static SurfaceRules.RuleSource overworldLike(HolderGetter<Biome> biomes, boolean checkAbovePreliminarySurface, boolean bedrockRoof, boolean bedrockFloor)
     {
         SurfaceRules.ConditionSource isBlockAboveY97WithVariationAbove = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(97), 2);
         SurfaceRules.ConditionSource isBlockAboveY256 = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(256), 0);
@@ -90,37 +93,37 @@ public class TBSurfaceRuleData
         SurfaceRules.ConditionSource isAboveWater = SurfaceRules.waterBlockCheck(0, 0);
         SurfaceRules.ConditionSource isInOrAboveDeepWaterWithVariationBelow = SurfaceRules.waterStartCheck(-6, -1);
         SurfaceRules.ConditionSource isHole = SurfaceRules.hole();
-        SurfaceRules.ConditionSource isFrozenOcean = SurfaceRules.isBiome(Biomes.FROZEN_OCEAN, Biomes.DEEP_FROZEN_OCEAN);
+        SurfaceRules.ConditionSource isFrozenOcean = SurfaceRules.isBiome(biomes, Biomes.FROZEN_OCEAN, Biomes.DEEP_FROZEN_OCEAN);
         SurfaceRules.ConditionSource isSteep = SurfaceRules.steep();
         SurfaceRules.RuleSource surfaceGrassOrDirtIfSubmerged = SurfaceRules.sequence(SurfaceRules.ifTrue(isAboveWater, GRASS_BLOCK), DIRT);
         SurfaceRules.RuleSource sandOrSandstoneCeiling = SurfaceRules.sequence(SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, SANDSTONE), SAND);
         SurfaceRules.RuleSource gravelOrStoneCeiling = SurfaceRules.sequence(SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, STONE), GRAVEL);
-        SurfaceRules.ConditionSource isSandyShoreOrOcean = SurfaceRules.isBiome(Biomes.WARM_OCEAN, Biomes.BEACH, Biomes.SNOWY_BEACH);
-        SurfaceRules.ConditionSource isDesert = SurfaceRules.isBiome(Biomes.DESERT);
+        SurfaceRules.ConditionSource isSandyShoreOrOcean = SurfaceRules.isBiome(biomes, Biomes.WARM_OCEAN, Biomes.BEACH, Biomes.SNOWY_BEACH);
+        SurfaceRules.ConditionSource isDesert = SurfaceRules.isBiome(biomes, Biomes.DESERT);
 
         SurfaceRules.RuleSource onAndUnderFloorSurfaceRules = SurfaceRules.sequence(
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.STONY_PEAKS),
+                SurfaceRules.isBiome(biomes, Biomes.STONY_PEAKS),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
-                        SurfaceRules.noiseCondition(Noises.CALCITE, -0.0125D, 0.0125D),
+                        SurfaceRules.noiseCondition2d(Noises.CALCITE, -0.0125D, 0.0125D),
                         CALCITE
                     ),
                     STONE
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.STONY_SHORE),
+                SurfaceRules.isBiome(biomes, Biomes.STONY_SHORE),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
-                        SurfaceRules.noiseCondition(Noises.GRAVEL, -0.05D, 0.05D),
+                        SurfaceRules.noiseCondition2d(Noises.GRAVEL, -0.05D, 0.05D),
                         gravelOrStoneCeiling
                     ),
                     STONE
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.WINDSWEPT_HILLS),
+                SurfaceRules.isBiome(biomes, Biomes.WINDSWEPT_HILLS),
                 SurfaceRules.ifTrue(
                     surfaceNoiseAbove(1.0D),
                     STONE
@@ -132,39 +135,39 @@ public class TBSurfaceRuleData
             ),
             SurfaceRules.ifTrue(isDesert, sandOrSandstoneCeiling),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.DRIPSTONE_CAVES),
+                SurfaceRules.isBiome(biomes, Biomes.DRIPSTONE_CAVES),
                 STONE
             )
         );
 
         SurfaceRules.RuleSource powderedSnowSmallPatches = SurfaceRules.ifTrue(
-            SurfaceRules.noiseCondition(Noises.POWDER_SNOW, 0.45D, 0.58D),
+            SurfaceRules.noiseCondition2d(Noises.POWDER_SNOW, 0.45D, 0.58D),
             SurfaceRules.ifTrue(isAboveWater, POWDER_SNOW)
         );
 
         SurfaceRules.RuleSource powderedSnowLargePatches = SurfaceRules.ifTrue(
-            SurfaceRules.noiseCondition(Noises.POWDER_SNOW, 0.35D, 0.6D),
+            SurfaceRules.noiseCondition2d(Noises.POWDER_SNOW, 0.35D, 0.6D),
             SurfaceRules.ifTrue(isAboveWater, POWDER_SNOW)
         );
 
         SurfaceRules.RuleSource underFloorSurfaceRules = SurfaceRules.sequence(
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.FROZEN_PEAKS),
+                SurfaceRules.isBiome(biomes, Biomes.FROZEN_PEAKS),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(isSteep, PACKED_ICE),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.noiseCondition(Noises.PACKED_ICE, -0.5D, 0.2D),
+                        SurfaceRules.noiseCondition2d(Noises.PACKED_ICE, -0.5D, 0.2D),
                         PACKED_ICE
                     ),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.noiseCondition(Noises.ICE, -0.0625D, 0.025D),
+                        SurfaceRules.noiseCondition2d(Noises.ICE, -0.0625D, 0.025D),
                         ICE
                     ),
                     SurfaceRules.ifTrue(isAboveWater, SNOW_BLOCK)
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.SNOWY_SLOPES),
+                SurfaceRules.isBiome(biomes, Biomes.SNOWY_SLOPES),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(isSteep, STONE),
                     powderedSnowSmallPatches,
@@ -172,11 +175,11 @@ public class TBSurfaceRuleData
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.JAGGED_PEAKS),
+                SurfaceRules.isBiome(biomes, Biomes.JAGGED_PEAKS),
                 STONE
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.GROVE),
+                SurfaceRules.isBiome(biomes, Biomes.GROVE),
                 SurfaceRules.sequence(
                     powderedSnowSmallPatches,
                     DIRT
@@ -184,14 +187,14 @@ public class TBSurfaceRuleData
             ),
             onAndUnderFloorSurfaceRules,
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.WINDSWEPT_SAVANNA),
+                SurfaceRules.isBiome(biomes, Biomes.WINDSWEPT_SAVANNA),
                 SurfaceRules.ifTrue(
                     surfaceNoiseAbove(1.75D),
                     STONE
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.WINDSWEPT_GRAVELLY_HILLS),
+                SurfaceRules.isBiome(biomes, Biomes.WINDSWEPT_GRAVELLY_HILLS),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
                         surfaceNoiseAbove(2.0D),
@@ -209,7 +212,7 @@ public class TBSurfaceRuleData
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.MANGROVE_SWAMP),
+                SurfaceRules.isBiome(biomes, Biomes.MANGROVE_SWAMP),
                 MUD
             ),
             DIRT
@@ -217,22 +220,22 @@ public class TBSurfaceRuleData
 
         SurfaceRules.RuleSource shallowFloorSurfaceRules = SurfaceRules.sequence(
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.FROZEN_PEAKS),
+                SurfaceRules.isBiome(biomes, Biomes.FROZEN_PEAKS),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(isSteep, PACKED_ICE),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.noiseCondition(Noises.PACKED_ICE, 0.0D, 0.2D),
+                        SurfaceRules.noiseCondition2d(Noises.PACKED_ICE, 0.0D, 0.2D),
                         PACKED_ICE
                     ),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.noiseCondition(Noises.ICE, 0.0D, 0.025D),
+                        SurfaceRules.noiseCondition2d(Noises.ICE, 0.0D, 0.025D),
                         ICE
                     ),
                     SurfaceRules.ifTrue(isAboveWater, SNOW_BLOCK)
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.SNOWY_SLOPES),
+                SurfaceRules.isBiome(biomes, Biomes.SNOWY_SLOPES),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(isSteep, STONE),
                     powderedSnowLargePatches,
@@ -241,14 +244,14 @@ public class TBSurfaceRuleData
             ),
             // Place stone on the cliff faces and snow on top for the jagged peaks
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.JAGGED_PEAKS),
+                SurfaceRules.isBiome(biomes, Biomes.JAGGED_PEAKS),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(isSteep, STONE),
                     SurfaceRules.ifTrue(isAboveWater, SNOW_BLOCK)
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.GROVE),
+                SurfaceRules.isBiome(biomes, Biomes.GROVE),
                 SurfaceRules.sequence(
                     powderedSnowLargePatches,
                     SurfaceRules.ifTrue(isAboveWater, SNOW_BLOCK)
@@ -257,7 +260,7 @@ public class TBSurfaceRuleData
             onAndUnderFloorSurfaceRules,
             // Windswept savanna stone mixed with coarse dirt
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.WINDSWEPT_SAVANNA),
+                SurfaceRules.isBiome(biomes, Biomes.WINDSWEPT_SAVANNA),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
                         surfaceNoiseAbove(1.75D),
@@ -271,7 +274,7 @@ public class TBSurfaceRuleData
             ),
             // Windswept gravelly hills: Gravel, stone and grass mixed
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.WINDSWEPT_GRAVELLY_HILLS),
+                SurfaceRules.isBiome(biomes, Biomes.WINDSWEPT_GRAVELLY_HILLS),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
                         surfaceNoiseAbove(2.0D),
@@ -289,7 +292,7 @@ public class TBSurfaceRuleData
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.OLD_GROWTH_PINE_TAIGA, Biomes.OLD_GROWTH_SPRUCE_TAIGA),
+                SurfaceRules.isBiome(biomes, Biomes.OLD_GROWTH_PINE_TAIGA, Biomes.OLD_GROWTH_SPRUCE_TAIGA),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
                         surfaceNoiseAbove(1.75D),
@@ -302,23 +305,23 @@ public class TBSurfaceRuleData
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.ICE_SPIKES),
+                SurfaceRules.isBiome(biomes, Biomes.ICE_SPIKES),
                 SurfaceRules.ifTrue(isAboveWater, SNOW_BLOCK)
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.MANGROVE_SWAMP),
+                SurfaceRules.isBiome(biomes, Biomes.MANGROVE_SWAMP),
                 MUD
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.MUSHROOM_FIELDS),
+                SurfaceRules.isBiome(biomes, Biomes.MUSHROOM_FIELDS),
                 MYCELIUM
             ),
             surfaceGrassOrDirtIfSubmerged
         );
 
-        SurfaceRules.ConditionSource isSuitableSurfaceNoiseLower = SurfaceRules.noiseCondition(Noises.SURFACE, -0.909D, -0.5454D);
-        SurfaceRules.ConditionSource isSuitableSurfaceNoiseMid = SurfaceRules.noiseCondition(Noises.SURFACE, -0.1818D, 0.1818D);
-        SurfaceRules.ConditionSource isSuitableSurfaceNoiseUpper = SurfaceRules.noiseCondition(Noises.SURFACE, 0.5454D, 0.909D);
+        SurfaceRules.ConditionSource isSuitableSurfaceNoiseLower = SurfaceRules.noiseCondition2d(Noises.SURFACE, -0.909D, -0.5454D);
+        SurfaceRules.ConditionSource isSuitableSurfaceNoiseMid = SurfaceRules.noiseCondition2d(Noises.SURFACE, -0.1818D, 0.1818D);
+        SurfaceRules.ConditionSource isSuitableSurfaceNoiseUpper = SurfaceRules.noiseCondition2d(Noises.SURFACE, 0.5454D, 0.909D);
 
         SurfaceRules.RuleSource surfaceRules = SurfaceRules.sequence(
             // Noisy biome floors (as seen in the wooded badlands, swamp and mangrove swamp)
@@ -326,7 +329,7 @@ public class TBSurfaceRuleData
                 SurfaceRules.ON_FLOOR,
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
-                        SurfaceRules.isBiome(Biomes.WOODED_BADLANDS),
+                        SurfaceRules.isBiome(biomes, Biomes.WOODED_BADLANDS),
                         SurfaceRules.ifTrue(
                             isBlockAboveY97WithVariationAbove,
                             SurfaceRules.sequence(
@@ -338,26 +341,26 @@ public class TBSurfaceRuleData
                         )
                     ),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.isBiome(Biomes.SWAMP),
+                        SurfaceRules.isBiome(biomes, Biomes.SWAMP),
                         SurfaceRules.ifTrue(
                             isBlockAboveY62,
                             SurfaceRules.ifTrue(
                                 SurfaceRules.not(isBlockAboveY63),
                                 SurfaceRules.ifTrue(
-                                    SurfaceRules.noiseCondition(Noises.SWAMP, 0.0D),
+                                    SurfaceRules.noiseCondition2d(Noises.SWAMP, 0.0D),
                                     WATER
                                 )
                             )
                         )
                     ),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.isBiome(Biomes.MANGROVE_SWAMP),
+                        SurfaceRules.isBiome(biomes, Biomes.MANGROVE_SWAMP),
                         SurfaceRules.ifTrue(
                             isBlockAboveY60,
                             SurfaceRules.ifTrue(
                                 SurfaceRules.not(isBlockAboveY63),
                                 SurfaceRules.ifTrue(
-                                    SurfaceRules.noiseCondition(Noises.SWAMP, 0.0D),
+                                    SurfaceRules.noiseCondition2d(Noises.SWAMP, 0.0D),
                                     WATER
                                 )
                             )
@@ -367,7 +370,7 @@ public class TBSurfaceRuleData
             ),
             // Badlands surface rules
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.BADLANDS, Biomes.ERODED_BADLANDS, Biomes.WOODED_BADLANDS),
+                SurfaceRules.isBiome(biomes, Biomes.BADLANDS, Biomes.ERODED_BADLANDS, Biomes.WOODED_BADLANDS),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
                         SurfaceRules.ON_FLOOR,
@@ -469,11 +472,11 @@ public class TBSurfaceRuleData
                 SurfaceRules.ON_FLOOR,
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
-                        SurfaceRules.isBiome(Biomes.FROZEN_PEAKS, Biomes.JAGGED_PEAKS),
+                        SurfaceRules.isBiome(biomes, Biomes.FROZEN_PEAKS, Biomes.JAGGED_PEAKS),
                         STONE
                     ),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.isBiome(Biomes.WARM_OCEAN, Biomes.LUKEWARM_OCEAN, Biomes.DEEP_LUKEWARM_OCEAN),
+                        SurfaceRules.isBiome(biomes, Biomes.WARM_OCEAN, Biomes.LUKEWARM_OCEAN, Biomes.DEEP_LUKEWARM_OCEAN),
                         sandOrSandstoneCeiling
                     ),
                     gravelOrStoneCeiling
@@ -513,7 +516,7 @@ public class TBSurfaceRuleData
         }));
     }
     
-    public static SurfaceRules.RuleSource nether()
+    public static SurfaceRules.RuleSource nether(HolderGetter<Biome> biomes)
     {
         SurfaceRules.ConditionSource isAbove31 = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(31), 0);
         SurfaceRules.ConditionSource isAbove32 = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(32), 0);
@@ -521,12 +524,12 @@ public class TBSurfaceRuleData
         SurfaceRules.ConditionSource isBelow35 = SurfaceRules.not(SurfaceRules.yStartCheck(VerticalAnchor.absolute(35), 0));
         SurfaceRules.ConditionSource isTop5Blocks = SurfaceRules.yBlockCheck(VerticalAnchor.belowTop(5), 0);
         SurfaceRules.ConditionSource isHole = SurfaceRules.hole();
-        SurfaceRules.ConditionSource isSuitableSoulSandNoise = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER, -0.012D);
-        SurfaceRules.ConditionSource surfacerules$conditionsource7 = SurfaceRules.noiseCondition(Noises.GRAVEL_LAYER, -0.012D);
-        SurfaceRules.ConditionSource isSuitablePatchNoise = SurfaceRules.noiseCondition(Noises.PATCH, -0.012D);
-        SurfaceRules.ConditionSource isSuitableNetherrackNoise = SurfaceRules.noiseCondition(Noises.NETHERRACK, 0.54D);
-        SurfaceRules.ConditionSource surfacerules$conditionsource10 = SurfaceRules.noiseCondition(Noises.NETHER_WART, 1.17D);
-        SurfaceRules.ConditionSource isStateSelectorNoiseSuitable = SurfaceRules.noiseCondition(Noises.NETHER_STATE_SELECTOR, 0.0D);
+        SurfaceRules.ConditionSource isSuitableSoulSandNoise = SurfaceRules.noiseCondition2d(Noises.SOUL_SAND_LAYER, -0.012D);
+        SurfaceRules.ConditionSource surfacerules$conditionsource7 = SurfaceRules.noiseCondition2d(Noises.GRAVEL_LAYER, -0.012D);
+        SurfaceRules.ConditionSource isSuitablePatchNoise = SurfaceRules.noiseCondition2d(Noises.PATCH, -0.012D);
+        SurfaceRules.ConditionSource isSuitableNetherrackNoise = SurfaceRules.noiseCondition2d(Noises.NETHERRACK, 0.54D);
+        SurfaceRules.ConditionSource surfacerules$conditionsource10 = SurfaceRules.noiseCondition2d(Noises.NETHER_WART, 1.17D);
+        SurfaceRules.ConditionSource isStateSelectorNoiseSuitable = SurfaceRules.noiseCondition2d(Noises.NETHER_STATE_SELECTOR, 0.0D);
 
         SurfaceRules.RuleSource gravelPatchRules = SurfaceRules.ifTrue(isSuitablePatchNoise, SurfaceRules.ifTrue(yStart30, SurfaceRules.ifTrue(isBelow35, GRAVEL)));
 
@@ -541,7 +544,7 @@ public class TBSurfaceRuleData
         SurfaceRules.RuleSource surfaceRules = SurfaceRules.sequence(
             SurfaceRules.ifTrue(isTop5Blocks, NETHERRACK),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.BASALT_DELTAS),
+                SurfaceRules.isBiome(biomes, Biomes.BASALT_DELTAS),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(SurfaceRules.UNDER_CEILING, BASALT),
                     SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR,
@@ -554,7 +557,7 @@ public class TBSurfaceRuleData
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.SOUL_SAND_VALLEY),
+                SurfaceRules.isBiome(biomes, Biomes.SOUL_SAND_VALLEY),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
                         SurfaceRules.UNDER_CEILING,
@@ -580,7 +583,7 @@ public class TBSurfaceRuleData
                         SurfaceRules.ifTrue(isHole, LAVA)
                     ),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.isBiome(Biomes.WARPED_FOREST),
+                        SurfaceRules.isBiome(biomes, Biomes.WARPED_FOREST),
                         SurfaceRules.ifTrue(
                             SurfaceRules.not(isSuitableNetherrackNoise),
                             SurfaceRules.ifTrue(
@@ -593,7 +596,7 @@ public class TBSurfaceRuleData
                         )
                     ),
                     SurfaceRules.ifTrue(
-                        SurfaceRules.isBiome(Biomes.CRIMSON_FOREST),
+                        SurfaceRules.isBiome(biomes, Biomes.CRIMSON_FOREST),
                         SurfaceRules.ifTrue(
                             SurfaceRules.not(isSuitableNetherrackNoise),
                             SurfaceRules.ifTrue(isAbove31,
@@ -607,7 +610,7 @@ public class TBSurfaceRuleData
                 )
             ),
             SurfaceRules.ifTrue(
-                SurfaceRules.isBiome(Biomes.NETHER_WASTES),
+                SurfaceRules.isBiome(biomes, Biomes.NETHER_WASTES),
                 SurfaceRules.sequence(
                     SurfaceRules.ifTrue(
                         SurfaceRules.UNDER_FLOOR,
@@ -663,6 +666,6 @@ public class TBSurfaceRuleData
 
     private static SurfaceRules.ConditionSource surfaceNoiseAbove(double value) 
     {
-        return SurfaceRules.noiseCondition(Noises.SURFACE, value / 8.25D, Double.MAX_VALUE);
+        return SurfaceRules.noiseCondition2d(Noises.SURFACE, value / 8.25D, Double.MAX_VALUE);
     }
 }

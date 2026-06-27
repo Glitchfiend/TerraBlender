@@ -19,6 +19,7 @@ package terrablender.worldgen.surface;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.util.KeyDispatchDataCodec;
@@ -30,16 +31,16 @@ import java.util.Map;
 
 public record NamespacedSurfaceRuleSource(SurfaceRules.RuleSource base, Map<String, SurfaceRules.RuleSource> sources) implements SurfaceRules.RuleSource
 {
-    public static final KeyDispatchDataCodec<NamespacedSurfaceRuleSource> CODEC = KeyDispatchDataCodec.of(RecordCodecBuilder.mapCodec((builder) ->
+    public static final MapCodec<NamespacedSurfaceRuleSource> CODEC = RecordCodecBuilder.mapCodec((builder) ->
     {
         return builder.group(
             SurfaceRules.RuleSource.CODEC.fieldOf("base").forGetter(NamespacedSurfaceRuleSource::base),
             Codec.unboundedMap(Codec.STRING, SurfaceRules.RuleSource.CODEC).fieldOf("sources").forGetter(NamespacedSurfaceRuleSource::sources)
         ).apply(builder, NamespacedSurfaceRuleSource::new);
-    }));
+    });
 
     @Override
-    public KeyDispatchDataCodec<? extends SurfaceRules.RuleSource> codec() {
+    public MapCodec<? extends SurfaceRules.RuleSource> codec() {
         return CODEC;
     }
 
@@ -55,11 +56,10 @@ public record NamespacedSurfaceRuleSource(SurfaceRules.RuleSource base, Map<Stri
     {
         public BlockState tryApply(int x, int y, int z)
         {
-            Holder<Biome> biome = context.biome.get();
             BlockState state = null;
 
-            if (biome.is(key -> this.rules.containsKey(key.identifier().getNamespace())))
-                state = this.rules.get(biome.unwrapKey().get().identifier().getNamespace()).tryApply(x, y, z);
+            if (context.getBiome().is(key -> this.rules.containsKey(key.identifier().getNamespace())))
+                state = this.rules.get(context.getBiome().unwrapKey().get().identifier().getNamespace()).tryApply(x, y, z);
 
             if (state == null)
                 state = this.baseRule.tryApply(x, y, z);

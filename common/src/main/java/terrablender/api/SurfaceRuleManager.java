@@ -22,6 +22,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.worldgen.TBSurfaceRuleData;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
@@ -114,13 +119,15 @@ public class SurfaceRuleManager
         if (defaultSurfaceRules.containsKey(category))
             return defaultSurfaceRules.get(category);
 
+        HolderGetter<Biome> biomes = VanillaRegistries.createLookup().lookupOrThrow(Registries.BIOME);
+
         if (category == RuleCategory.NETHER)
-            return TBSurfaceRuleData.nether();
+            return TBSurfaceRuleData.nether(biomes);
         else if (category == RuleCategory.END) {
             return TBSurfaceRuleData.end();
         }
 
-        return TBSurfaceRuleData.overworld();
+        return TBSurfaceRuleData.overworld(biomes);
     }
 
     /**
