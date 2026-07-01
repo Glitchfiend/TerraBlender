@@ -48,7 +48,10 @@ public class LevelUtils
     {
         RegistryAccess registryAccess = server.registryAccess();
         Registry<LevelStem> levelStemRegistry = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
+        Registry<Biome> biomeRegistry = registryAccess.lookupOrThrow(Registries.BIOME);
         long seed = server.getWorldGenSettings().options().seed();
+
+        SurfaceRuleManager.repopulateRules(biomeRegistry);
 
         for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : levelStemRegistry.entrySet())
         {

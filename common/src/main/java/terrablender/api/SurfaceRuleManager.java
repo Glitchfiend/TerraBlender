@@ -23,9 +23,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.HolderGetter;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.worldgen.TBSurfaceRuleData;
@@ -34,12 +31,17 @@ import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SurfaceRuleManager
 {
-    private static Map<RuleCategory, Map<String, SurfaceRules.RuleSource>> surfaceRules = Maps.newHashMap();
-    private static Map<RuleCategory, SurfaceRules.RuleSource> defaultSurfaceRules = Maps.newHashMap();
-    private static Map<RuleCategory, Map<RuleStage, List<Pair<Integer, SurfaceRules.RuleSource>>>> defaultSurfaceRuleInjections = Maps.newHashMap();
+    private static final Map<RuleCategory, Map<String, RuleBuilder>> surfaceRuleBuilders = Maps.newHashMap();
+    private static final Map<RuleCategory, RuleBuilder> defaultSurfaceRuleBuilders = Maps.newHashMap();
+    private static final Map<RuleCategory, Map<RuleStage, List<Pair<Integer, RuleBuilder>>>> defaultSurfaceRuleInjections = Maps.newHashMap();
+
+    private static final Map<RuleCategory, Map<String, SurfaceRules.RuleSource>> surfaceRules = Maps.newHashMap();
+    private static final Map<RuleCategory, SurfaceRules.RuleSource> defaultSurfaceRules = Maps.newHashMap();
 
     /**
      * Add surface rules for biomes belonging to a modded namespace.
@@ -47,9 +49,9 @@ public class SurfaceRuleManager
      * @param namespace the namespace to use these rules for.
      * @param rules the rules to add.
      */
-    public static void addSurfaceRules(RuleCategory category, String namespace, SurfaceRules.RuleSource rules)
+    public static void addSurfaceRules(RuleCategory category, String namespace, RuleBuilder rules)
     {
-        surfaceRules.get(category).put(namespace, rules);
+        surfaceRuleBuilders.get(category).put(namespace, rules);
     }
 
     /**
@@ -59,7 +61,7 @@ public class SurfaceRuleManager
      * @param priority the priority of the surface rules.
      * @param rules the rules to add.
      */
-    public static void addToDefaultSurfaceRulesAtStage(RuleCategory category, RuleStage ruleStage, int priority, SurfaceRules.RuleSource rules)
+    public static void addToDefaultSurfaceRulesAtStage(RuleCategory category, RuleStage ruleStage, int priority, RuleBuilder rules)
     {
         defaultSurfaceRuleInjections.get(category).get(ruleStage).add(Pair.of(priority, rules));
     }
@@ -69,9 +71,9 @@ public class SurfaceRuleManager
      * @param category the category of the surface rules.
      * @param rules the new default surface rules.
      */
-    public static void setDefaultSurfaceRules(RuleCategory category, SurfaceRules.RuleSource rules)
+    public static void setDefaultSurfaceRules(RuleCategory category, RuleBuilder rules)
     {
-        defaultSurfaceRules.put(category, rules);
+        defaultSurfaceRuleBuilders.put(category, rules);
     }
 
     /**
@@ -81,7 +83,7 @@ public class SurfaceRuleManager
      */
     public static void removeSurfaceRules(RuleCategory category, String namespace)
     {
-        surfaceRules.get(category).remove(namespace);
+        surfaceRuleBuilders.get(category).remove(namespace);
     }
 
     /**
@@ -104,9 +106,9 @@ public class SurfaceRuleManager
      * @param ruleStage the stage of the surface rules.
      * @return list of the surface rules to be added.
      */
-    public static List<SurfaceRules.RuleSource> getDefaultSurfaceRuleAdditionsForStage(RuleCategory category, RuleStage ruleStage)
+    public static List<SurfaceRules.RuleSource> getDefaultSurfaceRuleAdditionsForStage(RuleCategory category, RuleStage ruleStage, HolderGetter<Biome> biomes)
     {
-        return defaultSurfaceRuleInjections.get(category).get(ruleStage).stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(Pair::getSecond).collect(ImmutableList.toImmutableList());
+        return defaultSurfaceRuleInjections.get(category).get(ruleStage).stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(p -> p.getSecond().apply(biomes)).collect(ImmutableList.toImmutableList());
     }
 
     /**
@@ -116,18 +118,40 @@ public class SurfaceRuleManager
      */
     public static SurfaceRules.RuleSource getDefaultSurfaceRules(RuleCategory category)
     {
-        if (defaultSurfaceRules.containsKey(category))
-            return defaultSurfaceRules.get(category);
+        return defaultSurfaceRules.get(category);
+    }
 
-        HolderGetter<Biome> biomes = VanillaRegistries.createLookup().lookupOrThrow(Registries.BIOME);
+    /**
+     * INTERNAL
+     */
+    public static void repopulateRules(HolderGetter<Biome> biomes)
+    {
+        // Repopulate regular surface rules
+        surfaceRules.clear();
+        surfaceRules.putAll(
+            surfaceRuleBuilders.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> e.getValue().entrySet().stream()
+                                    .collect(Collectors.toMap(
+                                            Map.Entry::getKey,
+                                            r -> r.getValue().apply(biomes)
+                                    ))
+                    ))
+        );
 
-        if (category == RuleCategory.NETHER)
-            return TBSurfaceRuleData.nether(biomes);
-        else if (category == RuleCategory.END) {
-            return TBSurfaceRuleData.end();
-        }
+        // Repopulate default rules
+        defaultSurfaceRules.clear();
+        defaultSurfaceRules.putAll(
+            defaultSurfaceRuleBuilders.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                e -> e.getValue().apply(biomes)
+            ))
+        );
 
-        return TBSurfaceRuleData.overworld(biomes);
+        defaultSurfaceRules.putIfAbsent(RuleCategory.OVERWORLD, TBSurfaceRuleData.overworld(biomes));
+        defaultSurfaceRules.putIfAbsent(RuleCategory.NETHER, TBSurfaceRuleData.nether(biomes));
+        defaultSurfaceRules.putIfAbsent(RuleCategory.END, TBSurfaceRuleData.end(biomes));
     }
 
     /**
@@ -151,13 +175,15 @@ public class SurfaceRuleManager
         for (RuleCategory category : RuleCategory.values())
         {
             // Initialize the surface rules map
-            surfaceRules.put(category, Maps.newHashMap());
+            surfaceRuleBuilders.put(category, Maps.newHashMap());
 
             // Initialize the default surface rule injections map
-            Map<RuleStage, List<Pair<Integer, SurfaceRules.RuleSource>>> ruleStages = Maps.newHashMap();
+            Map<RuleStage, List<Pair<Integer, RuleBuilder>>> ruleStages = Maps.newHashMap();
             for (RuleStage stage : RuleStage.values())
                 ruleStages.put(stage, Lists.newArrayList());
             defaultSurfaceRuleInjections.put(category, ruleStages);
         }
     }
+
+    public interface RuleBuilder extends Function<HolderGetter<Biome>, SurfaceRules.RuleSource> {}
 }
