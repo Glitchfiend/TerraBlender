@@ -1,12 +1,8 @@
 plugins {
-    id 'fabric-loom' version '1.4-SNAPSHOT'
-    id 'idea'
+    id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = "Test-fabric"
+base.archivesName = "Test-fabric"
 
 repositories {
     maven { url = 'https://maven.minecraftforge.net/' }
@@ -14,10 +10,9 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modImplementation "com.github.glitchfiend:TerraBlender-fabric:${minecraft_version}-${terrablender_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    implementation "com.github.glitchfiend:TerraBlender-fabric:${minecraft_version}-${terrablender_version}"
 }
 
 loom {
@@ -35,4 +30,8 @@ loom {
             runDir("run")
         }
     }
+}
+
+fabricApi {
+    configureDataGeneration()
 }

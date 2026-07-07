@@ -1,48 +1,62 @@
 /**
  * Copyright (C) Glitchfiend
- * <p>
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package terrablender.example;
+package terrablender.api.data;
 
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import terrablender.api.Region;
-import terrablender.api.RegionType;
 
 import java.util.function.Consumer;
 
-public class TestRegion2 extends Region
+/**
+ * A region that is defined by a {@link RegionDefinition} and can be serialized to and from JSON.
+ * @see RegionDefinition
+ */
+public class DataDrivenRegion extends Region
 {
-    public TestRegion2(Identifier name, int weight)
+    public static final Codec<DataDrivenRegion> CODEC = RecordCodecBuilder.create(regionInstance -> regionInstance.group(
+            RegionDefinition.CODEC.fieldOf("definition").forGetter(region -> region.definition)
+    ).apply(regionInstance, DataDrivenRegion::new));
+
+    private final RegionDefinition definition;
+
+    public DataDrivenRegion(RegionDefinition regionDefinition)
     {
-        super(name, RegionType.OVERWORLD, weight);
+        super(regionDefinition);
+        this.definition = regionDefinition;
     }
 
     @Override
     public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper)
     {
-        this.addModifiedVanillaOverworldBiomes(mapper, builder -> {
-            // Simple example:
-            // Replace the Vanilla desert with our hot_red biome
-            builder.replaceBiome(Biomes.DESERT, TestBiomes.HOT_RED);
-        });
+        for (BiomeMapping mapping : definition.biomeMappings())
+        {
+            if (definition.condition().test(mapping.biome(), mapping.parameters()))
+            {
+                mapper.accept(Pair.of(mapping.parameters(), mapping.biome()));
+            }
+        }
     }
 }
+
+
