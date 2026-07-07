@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import terrablender.api.Regions;
 import terrablender.util.LevelUtils;
 
 // NOTE: Inject before fabric biome modifications (priority 1000)
@@ -19,6 +20,8 @@ public class MixinMinecraftServer
     @Inject(method = "<init>", at = @At("RETURN"), require = 1)
     private void onInit(CallbackInfo ci)
     {
-        LevelUtils.initializeOnServerStart((MinecraftServer)(Object)this);
+        MinecraftServer server = (MinecraftServer)(Object)this;
+        LevelUtils.initializeOnServerStart(server);
+        Regions.loadDataDrivenRegions(server.registryAccess());
     }
 }

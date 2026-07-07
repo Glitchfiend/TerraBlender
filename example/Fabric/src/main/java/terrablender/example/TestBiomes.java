@@ -18,8 +18,8 @@
 package terrablender.example;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 
 public class TestBiomes
@@ -29,6 +29,6 @@ public class TestBiomes
 
     private static ResourceKey<Biome> register(String name)
     {
-        return ResourceKey.create(Registries.BIOME, new ResourceLocation(TestMod.MOD_ID, name));
+        return ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(TestMod.MOD_ID, name));
     }
 }

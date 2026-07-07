@@ -13,6 +13,9 @@
       "main": [
         "terrablender.example.TestMod"
       ],
+      "fabric-datagen": [
+        "terrablender.example.datagen.DataGen"
+      ],
       "terrablender": [
         "terrablender.example.TestMod"
       ]
@@ -21,8 +24,8 @@
     "depends": {
       "fabricloader": "*",
       "fabric": "*",
-      "minecraft": "1.20.x",
-      "java": ">=17",
+      "minecraft": "26.1.x",
+      "java": ">=25",
       "terrablender": "*"
     }
   }

@@ -19,8 +19,8 @@ package terrablender.example;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import terrablender.api.Region;
@@ -33,7 +33,7 @@ import static terrablender.api.ParameterUtils.*;
 
 public class TestRegion1 extends Region
 {
-    public TestRegion1(ResourceLocation name, int weight)
+    public TestRegion1(Identifier name, int weight)
     {
         super(name, RegionType.OVERWORLD, weight);
     }

@@ -17,10 +17,27 @@
  */
 package terrablender.api;
 
+import com.mojang.serialization.Codec;
+import net.minecraft.util.StringRepresentable;
+import org.jspecify.annotations.NonNull;
+
 /**
- * The type of a biome region.
+ * The type of biome region.
  */
-public enum RegionType
+public enum RegionType implements StringRepresentable
 {
-    OVERWORLD, NETHER
+    OVERWORLD("overworld"), NETHER("nether");
+
+    public static final Codec<RegionType> CODEC = StringRepresentable.fromEnum(RegionType::values);
+
+    private final String name;
+
+    RegionType(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public @NonNull String getSerializedName() {
+        return name;
+    }
 }
