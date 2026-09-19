@@ -7,7 +7,7 @@
     "MixinBuiltInRegistries",
     "MixinChunkGenerator",
     "MixinMultiNoiseBiomeSource",
-    "MixinNoiseBasedChunkGenerator",
+    "MixinChunkGeneratorBiomeSource",
     "MixinNoiseGeneratorSettings",
     "MixinParameterList",
     "MixinPrimaryLevelData",

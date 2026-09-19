@@ -42,14 +42,14 @@ public abstract class MixinBuiltInRegistries
     @Inject(method="registerSimple(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap;)Lnet/minecraft/core/Registry;", at=@At("HEAD"), cancellable = true, remap = false)
     private static void registerSimple(ResourceKey key, BuiltInRegistries.RegistryBootstrap bootstrap, CallbackInfoReturnable<Registry> cir)
     {
-        if (key == Registries.MATERIAL_RULE)
+        if (key == Registries.MATERIAL_RULE_TYPE)
         {
             cir.setReturnValue(internalRegister(key, new MappedRegistry(key, Lifecycle.stable(), false), (registry -> {
                 // Run the Vanilla bootstrap
                 bootstrap.run(registry);
 
                 // Run our bootstrap
-                return Registry.register(registry, Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, "merged"), NamespacedSurfaceRuleSource.CODEC.codec());
+                return Registry.register(registry, Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, "merged"), NamespacedSurfaceRuleSource.CODEC);
             })));
         }
     }

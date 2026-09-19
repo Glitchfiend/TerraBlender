@@ -24,7 +24,9 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.MaterialRules;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 import terrablender.worldgen.TBSurfaceRuleData;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 
@@ -40,8 +42,8 @@ public class SurfaceRuleManager
     private static final Map<RuleCategory, RuleBuilder> defaultSurfaceRuleBuilders = Maps.newHashMap();
     private static final Map<RuleCategory, Map<RuleStage, List<Pair<Integer, RuleBuilder>>>> defaultSurfaceRuleInjections = Maps.newHashMap();
 
-    private static final Map<RuleCategory, Map<String, SurfaceRules.RuleSource>> surfaceRules = Maps.newHashMap();
-    private static final Map<RuleCategory, SurfaceRules.RuleSource> defaultSurfaceRules = Maps.newHashMap();
+    private static final Map<RuleCategory, Map<String, MaterialRule>> surfaceRules = Maps.newHashMap();
+    private static final Map<RuleCategory, MaterialRule> defaultSurfaceRules = Maps.newHashMap();
 
     /**
      * Add surface rules for biomes belonging to a modded namespace.
@@ -92,9 +94,9 @@ public class SurfaceRuleManager
      * @param fallback the surface rules to fallback on.
      * @return the namespaced rules.
      */
-    public static SurfaceRules.RuleSource getNamespacedRules(RuleCategory category, SurfaceRules.RuleSource fallback)
+    public static MaterialRule getNamespacedRules(RuleCategory category, MaterialRule fallback)
     {
-        ImmutableMap.Builder<String, SurfaceRules.RuleSource> builder = ImmutableMap.builder();
+        ImmutableMap.Builder<String, MaterialRule> builder = ImmutableMap.builder();
         builder.put("minecraft", getDefaultSurfaceRules(category));
         builder.putAll(surfaceRules.get(category));
         return new NamespacedSurfaceRuleSource(fallback, builder.build());
@@ -106,7 +108,7 @@ public class SurfaceRuleManager
      * @param ruleStage the stage of the surface rules.
      * @return list of the surface rules to be added.
      */
-    public static List<SurfaceRules.RuleSource> getDefaultSurfaceRuleAdditionsForStage(RuleCategory category, RuleStage ruleStage, HolderGetter<Biome> biomes)
+    public static List<MaterialRule> getDefaultSurfaceRuleAdditionsForStage(RuleCategory category, RuleStage ruleStage, HolderGetter<Biome> biomes)
     {
         return defaultSurfaceRuleInjections.get(category).get(ruleStage).stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(p -> p.getSecond().apply(biomes)).collect(ImmutableList.toImmutableList());
     }
@@ -116,7 +118,7 @@ public class SurfaceRuleManager
      * @param category the category to get the surface rules for.
      * @return the default surface rules.
      */
-    public static SurfaceRules.RuleSource getDefaultSurfaceRules(RuleCategory category)
+    public static MaterialRule getDefaultSurfaceRules(RuleCategory category)
     {
         return defaultSurfaceRules.get(category);
     }
@@ -185,5 +187,5 @@ public class SurfaceRuleManager
         }
     }
 
-    public interface RuleBuilder extends Function<HolderGetter<Biome>, SurfaceRules.RuleSource> {}
+    public interface RuleBuilder extends Function<HolderGetter<Biome>, MaterialRule> {}
 }

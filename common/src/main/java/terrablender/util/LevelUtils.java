@@ -51,7 +51,7 @@ public class LevelUtils
         Registry<Biome> biomeRegistry = registryAccess.lookupOrThrow(Registries.BIOME);
         long seed = server.getWorldGenSettings().options().seed();
 
-        SurfaceRuleManager.repopulateRules(biomeRegistry);
+        SurfaceRuleManager.repopulateRules(registryAccess);
 
         for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : levelStemRegistry.entrySet())
         {

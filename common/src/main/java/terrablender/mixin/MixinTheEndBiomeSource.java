@@ -26,7 +26,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.TheEndBiomeSource;
-import net.minecraft.world.level.levelgen.DensityFunction;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -134,7 +133,7 @@ public class MixinTheEndBiomeSource implements IExtendedTheEndBiomeSource
         }
         else
         {
-            double heightNoise = sampler.erosion().compute(new DensityFunction.SinglePointContext(blockX, blockY, blockZ));
+            double heightNoise = sampler.erosion().sampleValue(blockX, blockY, blockZ);
 
             if (heightNoise > 0.25)
             {

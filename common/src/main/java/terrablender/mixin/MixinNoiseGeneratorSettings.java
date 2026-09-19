@@ -18,7 +18,10 @@
 package terrablender.mixin;
 
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.levelgen.material.MaterialRules;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -33,20 +36,20 @@ import terrablender.worldgen.IExtendedNoiseGeneratorSettings;
 public class MixinNoiseGeneratorSettings implements IExtendedNoiseGeneratorSettings
 {
     @Shadow(remap = false)
-    private SurfaceRules.RuleSource surfaceRule;
+    private Holder<MaterialRule> materialRule;
 
     @Unique
     private SurfaceRuleManager.RuleCategory ruleCategory = null;
     @Unique
-    private SurfaceRules.RuleSource namespacedSurfaceRuleSource = null;
+    private Holder<MaterialRule> namespacedSurfaceRuleSource = null;
 
-    @Inject(method = "surfaceRule", at = @At("HEAD"), cancellable = true, remap = false)
-    private void surfaceRule(CallbackInfoReturnable<SurfaceRules.RuleSource> cir)
+    @Inject(method = "materialRule", at = @At("HEAD"), cancellable = true, remap = false)
+    private void materialRule(CallbackInfoReturnable<Holder<MaterialRule>> cir)
     {
         if (this.ruleCategory != null)
         {
             if (this.namespacedSurfaceRuleSource == null)
-                this.namespacedSurfaceRuleSource = SurfaceRuleManager.getNamespacedRules(this.ruleCategory, this.surfaceRule);
+                this.namespacedSurfaceRuleSource = Holder.direct(SurfaceRuleManager.getNamespacedRules(this.ruleCategory, new MaterialRule.HolderHolder(this.materialRule)));
 
             cir.setReturnValue(this.namespacedSurfaceRuleSource);
         }
@@ -56,5 +59,6 @@ public class MixinNoiseGeneratorSettings implements IExtendedNoiseGeneratorSetti
     public void setRuleCategory(SurfaceRuleManager.RuleCategory ruleCategory)
     {
         this.ruleCategory = ruleCategory;
+        this.namespacedSurfaceRuleSource = null;
     }
 }
