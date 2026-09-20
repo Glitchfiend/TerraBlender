@@ -83,11 +83,22 @@ public class LevelUtils
             return;
 
         NoiseGeneratorSettings generatorSettings = noiseBasedChunkGenerator.generatorSettings().value();
+        BiomeSource biomeSource = chunkGenerator.getBiomeSource();
 
-        if (chunkGenerator.getBiomeSource() instanceof TheEndBiomeSource)
+
+        if (dimensionType.is(DimensionTypeTags.END_REGIONS) || biomeSource instanceof TheEndBiomeSource)
         {
-            ((IExtendedTheEndBiomeSource)chunkGenerator.getBiomeSource()).initializeForTerraBlender(registryAccess, seed);
             ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(MaterialRuleManager.RuleCategory.END);
+
+            if (biomeSource instanceof TheEndBiomeSource)
+            {
+                ((IExtendedTheEndBiomeSource)biomeSource).initializeForTerraBlender(registryAccess, seed);
+            }
+            else
+            {
+                TerraBlender.LOGGER.warn(String.format("Level stem %s has the biome source %s, not TheEndBiomeSource, likely due to a datapack. TerraBlender biomes will likely not generate. ", levelResourceKey.identifier(), biomeSource.getClass().getName()));
+            }
+
             return;
         }
 
@@ -105,12 +116,12 @@ public class LevelUtils
         };
         ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(ruleCategory);
 
-        if (!shouldApplyToBiomeSource(chunkGenerator.getBiomeSource())) return;
+        if (!shouldApplyToBiomeSource(biomeSource)) return;
 
-        MultiNoiseBiomeSource biomeSource = (MultiNoiseBiomeSource)chunkGenerator.getBiomeSource();
-        IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)biomeSource;
+        MultiNoiseBiomeSource multiNoiseBiomeSource = (MultiNoiseBiomeSource)biomeSource;
+        IExtendedBiomeSource biomeSourceEx = (IExtendedBiomeSource)multiNoiseBiomeSource;
 
-        Climate.ParameterList parameters = biomeSource.parameters();
+        Climate.ParameterList parameters = multiNoiseBiomeSource.parameters();
         IExtendedParameterList parametersEx = (IExtendedParameterList)parameters;
 
         // Initialize the parameter list for TerraBlender

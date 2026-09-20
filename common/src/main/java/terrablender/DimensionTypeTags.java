@@ -11,6 +11,7 @@ public class DimensionTypeTags {
 
     public static final TagKey<DimensionType> OVERWORLD_REGIONS = create("overworld_regions");
     public static final TagKey<DimensionType> NETHER_REGIONS = create("nether_regions");
+    public static final TagKey<DimensionType> END_REGIONS = create("end_regions");
 
     private static TagKey<DimensionType> create(String id) {
         return TagKey.create(Registries.DIMENSION_TYPE, Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, id));

@@ -24,77 +24,105 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
-import net.minecraft.world.level.levelgen.material.rule.RuleEvaluator;
+import net.minecraft.world.level.levelgen.material.condition.ConditionEvaluator;
 import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
+import net.minecraft.world.level.levelgen.material.rule.RuleEvaluator;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
+import java.util.function.Function;
 
 public record NamespacedSurfaceRuleSource(MaterialRule base, Map<String, MaterialRule> sources) implements MaterialRule
 {
-    public static final MapCodec<NamespacedSurfaceRuleSource> CODEC = RecordCodecBuilder.mapCodec((builder) ->
-    {
-        return builder.group(
+    public static final MapCodec<NamespacedSurfaceRuleSource> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
             MaterialRule.CODEC.fieldOf("base").forGetter(NamespacedSurfaceRuleSource::base),
             Codec.unboundedMap(Codec.STRING, MaterialRule.CODEC).fieldOf("sources").forGetter(NamespacedSurfaceRuleSource::sources)
-        ).apply(builder, NamespacedSurfaceRuleSource::new);
-    });
+    ).apply(builder, NamespacedSurfaceRuleSource::new));
 
     @Override
-    public MapCodec<? extends MaterialRule> codec() {
+    public MapCodec<? extends MaterialRule> codec()
+    {
         return CODEC;
     }
 
     @Override
     public RuleEvaluator compile(MaterialRuleContext context)
     {
-        // Map Vanilla's possibleBiomes to possible namespaces
-        Set<Holder<Biome>> possibleBiomes = context.possibleBiomes();
-        Set<String> namespaces = new HashSet<>();
-        if (possibleBiomes != null)
-            possibleBiomes.forEach(biome -> namespaces.add(biome.unwrapKey().map(key -> key.identifier().getNamespace()).orElse("")));
-
-        // Gather the rules for the possible namespaces
-        RuleEvaluator fallback = this.base.compile(context);
+        MaterialRuleCompiler compiler = new MaterialRuleCompiler(context);
+        RuleEvaluator fallback = compiler.compile(this.base);
         Map<String, RuleEvaluator> rules = new HashMap<>();
-        this.sources.forEach((namespace, source) -> {
-            if (possibleBiomes == null || namespaces.contains(namespace))
-                rules.put(namespace, source.compile(context));
-        });
+        Function<String, RuleEvaluator> compileNamespace = namespace -> {
+            MaterialRule source = namespace == null ? null : this.sources.get(namespace);
+            return source == null ? fallback : withFallback(compiler.compile(source), fallback);
+        };
 
-        if (rules.isEmpty())
-            return fallback;
-
-        // No per-block biome lookup is necessary when every possible biome uses the same rule.
-        if (possibleBiomes != null && namespaces.size() == 1)
+        Set<Holder<Biome>> possibleBiomes = context.possibleBiomes();
+        if (possibleBiomes == null)
         {
-            RuleEvaluator selected = rules.get(namespaces.iterator().next());
-            return (x, y, z) -> {
-                BlockState state = selected.tryApply(x, y, z);
-                return state != null ? state : fallback.tryApply(x, y, z);
-            };
+            this.sources.keySet().forEach(namespace -> rules.put(namespace, compileNamespace.apply(namespace)));
+            if (rules.isEmpty())
+                return fallback;
+            RuleEvaluator dispatch = (x, y, z) -> rules.getOrDefault(namespaceOf(context.getBiome()), fallback).tryApply(x, y, z);
+            return dispatchConditional(compiler, rules.keySet(), dispatch, fallback);
         }
 
-        return new NamespacedRule(context, fallback, Map.copyOf(rules));
+        Map<Holder<Biome>, RuleEvaluator> biomeRules = new IdentityHashMap<>();
+        RuleEvaluator uniformRule = null;
+        boolean uniform = true;
+        for (Holder<Biome> biome : possibleBiomes)
+        {
+            RuleEvaluator rule = rules.computeIfAbsent(namespaceOf(biome), compileNamespace);
+            biomeRules.put(biome, rule);
+            if (uniformRule == null)
+                uniformRule = rule;
+            else if (uniformRule != rule)
+                uniform = false;
+        }
+
+        if (uniform)
+            return uniformRule == null ? fallback : uniformRule;
+
+        RuleEvaluator dispatch = (x, y, z) -> {
+            Holder<Biome> biome = context.getBiome();
+            RuleEvaluator rule = biomeRules.get(biome);
+            if (rule == null)
+                rule = rules.getOrDefault(namespaceOf(biome), fallback);
+            return rule.tryApply(x, y, z);
+        };
+        return dispatchConditional(compiler, rules.keySet(), dispatch, fallback);
     }
 
-    record NamespacedRule(MaterialRuleContext context, RuleEvaluator baseRule, Map<String, RuleEvaluator> rules) implements RuleEvaluator
+    private RuleEvaluator dispatchConditional(MaterialRuleCompiler compiler, Set<String> namespaces, RuleEvaluator dispatch, RuleEvaluator fallback)
     {
-        public BlockState tryApply(int x, int y, int z)
+        var rules = new ArrayList<MaterialRule>();
+
+        // Gather rules for all requested namespaces
+        for (String namespace : namespaces)
         {
-            BlockState state = null;
-
-            var key = context.getBiome().unwrapKey();
-            RuleEvaluator rule = key.map(biomeResourceKey -> this.rules.get(biomeResourceKey.identifier().getNamespace())).orElse(null);
-            if (rule != null)
-                state = rule.tryApply(x, y, z);
-
-            if (state == null)
-                state = this.baseRule.tryApply(x, y, z);
-
-            return state;
+            MaterialRule source = namespace == null ? null : this.sources.get(namespace);
+            if (source != null)
+                rules.add(source);
         }
+        ConditionEvaluator evaluator = compiler.createConditionEvaluator(rules);
+        if (evaluator == null)
+            return dispatch;
+        return (x, y, z) -> (evaluator.test() ? dispatch : fallback).tryApply(x, y, z);
+    }
+
+    private static RuleEvaluator withFallback(RuleEvaluator base, RuleEvaluator fallback)
+    {
+        return (x, y, z) -> {
+            BlockState state = base.tryApply(x, y, z);
+            return state != null ? state : fallback.tryApply(x, y, z);
+        };
+    }
+
+    private static String namespaceOf(Holder<Biome> biome)
+    {
+        var key = biome.unwrapKey();
+        return key.isPresent() ? key.get().identifier().getNamespace() : null;
     }
 }
