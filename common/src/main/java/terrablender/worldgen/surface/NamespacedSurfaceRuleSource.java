@@ -17,49 +17,79 @@
  */
 package terrablender.worldgen.surface;
 
-import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
+import net.minecraft.world.level.levelgen.material.rule.RuleEvaluator;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
-public record NamespacedSurfaceRuleSource(SurfaceRules.RuleSource base, Map<String, SurfaceRules.RuleSource> sources) implements SurfaceRules.RuleSource
+public record NamespacedSurfaceRuleSource(MaterialRule base, Map<String, MaterialRule> sources) implements MaterialRule
 {
     public static final MapCodec<NamespacedSurfaceRuleSource> CODEC = RecordCodecBuilder.mapCodec((builder) ->
     {
         return builder.group(
-            SurfaceRules.RuleSource.CODEC.fieldOf("base").forGetter(NamespacedSurfaceRuleSource::base),
-            Codec.unboundedMap(Codec.STRING, SurfaceRules.RuleSource.CODEC).fieldOf("sources").forGetter(NamespacedSurfaceRuleSource::sources)
+            MaterialRule.CODEC.fieldOf("base").forGetter(NamespacedSurfaceRuleSource::base),
+            Codec.unboundedMap(Codec.STRING, MaterialRule.CODEC).fieldOf("sources").forGetter(NamespacedSurfaceRuleSource::sources)
         ).apply(builder, NamespacedSurfaceRuleSource::new);
     });
 
     @Override
-    public MapCodec<? extends SurfaceRules.RuleSource> codec() {
+    public MapCodec<? extends MaterialRule> codec() {
         return CODEC;
     }
 
     @Override
-    public SurfaceRules.SurfaceRule apply(SurfaceRules.Context context)
+    public RuleEvaluator compile(MaterialRuleContext context)
     {
-        ImmutableMap.Builder<String, SurfaceRules.SurfaceRule> rules = new ImmutableMap.Builder<>();
-        this.sources.entrySet().forEach(entry -> rules.put(entry.getKey(), entry.getValue().apply(context)));
-        return new NamespacedRule(context, this.base.apply(context), rules.build());
+        // Map Vanilla's possibleBiomes to possible namespaces
+        Set<Holder<Biome>> possibleBiomes = context.possibleBiomes();
+        Set<String> namespaces = new HashSet<>();
+        if (possibleBiomes != null)
+            possibleBiomes.forEach(biome -> namespaces.add(biome.unwrapKey().map(key -> key.identifier().getNamespace()).orElse("")));
+
+        // Gather the rules for the possible namespaces
+        RuleEvaluator fallback = this.base.compile(context);
+        Map<String, RuleEvaluator> rules = new HashMap<>();
+        this.sources.forEach((namespace, source) -> {
+            if (possibleBiomes == null || namespaces.contains(namespace))
+                rules.put(namespace, source.compile(context));
+        });
+
+        if (rules.isEmpty())
+            return fallback;
+
+        // No per-block biome lookup is necessary when every possible biome uses the same rule.
+        if (possibleBiomes != null && namespaces.size() == 1)
+        {
+            RuleEvaluator selected = rules.get(namespaces.iterator().next());
+            return (x, y, z) -> {
+                BlockState state = selected.tryApply(x, y, z);
+                return state != null ? state : fallback.tryApply(x, y, z);
+            };
+        }
+
+        return new NamespacedRule(context, fallback, Map.copyOf(rules));
     }
 
-    record NamespacedRule(SurfaceRules.Context context, SurfaceRules.SurfaceRule baseRule, Map<String, SurfaceRules.SurfaceRule> rules) implements SurfaceRules.SurfaceRule
+    record NamespacedRule(MaterialRuleContext context, RuleEvaluator baseRule, Map<String, RuleEvaluator> rules) implements RuleEvaluator
     {
         public BlockState tryApply(int x, int y, int z)
         {
             BlockState state = null;
 
-            if (context.getBiome().is(key -> this.rules.containsKey(key.identifier().getNamespace())))
-                state = this.rules.get(context.getBiome().unwrapKey().get().identifier().getNamespace()).tryApply(x, y, z);
+            var key = context.getBiome().unwrapKey();
+            RuleEvaluator rule = key.map(biomeResourceKey -> this.rules.get(biomeResourceKey.identifier().getNamespace())).orElse(null);
+            if (rule != null)
+                state = rule.tryApply(x, y, z);
 
             if (state == null)
                 state = this.baseRule.tryApply(x, y, z);

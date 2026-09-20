@@ -23,8 +23,8 @@
     "mixins": [],
     "depends": {
       "fabricloader": "*",
-      "fabric": "*",
-      "minecraft": "26.1.x",
+      "fabric-api": "*",
+      "minecraft": "26.3",
       "java": ">=25",
       "terrablender": "*"
     }

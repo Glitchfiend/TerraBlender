@@ -41,6 +41,6 @@ public class TestMod implements ModInitializer, TerraBlenderApi
         Regions.register(new TestRegion2(Identifier.fromNamespaceAndPath(MOD_ID, "overworld_2"), 2));
 
         // Register our surface rules
-        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TestSurfaceRuleData.makeRules());
+        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TestSurfaceRuleData.SURFACE);
     }
 }

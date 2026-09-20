@@ -17,22 +17,20 @@
  */
 package terrablender.mixin;
 
-import com.mojang.datafixers.util.Either;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
-import net.minecraft.world.level.biome.MultiNoiseBiomeSourceParameterList;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import terrablender.worldgen.IExtendedMultiNoiseBiomeSource;
 import terrablender.worldgen.IExtendedParameterList;
 
@@ -44,10 +42,18 @@ public abstract class MixinMultiNoiseBiomeSource implements IExtendedMultiNoiseB
     @Shadow(remap = false)
     public abstract Climate.ParameterList<Holder<Biome>> parameters();
 
-    @Inject(method="getNoiseBiome(IIILnet/minecraft/world/level/biome/Climate$Sampler;)Lnet/minecraft/core/Holder;", at=@At("HEAD"), cancellable = true, remap = false)
-    public void getNoiseBiome(int x, int y, int z, Climate.Sampler sampler, CallbackInfoReturnable<Holder<Biome>> cir)
+    @WrapOperation(method = "/^lambda\\$createResolver\\$.*/", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/biome/MultiNoiseBiomeSource;getNoiseBiome(Lnet/minecraft/world/level/biome/Climate$TargetPoint;)Lnet/minecraft/core/Holder;"), remap = false)
+    private Holder<Biome> getNoiseBiome(MultiNoiseBiomeSource source, Climate.TargetPoint target, Operation<Holder<Biome>> original, @Local(argsOnly = true, ordinal = 0) int x, @Local(argsOnly = true, ordinal = 1) int y, @Local(argsOnly = true, ordinal = 2) int z)
     {
-        cir.setReturnValue(((IExtendedParameterList<Holder<Biome>>)this.parameters()).findValuePositional(sampler.sample(x, y, z), x, y, z));
+        IExtendedParameterList<Holder<Biome>> parameters = (IExtendedParameterList<Holder<Biome>>)this.parameters();
+        return parameters.isInitialized() ? parameters.findValuePositional(target, x, y, z) : original.call(source, target);
+    }
+
+    @WrapOperation(method = "/^lambda\\$createResolverForChunk\\$.*/", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/biome/MultiNoiseBiomeSource;getNoiseBiome(Lnet/minecraft/world/level/biome/Climate$TargetPoint;)Lnet/minecraft/core/Holder;"), remap = false)
+    private Holder<Biome> getNoiseBiomeForChunk(MultiNoiseBiomeSource source, Climate.TargetPoint target, Operation<Holder<Biome>> original, @Local(argsOnly = true, ordinal = 3) int x, @Local(argsOnly = true, ordinal = 4) int y, @Local(argsOnly = true, ordinal = 5) int z)
+    {
+        IExtendedParameterList<Holder<Biome>> parameters = (IExtendedParameterList<Holder<Biome>>)this.parameters();
+        return parameters.isInitialized() ? parameters.findValuePositional(target, x, y, z) : original.call(source, target);
     }
 
     @Inject(method="addDebugInfo", at =@At("TAIL"), remap = false)

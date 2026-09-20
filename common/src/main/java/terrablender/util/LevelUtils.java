@@ -33,7 +33,7 @@ import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import terrablender.DimensionTypeTags;
 import terrablender.api.RegionType;
 import terrablender.api.Regions;
-import terrablender.api.SurfaceRuleManager;
+import terrablender.api.MaterialRuleManager;
 import terrablender.core.TerraBlender;
 import terrablender.worldgen.IExtendedBiomeSource;
 import terrablender.worldgen.IExtendedNoiseGeneratorSettings;
@@ -51,7 +51,7 @@ public class LevelUtils
         Registry<Biome> biomeRegistry = registryAccess.lookupOrThrow(Registries.BIOME);
         long seed = server.getWorldGenSettings().options().seed();
 
-        SurfaceRuleManager.repopulateRules(registryAccess);
+        MaterialRuleManager.repopulateRules(registryAccess);
 
         for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : levelStemRegistry.entrySet())
         {
@@ -87,7 +87,7 @@ public class LevelUtils
         if (chunkGenerator.getBiomeSource() instanceof TheEndBiomeSource)
         {
             ((IExtendedTheEndBiomeSource)chunkGenerator.getBiomeSource()).initializeForTerraBlender(registryAccess, seed);
-            ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(SurfaceRuleManager.RuleCategory.END);
+            ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(MaterialRuleManager.RuleCategory.END);
             return;
         }
 
@@ -98,9 +98,9 @@ public class LevelUtils
             return;
 
         // Set the chunk generator settings' region type
-        SurfaceRuleManager.RuleCategory ruleCategory = switch(regionType) {
-            case OVERWORLD -> SurfaceRuleManager.RuleCategory.OVERWORLD;
-            case NETHER -> SurfaceRuleManager.RuleCategory.NETHER;
+        MaterialRuleManager.RuleCategory ruleCategory = switch(regionType) {
+            case OVERWORLD -> MaterialRuleManager.RuleCategory.OVERWORLD;
+            case NETHER -> MaterialRuleManager.RuleCategory.NETHER;
             default -> throw new IllegalArgumentException("Attempted to get surface rule category for unsupported region type " + regionType);
         };
         ((IExtendedNoiseGeneratorSettings)(Object)generatorSettings).setRuleCategory(ruleCategory);

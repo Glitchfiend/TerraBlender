@@ -17,33 +17,49 @@
  */
 package terrablender.example;
 
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.placement.CaveSurface;
+import net.minecraft.world.level.levelgen.material.MaterialRules;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 
 public class TestSurfaceRuleData
 {
-    private static final SurfaceRules.RuleSource DIRT = makeStateRule(Blocks.DIRT);
-    private static final SurfaceRules.RuleSource GRASS_BLOCK = makeStateRule(Blocks.GRASS_BLOCK);
-    private static final SurfaceRules.RuleSource RED_TERRACOTTA = makeStateRule(Blocks.RED_TERRACOTTA);
-    private static final SurfaceRules.RuleSource BLUE_TERRACOTTA = makeStateRule(Blocks.BLUE_TERRACOTTA);
+    public static final ResourceKey<MaterialRule> SURFACE = ResourceKey.create(Registries.MATERIAL_RULE, Identifier.fromNamespaceAndPath(TestMod.MOD_ID, "surface"));
 
-    protected static SurfaceRules.RuleSource makeRules()
+    public static void bootstrap(BootstrapContext<MaterialRule> context)
     {
-        SurfaceRules.ConditionSource isAtOrAboveWaterLevel = SurfaceRules.waterBlockCheck(-1, 0);
-        SurfaceRules.RuleSource grassSurface = SurfaceRules.sequence(SurfaceRules.ifTrue(isAtOrAboveWaterLevel, GRASS_BLOCK), DIRT);
+        context.register(SURFACE, makeRules(context.lookup(Registries.BIOME)));
+    }
 
-        return SurfaceRules.sequence(
-            SurfaceRules.ifTrue(SurfaceRules.isBiome(TestBiomes.HOT_RED), RED_TERRACOTTA),
-            SurfaceRules.ifTrue(SurfaceRules.isBiome(TestBiomes.COLD_BLUE), BLUE_TERRACOTTA),
+    private static final MaterialRule DIRT = makeStateRule(Blocks.DIRT);
+    private static final MaterialRule GRASS_BLOCK = makeStateRule(Blocks.GRASS_BLOCK);
+    private static final MaterialRule RED_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.red());
+    private static final MaterialRule BLUE_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.blue());
+
+    protected static MaterialRule makeRules(HolderGetter<Biome> biomes)
+    {
+        MaterialCondition isAtOrAboveWaterLevel = MaterialRules.waterBlockCheck(-1, 0);
+        MaterialRule grassSurface = MaterialRules.sequence(MaterialRules.ifTrue(isAtOrAboveWaterLevel, GRASS_BLOCK), DIRT);
+
+        return MaterialRules.sequence(
+            MaterialRules.ifTrue(MaterialRules.isBiome(biomes, TestBiomes.HOT_RED), RED_TERRACOTTA),
+            MaterialRules.ifTrue(MaterialRules.isBiome(biomes, TestBiomes.COLD_BLUE), BLUE_TERRACOTTA),
 
             // Default to a grass and dirt surface
-            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, grassSurface)
+            MaterialRules.ifTrue(MaterialRules.stoneDepthCheck(0, false, CaveSurface.FLOOR), grassSurface)
         );
     }
 
-    private static SurfaceRules.RuleSource makeStateRule(Block block)
+    private static MaterialRule makeStateRule(Block block)
     {
-        return SurfaceRules.state(block.defaultBlockState());
+        return MaterialRules.state(block.defaultBlockState());
     }
 }

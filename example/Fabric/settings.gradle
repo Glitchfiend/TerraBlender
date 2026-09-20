@@ -10,3 +10,12 @@ pluginManagement {
 }
 
 rootProject.name = 'Example'
+
+// Use -PlocalTerraBlender to develop the example against the adjacent working copy.
+if (providers.gradleProperty('localTerraBlender').isPresent()) {
+    includeBuild('../..') {
+        dependencySubstitution {
+            substitute module('com.github.glitchfiend:TerraBlender-fabric') using project(':Fabric')
+        }
+    }
+}

@@ -45,7 +45,7 @@ public class TestMod
             Regions.register(new TestRegion2(new ResourceLocation(MOD_ID, "overworld_2"), 2));
 
             // Register our surface rules
-            SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TestSurfaceRuleData.makeRules());
+            SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TestSurfaceRuleData::makeRules);
         });
     }
 }

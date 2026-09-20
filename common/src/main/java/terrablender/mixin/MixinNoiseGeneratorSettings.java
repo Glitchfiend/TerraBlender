@@ -19,17 +19,14 @@ package terrablender.mixin;
 
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.core.Holder;
-import net.minecraft.world.level.levelgen.material.MaterialRules;
 import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
-import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import terrablender.api.RegionType;
-import terrablender.api.SurfaceRuleManager;
+import terrablender.api.MaterialRuleManager;
 import terrablender.worldgen.IExtendedNoiseGeneratorSettings;
 
 @Mixin(NoiseGeneratorSettings.class)
@@ -39,7 +36,7 @@ public class MixinNoiseGeneratorSettings implements IExtendedNoiseGeneratorSetti
     private Holder<MaterialRule> materialRule;
 
     @Unique
-    private SurfaceRuleManager.RuleCategory ruleCategory = null;
+    private MaterialRuleManager.RuleCategory ruleCategory = null;
     @Unique
     private Holder<MaterialRule> namespacedSurfaceRuleSource = null;
 
@@ -49,14 +46,14 @@ public class MixinNoiseGeneratorSettings implements IExtendedNoiseGeneratorSetti
         if (this.ruleCategory != null)
         {
             if (this.namespacedSurfaceRuleSource == null)
-                this.namespacedSurfaceRuleSource = Holder.direct(SurfaceRuleManager.getNamespacedRules(this.ruleCategory, new MaterialRule.HolderHolder(this.materialRule)));
+                this.namespacedSurfaceRuleSource = Holder.direct(MaterialRuleManager.getNamespacedRules(this.ruleCategory, new MaterialRule.HolderHolder(this.materialRule)));
 
             cir.setReturnValue(this.namespacedSurfaceRuleSource);
         }
     }
 
     @Override
-    public void setRuleCategory(SurfaceRuleManager.RuleCategory ruleCategory)
+    public void setRuleCategory(MaterialRuleManager.RuleCategory ruleCategory)
     {
         this.ruleCategory = ruleCategory;
         this.namespacedSurfaceRuleSource = null;

@@ -17,9 +17,9 @@
  */
 package terrablender.worldgen;
 
-import terrablender.api.SurfaceRuleManager;
+import terrablender.api.MaterialRuleManager;
 
 public interface IExtendedNoiseGeneratorSettings
 {
-    void setRuleCategory(SurfaceRuleManager.RuleCategory ruleCategory);
+    void setRuleCategory(MaterialRuleManager.RuleCategory ruleCategory);
 }
