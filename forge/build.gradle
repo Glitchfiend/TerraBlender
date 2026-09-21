@@ -59,6 +59,7 @@ curseforge {
 
         releaseType = release_channel
         addGameVersion minecraft_version
+        addGameVersion 'Forge'
         addGameVersion 'Client'
         addGameVersion 'Server'
 
