@@ -74,6 +74,8 @@ curseforge {
         releaseType = release_channel
         addGameVersion minecraft_version
         addGameVersion 'NeoForge' // NeoForge isn't auto-detected and must be manually specified
+        addGameVersion 'Client'
+        addGameVersion 'Server'
 
         mainArtifact(jar) {
             displayName = "TerraBlender NeoForge ${version}"

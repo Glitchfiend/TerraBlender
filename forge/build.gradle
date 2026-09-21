@@ -59,6 +59,8 @@ curseforge {
 
         releaseType = release_channel
         addGameVersion minecraft_version
+        addGameVersion 'Client'
+        addGameVersion 'Server'
 
         mainArtifact(jar) {
             displayName = "TerraBlender Forge ${version}"
