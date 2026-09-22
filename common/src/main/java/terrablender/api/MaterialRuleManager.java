@@ -17,10 +17,8 @@
  */
 package terrablender.api;
 
-import net.minecraft.core.HolderGetter;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 import terrablender.worldgen.surface.MaterialRuleResolver;
 
@@ -108,11 +106,12 @@ public class MaterialRuleManager
      * Get the material rules to be added to a given stage.
      * @param category the category of the material rules.
      * @param ruleStage the stage of the material rules.
+     * @param registries the world registries.
      * @return list of the material rules to be added.
      */
-    public static List<MaterialRule> getDefaultRuleAdditionsForStage(RuleCategory category, RuleStage ruleStage, HolderGetter<Biome> biomes)
+    public static List<MaterialRule> getDefaultRuleAdditionsForStage(RuleCategory category, RuleStage ruleStage, RegistryAccess registries)
     {
-        return MaterialRuleResolver.getDefaultRuleAdditionsForStage(category, ruleStage, biomes);
+        return MaterialRuleResolver.getDefaultRuleAdditionsForStage(category, ruleStage, registries);
     }
 
     /**
@@ -147,5 +146,5 @@ public class MaterialRuleManager
         BEFORE_BEDROCK, AFTER_BEDROCK
     }
 
-    public interface RuleBuilder extends Function<HolderGetter<Biome>, MaterialRule> {}
+    public interface RuleBuilder extends Function<RegistryAccess, MaterialRule> {}
 }

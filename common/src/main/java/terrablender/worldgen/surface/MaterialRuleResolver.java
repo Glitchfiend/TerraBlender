@@ -28,7 +28,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.material.VanillaMaterialRules;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.material.MaterialRules;
 import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 import net.minecraft.world.level.levelgen.material.rule.SequenceRule;
@@ -55,7 +54,7 @@ public class MaterialRuleResolver
     private static final Map<RuleCategory, Map<String, MaterialRule>> runtimeMaterialRules = Maps.newHashMap();
     private static final Map<RuleCategory, MaterialRule> defaultMaterialRules = Maps.newHashMap();
 
-    private static HolderGetter<Biome> biomeGetter;
+    private static RegistryAccess registryAccess;
 
     public static void addRules(RuleCategory category, String namespace, ResourceKey<MaterialRule> rules)
     {
@@ -116,9 +115,9 @@ public class MaterialRuleResolver
         return defaultSurfaceRuleInjections.get(category).values().stream().anyMatch(rules -> !rules.isEmpty());
     }
 
-    public static List<MaterialRule> getDefaultRuleAdditionsForStage(RuleCategory category, RuleStage ruleStage, HolderGetter<Biome> biomes)
+    public static List<MaterialRule> getDefaultRuleAdditionsForStage(RuleCategory category, RuleStage ruleStage, RegistryAccess registries)
     {
-        return defaultSurfaceRuleInjections.get(category).get(ruleStage).stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(p -> p.getSecond().apply(biomes)).collect(ImmutableList.toImmutableList());
+        return defaultSurfaceRuleInjections.get(category).get(ruleStage).stream().sorted(Comparator.comparing(Pair::getFirst, Comparator.reverseOrder())).map(p -> p.getSecond().apply(registries)).collect(ImmutableList.toImmutableList());
     }
 
     public static MaterialRule getDefaultRules(RuleCategory category)
@@ -131,25 +130,21 @@ public class MaterialRuleResolver
         MaterialRule override = defaultMaterialRules.get(category);
         if (override != null)
             return override;
-        if (biomeGetter == null && hasDefaultSurfaceRuleInjections(category))
+        if (registryAccess == null && hasDefaultSurfaceRuleInjections(category))
             throw new IllegalStateException("Called getDefaultRules for " + category + " before repopulateRules was called");
-        return withStages(category, base, biomeGetter);
+        return withStages(category, base, registryAccess);
     }
 
     public static void repopulateRules(RegistryAccess registries)
     {
-        repopulateRules(registries.lookupOrThrow(Registries.BIOME), registries.lookupOrThrow(Registries.MATERIAL_RULE));
-    }
-
-    private static void repopulateRules(HolderGetter<Biome> biomes, HolderGetter<MaterialRule> materialRules)
-    {
-        biomeGetter = biomes;
+        HolderGetter<MaterialRule> materialRules = registries.lookupOrThrow(Registries.MATERIAL_RULE);
+        registryAccess = registries;
         runtimeMaterialRules.clear();
         for (RuleCategory category : RuleCategory.values())
             runtimeMaterialRules.put(category, Maps.newHashMap());
 
         materialRuleBuilders.forEach((category, rules) -> rules.forEach((namespace, builder) -> {
-            runtimeMaterialRules.get(category).put(namespace, builder.apply(biomes));
+            runtimeMaterialRules.get(category).put(namespace, builder.apply(registries));
         }));
 
         materialRuleKeys.forEach((category, rules) -> rules.forEach((namespace, key) ->
@@ -158,15 +153,15 @@ public class MaterialRuleResolver
         defaultMaterialRules.putAll(
             defaultMaterialRuleBuilders.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                e -> e.getValue().apply(biomes)
+                e -> e.getValue().apply(registries)
             ))
         );
     }
 
-    public static MaterialRule withStages(RuleCategory category, MaterialRule vanilla, HolderGetter<Biome> biomes)
+    public static MaterialRule withStages(RuleCategory category, MaterialRule vanilla, RegistryAccess registries)
     {
-        List<MaterialRule> beforeBedrockRules = getDefaultRuleAdditionsForStage(category, RuleStage.BEFORE_BEDROCK, biomes);
-        List<MaterialRule> afterBedrockRules = getDefaultRuleAdditionsForStage(category, RuleStage.AFTER_BEDROCK, biomes);
+        List<MaterialRule> beforeBedrockRules = getDefaultRuleAdditionsForStage(category, RuleStage.BEFORE_BEDROCK, registries);
+        List<MaterialRule> afterBedrockRules = getDefaultRuleAdditionsForStage(category, RuleStage.AFTER_BEDROCK, registries);
         if (beforeBedrockRules.isEmpty() && afterBedrockRules.isEmpty())
             return vanilla;
 
