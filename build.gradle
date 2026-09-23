@@ -97,7 +97,7 @@ subprojects {
         it.options.release.set(25)
     }
 
-    // Declare capabilities on the outgoing configurations.
+    // Declare capabilities on the outgoing configurations
     // Read more about capabilities here: https://docs.gradle.org/current/userguide/component_capabilities.html#sec:declaring-additional-capabilities-for-a-local-component
     ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
         configurations."$variant".outgoing {
