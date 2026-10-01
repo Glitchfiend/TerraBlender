@@ -22,7 +22,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewDatapackRegistryEvent;
 import terrablender.api.data.RegionDefinition;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegistryBuilder;
@@ -44,9 +44,9 @@ public class InitializationHandler
         Regions.loadDataDrivenRegions(event.getServer().registryAccess());
     }
 
-    public static void onRegisterDataPackRegistries(DataPackRegistryEvent.NewRegistry event)
+    public static void onRegisterDataPackRegistries(NewDatapackRegistryEvent event)
     {
-        event.dataPackRegistry(Registries.REGION, RegionDefinition.CODEC);
+        event.worldRegistry(Registries.REGION, RegionDefinition.CODEC);
     }
 
     public static void onNewRegistry(NewRegistryEvent event)
