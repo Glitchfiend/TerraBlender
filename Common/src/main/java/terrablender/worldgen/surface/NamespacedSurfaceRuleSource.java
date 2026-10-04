@@ -55,15 +55,39 @@ public record NamespacedSurfaceRuleSource(SurfaceRules.RuleSource base, Map<Stri
         return new NamespacedRule(context, this.base.apply(context), rules.build());
     }
 
-    record NamespacedRule(SurfaceRules.Context context, SurfaceRules.SurfaceRule baseRule, Map<String, SurfaceRules.SurfaceRule> rules) implements SurfaceRules.SurfaceRule
+    static final class NamespacedRule implements SurfaceRules.SurfaceRule
     {
+        private final SurfaceRules.Context context;
+        private final SurfaceRules.SurfaceRule baseRule;
+        private final Map<String, SurfaceRules.SurfaceRule> rules;
+        private Holder<Biome> lastBiome;
+        private SurfaceRules.SurfaceRule lastRule;
+
+        NamespacedRule(SurfaceRules.Context context, SurfaceRules.SurfaceRule baseRule, Map<String, SurfaceRules.SurfaceRule> rules)
+        {
+            this.context = context;
+            this.baseRule = baseRule;
+            this.rules = rules;
+        }
+
         @Nullable
         public BlockState tryApply(int x, int y, int z)
         {
             Holder<Biome> biome = context.biome.get();
             BlockState state = null;
 
-            if (biome.is(key -> this.rules.containsKey(key.location().getNamespace())))
+            Class<?> holderType = biome.getClass();
+            if ((holderType == Holder.Reference.class || holderType == Holder.Direct.class) && biome.isBound())
+            {
+                if (biome != this.lastBiome)
+                {
+                    this.lastRule = biome.unwrapKey().map(key -> this.rules.get(key.location().getNamespace())).orElse(null);
+                    this.lastBiome = biome;
+                }
+                if (this.lastRule != null)
+                    state = this.lastRule.tryApply(x, y, z);
+            }
+            else if (biome.is(key -> this.rules.containsKey(key.location().getNamespace())))
                 state = this.rules.get(biome.unwrapKey().get().location().getNamespace()).tryApply(x, y, z);
 
             if (state == null)
