@@ -25,6 +25,7 @@ public class TerraBlenderConfig extends ConfigFile
     public final int netherRegionSize;
     public final int vanillaOverworldRegionWeight;
     public final int vanillaNetherRegionWeight;
+    public final boolean sortRegions;
 
     public TerraBlenderConfig(Path path)
     {
@@ -38,6 +39,7 @@ public class TerraBlenderConfig extends ConfigFile
         this.netherRegionSize = generationSettings.addNumber("The size of nether biome regions from each mod that uses TerraBlender.", "nether_region_size", 2, 2, 6);
         this.vanillaOverworldRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the overworld.", "vanilla_overworld_region_weight", 10, 0, Integer.MAX_VALUE);
         this.vanillaNetherRegionWeight = generationSettings.addNumber("The weighting of vanilla biome regions in the nether.", "vanilla_nether_region_weight", 10, 0, Integer.MAX_VALUE);
+        this.sortRegions = generationSettings.add("Order regions by name instead of by registration order, so the region order is the same on every launch.\nRegistration order can change between launches when mods register their regions in parallel, which changes the biome layout for the same seed.\nChanging this alters the biome layout of new chunks in existing worlds.", "sort_regions", false);
         this.addSubConfig("Generation settings", "generation_settings", generationSettings);
 
         this.save();
