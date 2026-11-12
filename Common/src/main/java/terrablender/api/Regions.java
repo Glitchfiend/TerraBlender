@@ -25,6 +25,7 @@ import terrablender.core.TerraBlender;
 import terrablender.worldgen.DefaultNetherRegion;
 import terrablender.worldgen.DefaultOverworldRegion;
 
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ public class Regions
 {
     private static Map<RegionType, LinkedHashMap<ResourceLocation, Region>> regions = Maps.newHashMap();
     private static Map<RegionType, Map<ResourceLocation, Integer>> indices = Maps.newHashMap();
+    private static Map<RegionType, Map<ResourceLocation, Integer>> explicitIndices = Maps.newHashMap();
+    private static final Comparator<ResourceLocation> NAME_ORDER = Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath);
 
     /**
      * Register a {@link Region}.
@@ -44,6 +47,13 @@ public class Regions
         regions.get(region.getType()).put(name, region);
         int index = regions.get(region.getType()).size() - 1;
         indices.get(region.getType()).put(name, index);
+
+        if (TerraBlender.CONFIG.sortRegions)
+        {
+            sort(region.getType());
+            index = indices.get(region.getType()).get(name);
+        }
+
         TerraBlender.LOGGER.info("Registered region " + name + " to index " + index + " for type " + region.getType());
     }
 
@@ -62,6 +72,13 @@ public class Regions
         // Clear the current regions and reconstruct the map
         regions.get(region.getType()).clear();
         entries.forEach(entry -> regions.get(region.getType()).put(entry.getKey(), entry.getValue()));
+
+        if (TerraBlender.CONFIG.sortRegions)
+        {
+            explicitIndices.get(region.getType()).put(name, index);
+            sort(region.getType());
+        }
+
         TerraBlender.LOGGER.info("Registered region " + name + " to index " + index + " for type " + region.getType());
     }
 
@@ -85,6 +102,13 @@ public class Regions
             return;
 
         regions.get(type).remove(name);
+
+        if (TerraBlender.CONFIG.sortRegions)
+        {
+            explicitIndices.get(type).remove(name);
+            sort(type);
+        }
+
         TerraBlender.LOGGER.info("Removed region " + name);
     }
 
@@ -130,6 +154,36 @@ public class Regions
         return regions.get(type).size();
     }
 
+    /**
+     * Reorders the regions of a type by name, so the order no longer depends on the order mods register in.
+     * The default region stays first and regions registered to a specified index keep that index.
+     * @param type the type of the regions.
+     */
+    private static void sort(RegionType type)
+    {
+        LinkedHashMap<ResourceLocation, Region> typedRegions = regions.get(type);
+        Map<ResourceLocation, Integer> typedExplicitIndices = explicitIndices.get(type);
+        List<Map.Entry<ResourceLocation, Region>> sorted = Lists.newArrayList();
+        List<Map.Entry<ResourceLocation, Region>> placed = Lists.newArrayList();
+        typedRegions.forEach((name, region) -> (typedExplicitIndices.containsKey(name) ? placed : sorted).add(Map.entry(name, region)));
+
+        sorted.sort(Comparator.<Map.Entry<ResourceLocation, Region>>comparingInt(entry -> entry.getValue() instanceof DefaultOverworldRegion || entry.getValue() instanceof DefaultNetherRegion ? 0 : 1)
+            .thenComparing(Map.Entry::getKey, NAME_ORDER));
+        placed.sort(Comparator.<Map.Entry<ResourceLocation, Region>>comparingInt(entry -> typedExplicitIndices.get(entry.getKey()))
+            .thenComparing(Map.Entry::getKey, NAME_ORDER));
+        placed.forEach(entry -> sorted.add(Math.min(typedExplicitIndices.get(entry.getKey()), sorted.size()), entry));
+
+        // Rebuild the region map and the indices in the new order
+        Map<ResourceLocation, Integer> typedIndices = indices.get(type);
+        typedRegions.clear();
+        typedIndices.clear();
+        for (int i = 0; i < sorted.size(); i++)
+        {
+            typedRegions.put(sorted.get(i).getKey(), sorted.get(i).getValue());
+            typedIndices.put(sorted.get(i).getKey(), i);
+        }
+    }
+
     static
     {
         // Initialize the maps for all regions
@@ -137,6 +191,7 @@ public class Regions
         {
             regions.put(type, Maps.newLinkedHashMap());
             indices.put(type, Maps.newHashMap());
+            explicitIndices.put(type, Maps.newHashMap());
         }
 
         register(new DefaultOverworldRegion(TerraBlender.CONFIG.vanillaOverworldRegionWeight));
