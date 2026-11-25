@@ -62,11 +62,14 @@ public class Area
 
             stamp = this.lock.writeLock();
 
-            int value = this.operator.apply(x, z);
-            this.keys[idx] = key;
-            this.values[idx] = value;
-
-            this.lock.unlockWrite(stamp);
+            int value;
+            try {
+                value = this.operator.apply(x, z);
+                this.keys[idx] = key;
+                this.values[idx] = value;
+            } finally {
+                this.lock.unlockWrite(stamp);
+            }
 
             return value;
         }
